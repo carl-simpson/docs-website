@@ -5,16 +5,23 @@ import './clipboard';
 import './components/search';
 import { initLazyLoading } from './components/lazyImages';
 import { initErrorLogging } from './components/errorLogging';
+import { initMobileMenu } from './components/mobileMenu';
 
 window.Alpine = Alpine;
 
 Alpine.plugin(Focus);
-Alpine.start();
 
 // Initialize error logging first to catch any subsequent errors
 initErrorLogging();
 
-document.addEventListener('DOMContentLoaded', () => {
+// Main initialization function
+function initApp() {
+    // Start Alpine after DOM is loaded to ensure x-data elements exist
+    Alpine.start();
+
+    // Initialize mobile menu (vanilla JS, no Alpine dependency)
+    initMobileMenu();
+
     // Initialize lazy loading for all images
     initLazyLoading();
 
@@ -32,5 +39,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Connect mobile menu search to desktop search functionality
+    const desktopSearchBtn = document.getElementById('header-search');
+    const mobileMenuSearch = document.getElementById('mobile-menu-search');
+
+    if (mobileMenuSearch && desktopSearchBtn) {
+        mobileMenuSearch.addEventListener('click', () => {
+            desktopSearchBtn.click();
+        });
+    }
+
     import('./components/accessibility');
-});
+}
+
+// Check if DOM is already loaded (module scripts defer by default)
+// If so, run immediately; otherwise wait for DOMContentLoaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    // DOM is already ready, run immediately
+    initApp();
+}

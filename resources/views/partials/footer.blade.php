@@ -3,21 +3,18 @@
         [
             'title' => 'Documentation',
             'links' => [
-                'Start Selling' => '/docs/start-selling',
-                'Manage Catalog' => '/docs/manage-catalog',
-                'Handle Orders' => '/docs/handle-orders',
-                'Grow Store' => '/docs/grow-store',
-                'Improve UX' => '/docs/improve-ux',
-                'Stay Compliant' => '/docs/stay-compliant',
+                'Start Selling' => '/merchant/start-selling',
+                'Manage Catalog' => '/merchant/manage-catalog',
+                'Handle Orders' => '/merchant/handle-orders',
+                'Grow Store' => '/merchant/grow-store',
+                'Improve UX' => '/merchant/improve-ux',
+                'Stay Compliant' => '/merchant/stay-compliant',
             ],
         ],
         [
             'title' => 'Resources',
             'links' => [
-                'Getting Started' => '/docs/getting-started',
-                'Support and Resources' => '/docs/support-and-resources',
-                'Troubleshooting' => '/docs/troubleshooting',
-                'Magento User Guide' => 'https://docs.magento.com/user-guide/',
+                'Getting Started' => '/merchant/getting-started',
                 'Magento StackExchange' => 'https://magento.stackexchange.com/',
             ],
         ],
@@ -29,22 +26,20 @@
                  'Magento Marketplace' => 'https://marketplace.magento.com/',
                  'Magento Blog' => 'https://magento.com/blog',
                  'GitHub' => 'https://github.com/magento/magento2',
-             ]
+             ],
          ],
         [
             'title' => 'Support',
             'links' => [
-                'Contact Support' => '/support',
-                'Report Issues' => '/issues',
-                'Feature Requests' => '/feature-requests',
-                'Developer Resources' => 'https://developer.adobe.com/commerce/',
+                'Contact Support' => 'https://github.com/magentoopensource/docs/issues',
+                'Report Issues' => 'https://github.com/magentoopensource/docs/issues',
                 'Community Resources' => 'https://community.magento.com/',
             ],
         ],
     ];
 @endphp
 
-<footer class="relative pt-12 bg-white border-t border-mine-shaft-500">
+<footer class="relative pt-12 bg-white border-t border-charcoal">
     <div class="max-w-[1440px] mx-auto w-full px-8">
         <div>
             <a href="/" class="inline-flex items-center">
@@ -57,13 +52,12 @@
                     <path d="M16.0862 26.2367L14.7883 26.9779L13.4492 26.2135V14.233L10.178 16.0975V27.3485L13.4492 29.213L14.7883 29.9773L16.0862 29.2362L19.4045 27.3485V16.0975L16.0862 14.2098V26.2367Z" fill="#F1BC1B"/>
                 </svg>
 
-                <span class="ml-3 text-xl font-inter-tight font-bold text-mine-shaft-500">Merchant Documentation</span>
-            </a>
+                <span class="ml-3 text-xl font-inter-tight font-bold text-charcoal">Merchant Documentation</span> </a>
         </div>
 
         <div class="mt-6 grid grid-cols-12 md:gap-x-8 gap-y-12 sm:mt-12">
             <div class="col-span-12 lg:col-span-4">
-                <p class="max-w-sm text-xs font-inter-tight text-mine-shaft-500 sm:text-sm">Your comprehensive guide to managing and growing your Magento 2 store. From setting up your first product to advanced marketing strategies, we provide clear, actionable documentation for merchants of all experience levels.</p>
+                <p class="max-w-sm text-xs font-inter-tight text-charcoal sm:text-sm">Your comprehensive guide to managing and growing your Magento 2 store. From setting up your first product to advanced marketing strategies, we provide clear, actionable documentation for merchants of all experience levels.</p>
                 <ul class="mt-6 flex items-center space-x-3">
                     <li>
                         <a href="https://github.com/magento/magento2" class="p-2 md:p-0">
@@ -74,12 +68,12 @@
             </div>
             @foreach ($links as $column)
                 <div class="text-xs col-span-6 md:col-span-3 lg:col-span-2">
-                    <span class="uppercase font-inter-tight text-mine-shaft-500 font-semibold">{{ $column['title'] }}</span>
+                    <span class="uppercase font-inter-tight text-charcoal font-semibold">{{ $column['title'] }}</span>
                     <div class="mt-5">
-                        <ul class="space-y-3.5 md:space-y-3 font-inter-tight text-mine-shaft-400">
+                        <ul class="space-y-3.5 md:space-y-3 font-inter-tight text-gray-darkest list-none">
                             @foreach ($column['links'] as $title => $href)
                                 <li>
-                                    <a href="{{ $href }}" class="transition-colors hover:text-figma-orange-500 py-1.5 md:py-1">{{ $title }}</a>
+                                    <a href="{{ $href }}" class="transition-colors no-underline hover:text-orange py-1.5 md:py-1">{{ $title }}</a>
                                 </li>
                             @endforeach
                         </ul>
@@ -87,13 +81,13 @@
                 </div>
             @endforeach
         </div>
-        <div class="mt-10 border-t pt-6 pb-16 border-mine-shaft-500">
-            <p class="text-xs font-inter-tight text-mine-shaft-500">
+        <div class="mt-10 border-t pt-6 pb-16 border-charcoal">
+            <p class="text-xs font-inter-tight text-charcoal">
                 © {{ now()->format('Y') }} Magento 2 Merchant Documentation
                 Magento® is a registered trademark of Adobe Inc.
             </p>
-            <p class="mt-6 text-xs font-inter-tight text-mine-shaft-500">
-                This documentation provides guidance for Magento 2 merchants and store owners. For developer documentation, visit the <a href="https://developer.adobe.com/commerce/" class="text-figma-orange-700 hover:text-figma-orange-500 transition-colors">official developer documentation</a>.
+            <p class="mt-6 text-xs font-inter-tight text-charcoal">
+                This documentation provides guidance for Magento 2 merchants and store owners. For developer documentation, visit the <a href="https://developer.adobe.com/commerce/" class="text-red hover:text-orange transition-colors">official developer documentation</a>.
             </p>
         </div>
     </div>

@@ -292,7 +292,7 @@
     "src": "node_modules/mermaid/dist/timeline-definition-46a17596.js"
   },
   "resources/css/app.css": {
-    "file": "assets/app-98273d73.css",
+    "file": "assets/app-966feecc.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },
@@ -302,7 +302,7 @@
       "_mermaid-2a128eb4.js",
       "resources/js/components/accessibility.js"
     ],
-    "file": "assets/app-89041803.js",
+    "file": "assets/app-a126197d.js",
     "imports": [
       "_mermaid-2a128eb4.js",
       "_alpine-104cb9f9.js",

@@ -24,7 +24,17 @@ class DocsController extends Controller
      */
     public function showRootPage()
     {
-        $categories = $this->navigationParser->getCategories();
+        $categories = $this->navigationParser->getCategories()
+            ->map(function ($category) {
+                // Limit each category to max 4 articles
+                $category['articles'] = array_slice($category['articles'], 0, 4);
+
+                // Add metadata (description, color, etc.)
+                $metadata = $this->getCategoryMetadata($category['slug']);
+                $category['description'] = $metadata['description'];
+
+                return $category;
+            });
 
         return view("homepage", [
             "title" => "Merchant Documentation",
@@ -41,7 +51,12 @@ class DocsController extends Controller
      */
     public function showDocsIndex()
     {
-        $categories = $this->navigationParser->getCategories();
+        $categories = $this->navigationParser->getCategories()
+            ->map(function ($category) {
+                // Limit each category to max 4 articles
+                $category['articles'] = array_slice($category['articles'], 0, 4);
+                return $category;
+            });
 
         return view("docs-index", [
             "title" => "Documentation Index",
@@ -108,7 +123,7 @@ class DocsController extends Controller
 
         $canonical = null;
         if ($this->docs->sectionExists($sectionPage)) {
-            $canonical = "docs/" . $sectionPage;
+            $canonical = "merchant/" . $sectionPage;
         }
 
         // Get category articles for left sidebar
@@ -171,43 +186,21 @@ class DocsController extends Controller
             ];
         });
 
-        // Use new Blade template for start-selling category
-        if ($category === "start-selling") {
-            return view("category.start-selling", [
-                "title" => $categoryData["name"] . " - Merchant Documentation",
-                "metaTitle" =>
-                    $categoryData["name"] . " - " . self::DEFAULT_META_TITLE,
-                "metaDescription" =>
-                    "Learn how to start selling with Magento 2",
-                "metaKeywords" => self::DEFAULT_META_KEYWORDS,
-                "canonical" => "docs/" . $category,
-                "category" => $categoryData,
-                "articles" => $articlesWithMetadata,
-            ]);
-        }
-
-        // Get category metadata (icons, colors, etc.)
+        // Get category metadata (icons, colors, etc.) for potential future use
         $categoryMeta = $this->getCategoryMetadata($category);
 
-        // Fallback to original category view for other categories
-        return view("category", [
+        // Use unified category view for all categories
+        return view("category.show", [
             "title" => $categoryData["name"] . " - Merchant Documentation",
-            "category_title" => $categoryData["name"],
-            "category_description" =>
-                $categoryMeta["description"] ??
-                "Learn about " . $categoryData["name"],
-            "category_color" => $categoryMeta["color"] ?? "bg-blue-100",
-            "category_icon" => $categoryMeta["icon"],
-            "articles" => $articlesWithMetadata->toArray(),
-            "related_categories" => $this->getRelatedCategories($category),
-            "quick_start_url" => "/merchant/getting-started/store-setup-overview",
             "metaTitle" =>
                 $categoryData["name"] . " - " . self::DEFAULT_META_TITLE,
             "metaDescription" =>
                 $categoryMeta["description"] ??
                 "Learn about " . $categoryData["name"],
             "metaKeywords" => self::DEFAULT_META_KEYWORDS,
-            "canonical" => "docs/" . $category,
+            "canonical" => "merchant/" . $category,
+            "category" => $categoryData,
+            "articles" => $articlesWithMetadata,
         ]);
     }
 

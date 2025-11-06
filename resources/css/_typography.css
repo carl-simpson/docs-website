@@ -8,42 +8,42 @@
 @layer base {
     /* Headings - Using Inter Tight and design system tokens */
     h1 {
-        @apply text-4xl font-bold leading-tight text-mine-shaft-500 mb-6 font-inter-tight scroll-mt-24;
+        @apply text-4xl font-bold leading-tight text-charcoal mb-6 font-inter-tight scroll-mt-24;
     }
 
     h2 {
-        @apply text-3xl font-semibold leading-snug text-mine-shaft-500 mt-12 mb-6 font-inter-tight scroll-mt-24;
+        @apply text-3xl font-semibold leading-snug text-charcoal mt-12 mb-6 font-inter-tight scroll-mt-24;
     }
 
     h3 {
-        @apply text-2xl font-semibold leading-snug text-mine-shaft-500 mt-10 mb-4 font-inter-tight scroll-mt-24;
+        @apply text-2xl font-semibold leading-snug text-charcoal mt-10 mb-4 font-inter-tight scroll-mt-24;
     }
 
     h4 {
-        @apply text-xl font-semibold leading-snug text-mine-shaft-500 mt-8 mb-4 font-inter-tight scroll-mt-24;
+        @apply text-xl font-semibold leading-snug text-charcoal mt-8 mb-4 font-inter-tight scroll-mt-24;
     }
 
     h5 {
-        @apply text-lg font-semibold leading-normal text-mine-shaft-500 mt-6 mb-3 font-inter-tight scroll-mt-24;
+        @apply text-lg font-semibold leading-normal text-charcoal mt-6 mb-3 font-inter-tight scroll-mt-24;
     }
 
     h6 {
-        @apply text-base font-semibold leading-normal text-mine-shaft-400 mt-6 mb-3 font-inter-tight uppercase tracking-wide scroll-mt-24;
+        @apply text-base font-semibold leading-normal text-gray-darkest mt-6 mb-3 font-inter-tight uppercase tracking-wide scroll-mt-24;
     }
 
     /* Paragraphs */
     p {
-        @apply text-base leading-relaxed text-mine-shaft-500 mb-6 font-inter-tight;
+        @apply text-base leading-relaxed text-charcoal mb-6 font-inter-tight;
     }
 
     /* Links */
     a {
-        @apply text-figma-orange-700 underline decoration-from-font hover:text-figma-orange-500 transition-colors duration-200;
+        @apply text-red underline decoration-from-font hover:text-orange transition-colors duration-200;
     }
 
     /* Strong/Bold */
     strong {
-        @apply font-semibold text-mine-shaft-500;
+        @apply font-semibold text-charcoal;
     }
 
     /* Lists */
@@ -52,12 +52,17 @@
     }
 
     ul > li {
-        @apply text-base leading-relaxed text-mine-shaft-500 font-inter-tight flex gap-2 items-start;
+        @apply text-base leading-relaxed text-charcoal font-inter-tight flex gap-2 items-start;
     }
 
     ul > li::before {
         content: "•";
         @apply flex-shrink-0 w-3.5;
+    }
+
+    /* Remove bullets from footer lists */
+    footer ul > li::before {
+        content: none;
     }
 
     /* Nested lists need block display */
@@ -71,13 +76,18 @@
         @apply inline mr-2;
     }
 
+    footer ul > li:has(ol)::before,
+    footer ul > li:has(ul)::before {
+        content: none;
+    }
+
     ol {
         @apply list-none pl-0 mb-6 space-y-1;
         counter-reset: item;
     }
 
     ol > li {
-        @apply text-base leading-relaxed text-mine-shaft-500 font-inter-tight flex gap-2 items-start;
+        @apply text-base leading-relaxed text-charcoal font-inter-tight flex gap-2 items-start;
         counter-increment: item;
     }
 
@@ -86,12 +96,89 @@
         @apply flex-shrink-0 w-5;
     }
 
-    /* Nested list indentation */
+    /* Ordered list items with nested lists also need block display */
+    ol > li:has(ol),
+    ol > li:has(ul) {
+        @apply block;
+    }
+
+    ol > li:has(ol)::before,
+    ol > li:has(ul)::before {
+        @apply inline mr-2;
+    }
+
+    /* Alternative approach: directly target list items containing nested lists */
+    li > ul,
+    li > ol {
+        @apply mt-0 mb-2 ml-7;
+    }
+
+    /* Parent list items containing nested lists must be block */
+    li:has(> ul),
+    li:has(> ol) {
+        display: block !important;
+    }
+
+    li:has(> ul)::before,
+    li:has(> ol)::before {
+        display: inline !important;
+        margin-right: 0.5rem !important;
+    }
+
+    /* Nested list indentation - Level 2 */
     ul ul,
     ul ol,
     ol ul,
     ol ol {
-        @apply mt-2 mb-2 ml-7;
+        @apply mt-0 mb-2 ml-7;
+    }
+
+    /* Nested list indentation - Level 3 */
+    ul ul ul,
+    ul ul ol,
+    ul ol ul,
+    ul ol ol,
+    ol ul ul,
+    ol ul ol,
+    ol ol ul,
+    ol ol ol {
+        @apply mt-0 mb-2 ml-7;
+    }
+
+    /* Nested list indentation - Level 4 */
+    ul ul ul ul,
+    ul ul ul ol,
+    ul ul ol ul,
+    ul ul ol ol,
+    ul ol ul ul,
+    ul ol ul ol,
+    ul ol ol ul,
+    ul ol ol ol,
+    ol ul ul ul,
+    ol ul ul ol,
+    ol ul ol ul,
+    ol ul ol ol,
+    ol ol ul ul,
+    ol ol ul ol,
+    ol ol ol ul,
+    ol ol ol ol {
+        @apply mt-0 mb-2 ml-7;
+    }
+
+    /* Different bullet styles for nested levels */
+    ul ul > li::before {
+        content: "◦";
+        /* Hollow circle for level 2 */
+    }
+
+    ul ul ul > li::before {
+        content: "▪";
+        /* Square for level 3 */
+    }
+
+    ul ul ul ul > li::before {
+        content: "‣";
+        /* Triangle for level 4 */
     }
 
     /* Reset counter for nested ordered lists */
@@ -99,9 +186,17 @@
         counter-reset: item;
     }
 
+    ol ol ol {
+        counter-reset: item;
+    }
+
+    ol ol ol ol {
+        counter-reset: item;
+    }
+
     /* Inline Code */
     code {
-        @apply inline font-mono text-sm bg-gray-100 text-mine-shaft-500 px-2 py-0.5 rounded border border-alabaster-600;
+        @apply inline font-mono text-sm bg-gray-100 text-charcoal px-2 py-0.5 rounded border border-gray-light;
         white-space: nowrap;
     }
 
@@ -130,7 +225,7 @@
 
     /* Blockquotes */
     blockquote {
-        @apply border-l-4 border-flamingo-400 pl-4 py-2 my-6 italic text-mine-shaft-400;
+        @apply border-l-4 border-orange pl-4 py-2 my-6 italic text-gray-darkest;
     }
 
     blockquote p {

@@ -44,12 +44,8 @@ add('writable_dirs', [
 ]);
 
 // Tasks
-desc('Build assets');
-task('deploy:build', function () {
-    cd('{{release_path}}');
-    run('npm ci');
-    run('npm run build');
-});
+// Note: Assets are built in GitHub Actions before deployment
+// No need to build on production server
 
 desc('Sync external documentation');
 task('deploy:sync-docs', function () {
@@ -68,17 +64,38 @@ task('deploy:optimize', function () {
     run('php artisan view:cache');
 });
 
+desc('Clear PHP OPcache');
+task('deploy:clear-opcache', function () {
+    $script = <<<'PHP'
+<?php
+if (function_exists('opcache_reset')) {
+    opcache_reset();
+    echo "OPcache cleared\n";
+} else {
+    echo "OPcache not enabled\n";
+}
+PHP;
+
+    // Create temporary script
+    run("echo '$script' > {{release_path}}/public/clear-opcache-temp.php");
+
+    // Execute it via HTTP to clear OPcache
+    run('curl -s http://localhost/clear-opcache-temp.php || curl -s https://docs.magento-opensource.com/clear-opcache-temp.php');
+
+    // Remove temporary script
+    run('rm -f {{release_path}}/public/clear-opcache-temp.php');
+});
+
 // Hooks
-after('deploy:vendors', 'deploy:build');
 after('deploy:symlink', 'deploy:sync-docs');
 after('deploy:sync-docs', 'deploy:optimize');
+after('deploy:optimize', 'deploy:clear-opcache');
 
 // Main deployment flow
 desc('Deploy the application');
 task('deploy', [
     'deploy:prepare',
     'deploy:vendors',
-    'deploy:build',
     'deploy:publish',
 ]);
 

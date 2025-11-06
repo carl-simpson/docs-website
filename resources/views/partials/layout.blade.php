@@ -15,6 +15,9 @@
     <meta name="description" content="{{ $metaDescription }}">
     <meta name="keywords" content="{{ $metaKeywords }}">
 
+    <!-- Algolia Site Verification -->
+    <meta name="algolia-site-verification" content="2D7B67D7596729A9" />
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ $canonical ? url($canonical) : url('/') }}">
@@ -30,11 +33,10 @@
     <meta property="twitter:image" content="{{ url('/img/merchant-docs-og.png') }}">
 
     <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon/favicon-16x16.png">
     <link rel="manifest" href="/img/favicon/site.webmanifest">
-    <link rel="mask-icon" href="/img/favicon/safari-pinned-tab.svg" color="#FF6700">
     <meta name="msapplication-TileColor" content="#FF6700">
     <meta name="msapplication-config" content="/img/favicon/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
@@ -72,6 +74,8 @@
 <body
     x-data="{
         navIsOpen: false,
+        closeNav() { this.navIsOpen = false; },
+        toggleNav() { this.navIsOpen = !this.navIsOpen; },
     }"
     class="w-full h-full font-sans antialiased text-gray-900 language-php bg-white"
 >
@@ -94,6 +98,7 @@
     style="display: none;"
     data-algolia-app-id="{{ config('algolia.connections.main.id', '') }}"
     data-algolia-search-key="{{ config('algolia.connections.main.search_key', '') }}"
+    data-algolia-index-name="{{ config('algolia.connections.main.index_name', 'devmage-os') }}"
     data-version="main"
 ></div>
 

@@ -2,10 +2,10 @@
 
 @section('content')
 <div class="relative bg-white">
-    <div class="mx-auto max-w-[1440px] px-6 lg:px-8">
+    <div class="mx-auto max-w-[1440px]">
         <div class="flex py-8">
             {{-- Left Sidebar: Category Articles --}}
-            <aside class="hidden lg:block w-[400px] flex-shrink-0 pr-8 lg:pr-12">
+            <aside class="hidden lg:block w-[400px] flex-shrink-0 pr-[120px]">
                 <div class="sticky top-24">
                     {{-- Category Header --}}
                     <div class="mb-6">
@@ -50,7 +50,7 @@
             </aside>
 
             {{-- Main Content Area --}}
-            <main class="flex-1 min-w-0">
+            <main class="flex-1 min-w-0 px-4 sm:px-6 lg:px-0">
                 {{-- Documentation Content --}}
                 <article class="docs-content max-w-none">
                     {!! $content !!}
@@ -74,7 +74,7 @@
 
             {{-- Right Sidebar: Table of Contents --}}
             @if(count($tableOfContents) > 0)
-            <aside class="hidden xl:block w-64 flex-shrink-0 pl-8">
+            <aside class="hidden xl:block w-64 flex-shrink-0 pl-[30px]">
                 <div class="sticky top-24">
                     <div class="mb-4">
                         <h3 class="text-xs font-semibold text-gray-900 uppercase tracking-wider">
@@ -113,5 +113,82 @@
     </div>
 </div>
 
-{{-- No duplicate mobile menu here - mobile menu is in main-header.blade.php --}}
+{{-- Mobile Navigation Toggle (for smaller screens) --}}
+<div class="lg:hidden fixed bottom-4 right-4 z-50">
+    <button
+        data-mobile-menu-toggle
+        aria-label="Toggle navigation menu"
+        aria-expanded="false"
+        class="flex items-center gap-2 px-4 py-3 bg-orange-600 text-white rounded-full shadow-lg hover:bg-orange-700 transition-colors"
+    >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+        <span class="text-sm font-medium">Menu</span>
+    </button>
+</div>
+
+{{-- Mobile Navigation Overlay --}}
+<div
+    data-mobile-menu-overlay
+    class="hidden lg:hidden fixed inset-0 z-40 bg-gray-800 bg-opacity-50 transition-opacity duration-200"
+    aria-hidden="true"
+>
+    <div
+        data-mobile-menu-panel
+        aria-hidden="true"
+        class="hidden absolute right-0 top-0 bottom-0 w-80 max-w-full bg-white shadow-xl overflow-y-auto transform translate-x-full transition-transform duration-200 ease-out"
+    >
+        <div class="p-6">
+            {{-- Close Button --}}
+            <button
+                data-mobile-menu-close
+                aria-label="Close navigation menu"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+
+            {{-- Category Articles --}}
+            <div class="mb-8">
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">
+                    {{ ucwords(str_replace('-', ' ', $category)) }}
+                </h3>
+                <nav class="space-y-1">
+                    @foreach($categoryArticles as $article)
+                        <a
+                            href="/merchant/{{ $article['path'] }}"
+                            class="block px-3 py-2 text-sm rounded-lg transition-colors no-underline
+                                {{ $article['slug'] === $page ? 'bg-yellow text-charcoal font-medium' : 'text-gray-700 hover:bg-gray-50' }}"
+                        >
+                            {{ $article['title'] }}
+                        </a>
+                    @endforeach
+                </nav>
+            </div>
+
+            {{-- Table of Contents --}}
+            @if(count($tableOfContents) > 0)
+            <div class="pt-8 border-t border-gray-200">
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">
+                    On this page
+                </h3>
+                <nav class="space-y-2">
+                    @foreach($tableOfContents as $heading)
+                        <a
+                            href="#{{ $heading['slug'] }}"
+                            class="block text-sm transition-colors no-underline
+                                {{ $heading['level'] === 2 ? 'font-medium text-gray-700' : 'pl-4 text-gray-600' }}"
+                        >
+                            {{ $heading['text'] }}
+                        </a>
+                    @endforeach
+                </nav>
+            </div>
+            @endif
+        </div>
+    </div>
+</div>
 @endsection
