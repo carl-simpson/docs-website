@@ -16,6 +16,11 @@ test.describe('Navigation and Styling', () => {
     expect(response.status()).toBe(200);
   });
 
+  test('merchant category page loads', async ({ page }) => {
+    const response = await page.goto('http://localhost:8000/merchant/getting-started');
+    expect(response.status()).toBe(200);
+  });
+
   test('merchant article loads', async ({ page }) => {
     const response = await page.goto('http://localhost:8000/merchant/getting-started/tutorial-complete-store-setup-from-scratch');
     expect(response.status()).toBe(200);
@@ -35,7 +40,7 @@ test.describe('Navigation and Styling', () => {
 
   test('mobile menu button shows on smaller screens', async ({ page }) => {
     await page.goto('http://localhost:8000/merchant/getting-started/tutorial-complete-store-setup-from-scratch');
-    await page.setViewportSize({ width: 1024, height: 768 });
+    await page.setViewportSize({ width: 768, height: 1024 });
     const mobileMenuButton = page.locator('button:has-text("Menu")');
     await expect(mobileMenuButton).toBeVisible();
   });
