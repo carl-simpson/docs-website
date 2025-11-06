@@ -44,26 +44,26 @@
             </a>
         </div>
 
-        {{-- Mobile burger menu button (visible on mobile only) --}}
+        {{-- Mobile burger menu button (visible below lg breakpoint only) --}}
         <button
             @click="navIsOpen = !navIsOpen"
-            class="xl:hidden flex items-center justify-center w-10 h-10 text-charcoal hover:text-orange transition-colors"
+            class="lg:hidden flex items-center justify-center w-10 h-10 text-charcoal hover:text-orange transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2 rounded-md"
             aria-label="Toggle navigation menu"
             aria-expanded="false"
             x-bind:aria-expanded="navIsOpen.toString()"
         >
-            {{-- Hamburger icon --}}
-            <svg x-show="!navIsOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            {{-- Hamburger icon (3 horizontal bars) --}}
+            <svg x-show="!navIsOpen" class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 6H21M3 12H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            {{-- Close icon --}}
-            <svg x-show="navIsOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            {{-- Close icon (X) --}}
+            <svg x-show="navIsOpen" class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </button>
 
         {{-- Desktop Navigation and Search --}}
-        <div class="hidden xl:flex items-center gap-8">
+        <div class="hidden lg:flex items-center gap-8">
             {{-- Main Navigation --}}
             <nav class="flex flex-row gap-x-[30px] items-center justify-center">
                 <a href="/merchant/getting-started" class="font-inter-tight text-medium no-underline leading-[1.5] text-charcoal hover:text-orange transition-colors whitespace-nowrap">Getting Started</a>
@@ -99,7 +99,7 @@
     x-transition:leave-start="opacity-100"
     x-transition:leave-end="opacity-0"
     @click="navIsOpen = false"
-    class="fixed inset-0 bg-charcoal/50 z-40 lg:hidden"
+    class="fixed inset-0 bg-charcoal/50 z-40"
     aria-hidden="true"
 ></div>
 
@@ -113,7 +113,7 @@
     x-transition:leave="transition ease-in duration-200"
     x-transition:leave-start="transform translate-x-0"
     x-transition:leave-end="transform translate-x-full"
-    class="fixed top-0 right-0 h-full w-80 max-w-[85%] bg-white shadow-2xl z-50 lg:hidden overflow-y-auto"
+    class="fixed top-0 right-0 h-full w-80 max-w-[85%] bg-white shadow-2xl z-50 overflow-y-auto"
 >
     <div class="flex flex-col h-full">
         {{-- Mobile Menu Header --}}

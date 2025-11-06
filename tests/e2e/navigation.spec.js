@@ -41,7 +41,7 @@ test.describe('Navigation and Styling', () => {
   test('mobile menu button shows on smaller screens', async ({ page }) => {
     await page.goto('http://localhost:8000/merchant/getting-started/tutorial-complete-store-setup-from-scratch');
     await page.setViewportSize({ width: 768, height: 1024 });
-    const mobileMenuButton = page.locator('button:has-text("Menu")');
+    const mobileMenuButton = page.locator('button[aria-label="Toggle navigation menu"]');
     await expect(mobileMenuButton).toBeVisible();
   });
 
