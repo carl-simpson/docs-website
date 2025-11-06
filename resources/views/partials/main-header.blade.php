@@ -99,7 +99,7 @@
     x-transition:leave-start="opacity-100"
     x-transition:leave-end="opacity-0"
     @click="navIsOpen = false"
-    class="fixed inset-0 bg-charcoal/50 z-40"
+    class="hidden fixed inset-0 bg-charcoal/50 z-40"
     aria-hidden="true"
 ></div>
 
@@ -113,7 +113,7 @@
     x-transition:leave="transition ease-in duration-200"
     x-transition:leave-start="transform translate-x-0"
     x-transition:leave-end="transform translate-x-full"
-    class="fixed top-0 right-0 h-full w-80 max-w-[85%] bg-white shadow-2xl z-50 overflow-y-auto"
+    class="hidden fixed top-0 right-0 h-full w-80 max-w-[85%] bg-white shadow-2xl z-50 overflow-y-auto"
 >
     <div class="flex flex-col h-full">
         {{-- Mobile Menu Header --}}
