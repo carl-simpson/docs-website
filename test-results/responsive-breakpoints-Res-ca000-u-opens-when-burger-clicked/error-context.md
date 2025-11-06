@@ -1,0 +1,404 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e4]:
+      - generic [ref=e6]: Explore the Magento® Open Source Ecosystem
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - link "Magento Open Source" [ref=e9] [cursor=pointer]:
+            - /url: https://github.com/magento/magento2
+          - img [ref=e10]
+        - generic [ref=e13]:
+          - link "Magento Association" [ref=e14] [cursor=pointer]:
+            - /url: https://www.magentoassociation.org/home
+          - img [ref=e15]
+        - generic [ref=e18]:
+          - link "Meet Magento" [ref=e19] [cursor=pointer]:
+            - /url: https://www.meet-magento.com/
+          - img [ref=e20]
+        - generic [ref=e23]:
+          - link "Development Resources" [ref=e24] [cursor=pointer]:
+            - /url: https://devdocs.mage-os.org/
+          - img [ref=e25]
+    - generic [ref=e28]:
+      - link [ref=e30] [cursor=pointer]:
+        - /url: /
+        - img [ref=e31]
+      - button "Toggle navigation menu" [ref=e61] [cursor=pointer]:
+        - img [ref=e62]
+  - main [ref=e64]:
+    - generic [ref=e65]:
+      - main [ref=e69]:
+        - article [ref=e70]:
+          - heading "Complete Store Setup from Scratch" [level=1] [ref=e71]
+          - heading "Why This Tutorial Matters" [level=2] [ref=e72]
+          - paragraph [ref=e73]:
+            - strong [ref=e74]: "Business Impact:"
+          - list [ref=e75]:
+            - listitem [ref=e76]: • Launch a conversion-ready store faster with a proven setup sequence
+            - listitem [ref=e77]: • Reduce rework and avoid checkout failures that jeopardize early revenue
+            - listitem [ref=e78]: • Establish compliant tax, shipping, and payment configurations from day one
+          - paragraph [ref=e79]:
+            - strong [ref=e80]: "What You'll Achieve:"
+          - list [ref=e81]:
+            - listitem [ref=e82]: • A checkout-ready store with core settings, catalog, payments, and shipping configured
+            - listitem [ref=e83]: • A successfully placed test order with correct totals and emails
+            - listitem [ref=e84]: • A concise launch checklist to move from sandbox to production safely
+          - heading "Learning Journey Overview" [level=2] [ref=e85]
+          - heading "Your Situation" [level=3] [ref=e86]
+          - paragraph [ref=e87]: You're signed into a fresh Magento 2.4.x Admin and need a clear, end-to-end path to configure settings, add a product, enable payments/shipping, and validate checkout before going live.
+          - heading "What You'll Learn" [level=3] [ref=e88]
+          - paragraph [ref=e89]: "By completing this tutorial, you will:"
+          - list [ref=e90]:
+            - listitem [ref=e91]: • Configure store info, locale, and currency
+            - listitem [ref=e92]: • Set up taxes, shipping methods, and payment methods
+            - listitem [ref=e93]: • Create categories and your first product
+            - listitem [ref=e94]: • Assign a theme and configure checkout and emails
+            - listitem [ref=e95]: • Place and verify a test order end-to-end
+          - heading "Success Criteria" [level=3] [ref=e96]
+          - paragraph [ref=e97]: "You'll know you've succeeded when:"
+          - list [ref=e98]:
+            - listitem [ref=e99]: A shopper can place a test order (guest or customer) with correct tax, shipping, and totals
+            - listitem [ref=e100]: Order-related emails (order, invoice, shipment) are received
+            - listitem [ref=e101]: The order appears in Sales > Orders with expected statuses and amounts
+          - heading "Time Investment" [level=3] [ref=e102]
+          - list [ref=e103]:
+            - listitem [ref=e104]:
+              - text: •
+              - strong [ref=e105]: "Estimated time:"
+              - text: 90–120 minutes
+            - listitem [ref=e106]:
+              - text: •
+              - strong [ref=e107]: "Skill level after completion:"
+              - text: Confident beginner
+            - listitem [ref=e108]:
+              - text: •
+              - strong [ref=e109]: "Business value unlock:"
+              - text: Conversion-ready store with validated checkout
+          - heading "Before We Start" [level=2] [ref=e110]
+          - heading "Who This Is For" [level=3] [ref=e111]
+          - paragraph [ref=e112]: "This tutorial is designed for:"
+          - list [ref=e113]:
+            - listitem [ref=e114]: • Merchants and operators responsible for launching a new Magento store
+            - listitem [ref=e115]: • New Magento users who need a safe, repeatable setup checklist
+          - heading "What You Need" [level=3] [ref=e116]
+          - paragraph [ref=e117]: "Make sure you have:"
+          - list [ref=e118]:
+            - listitem [ref=e119]: • Magento Open Source 2.4.x Admin access
+            - listitem [ref=e120]: • A domain with an SSL certificate (or a secure staging URL)
+            - listitem [ref=e121]: • Payment provider sandbox credentials (for example, PayPal)
+            - listitem [ref=e122]: • Shipping carrier account details (optional for live rates)
+            - listitem [ref=e123]: • Basic tax requirements for your selling regions
+          - heading "Preparation Checklist" [level=3] [ref=e124]
+          - paragraph [ref=e125]: "Before starting, complete these preparation steps:"
+          - list [ref=e126]:
+            - listitem [ref=e127]: • Confirm Admin login and 2FA work for your user
+            - listitem [ref=e128]: "• Ensure Base URLs point to your domain: Stores > Configuration > General > Web"
+            - listitem [ref=e129]: • Verify SSL is installed and Use Secure URLs is enabled (Storefront and Admin)
+            - listitem [ref=e130]: "• Confirm caches are enabled: System > Cache Management"
+          - heading "Step-by-Step Learning Path" [level=2] [ref=e131]
+          - heading "1) Set Store Info, Locale, and Currency" [level=3] [ref=e132]
+          - list [ref=e133]:
+            - listitem [ref=e134]: "• Go to: Stores > Settings > Configuration > General > General > Store Information and enter your business details"
+            - listitem [ref=e135]: "• Set locale: Stores > Configuration > General > Locale Options (Timezone, Locale, First Day of Week)"
+            - listitem [ref=e136]: "• Set currency: Stores > Configuration > General > Currency Setup (Base, Default, Display)"
+            - listitem [ref=e137]: "• If using multiple currencies: Stores > Currency > Currency Rates and update rates"
+          - paragraph [ref=e138]: "Checkpoint: Storefront shows the correct language/locale and displays prices in your chosen currency."
+          - heading "2) Configure Websites, Stores, and Views" [level=3] [ref=e139]
+          - list [ref=e140]:
+            - listitem [ref=e141]: "• Go to: Stores > Settings > All Stores"
+            - listitem [ref=e142]: • Create additional Website/Store/Store Views if needed
+            - listitem [ref=e143]: • Set the Default Store View and confirm your store switcher reflects the intended structure
+          - paragraph [ref=e144]: "Checkpoint: Your store structure matches your business (e.g., single site, multiple views for languages)."
+          - heading "3) Configure Taxes" [level=3] [ref=e145]
+          - list [ref=e146]:
+            - listitem [ref=e147]: "• Add tax rates: Stores > Taxes > Tax Zones and Rates"
+            - listitem [ref=e148]: "• Create tax rules: Stores > Taxes > Tax Rules (map product and customer tax classes to rates)"
+            - listitem [ref=e149]: "• Set calculation/display: Stores > Configuration > Sales > Tax (Calculation Settings, Default Tax Destination, and Display Settings)"
+          - paragraph [ref=e150]: "Checkpoint: Tax applies correctly in cart/checkout when you enter a taxable address."
+          - heading "4) Configure Shipping" [level=3] [ref=e151]
+          - list [ref=e152]:
+            - listitem [ref=e153]: "• Set shipping origin: Stores > Configuration > Sales > Shipping Settings > Origin"
+            - listitem [ref=e154]:
+              - text: "•Enable methods: Stores > Configuration > Sales > Delivery Methods"
+              - list [ref=e155]:
+                - listitem [ref=e156]: ◦ Start with Flat Rate and/or Free Shipping (configure thresholds if needed)
+                - listitem [ref=e157]: ◦ Optionally configure carriers (UPS, USPS, FedEx, DHL) with your account credentials
+            - listitem [ref=e158]: • Ensure products intended for shipping have a weight set (non-virtual)
+          - paragraph [ref=e159]: "Checkpoint: At checkout, at least one shipping method appears for your test address."
+          - heading "5) Configure Payments" [level=3] [ref=e160]
+          - list [ref=e161]:
+            - listitem [ref=e162]: "• Go to: Stores > Configuration > Sales > Payment Methods"
+            - listitem [ref=e163]: • For testing, enable Check / Money Order (simple, no external credentials)
+            - listitem [ref=e164]: • Optionally configure PayPal using Sandbox credentials (set Environment = Sandbox)
+          - paragraph [ref=e165]: "Checkpoint: Your chosen payment method(s) appear during checkout."
+          - 'heading "6) Build Your Catalog: Categories and First Product" [level=3] [ref=e166]'
+          - list [ref=e167]:
+            - listitem [ref=e168]:
+              - text: "•Categories: Catalog > Categories"
+              - list [ref=e169]:
+                - listitem [ref=e170]: ◦ Use the existing Default Category or create a new root category and set it as default for the store
+            - listitem [ref=e171]:
+              - text: "•Product: Catalog > Products > Add Product (Simple Product)"
+              - list [ref=e172]:
+                - listitem [ref=e173]: "◦ Required: Name, SKU, Price, Weight (if shippable), Quantity, Category assignment, Visibility = Catalog, Search, Enable Product = Yes"
+          - paragraph [ref=e174]: "Checkpoint: Product is visible on the storefront category page and product detail page."
+          - heading "7) Verify Inventory (MSI)" [level=3] [ref=e175]
+          - list [ref=e176]:
+            - listitem [ref=e177]:
+              - text: "•Go to: Stores > Inventory > Sources and Stocks"
+              - list [ref=e178]:
+                - listitem [ref=e179]: ◦ Confirm Default Source and Default Stock exist
+                - listitem [ref=e180]: ◦ Ensure your product is assigned and shows Salable Quantity > 0
+          - paragraph [ref=e181]: "Checkpoint: Product shows In Stock on the storefront and can be added to cart."
+          - heading "8) Assign a Theme" [level=3] [ref=e182]
+          - list [ref=e183]:
+            - listitem [ref=e184]: "• Go to: Content > Design > Configuration"
+            - listitem [ref=e185]: • Edit the Global (Default) scope or specific store view
+            - listitem [ref=e186]: • Select your theme and Save Configuration
+            - listitem [ref=e187]: "• If prompted, clear caches: System > Cache Management > Flush Magento Cache"
+          - paragraph [ref=e188]: "Checkpoint: Storefront renders with your selected theme."
+          - heading "9) Configure Checkout and Emails" [level=3] [ref=e189]
+          - list [ref=e190]:
+            - listitem [ref=e191]:
+              - text: "•Checkout: Stores > Configuration > Sales > Checkout"
+              - list [ref=e192]:
+                - listitem [ref=e193]: ◦ Enable Guest Checkout if desired and review checkout options
+            - listitem [ref=e194]: "• Email Identities: Stores > Configuration > General > Store Email Addresses (set From names and addresses)"
+            - listitem [ref=e195]: "• Transactional Emails: Stores > Configuration > Sales > Sales Emails (enable and confirm sender identities)"
+          - paragraph [ref=e196]: "Checkpoint: You are ready to validate order and invoice emails by placing a test order."
+          - heading "10) Place a Test Order and Verify" [level=3] [ref=e197]
+          - list [ref=e198]:
+            - listitem [ref=e199]: • On the storefront, add your product to cart and proceed to checkout
+            - listitem [ref=e200]: • Enter a taxable address (if applicable), select a shipping method, and choose Check / Money Order
+            - listitem [ref=e201]: • Place the order and confirm the order success page
+            - listitem [ref=e202]:
+              - text: "•In Admin: Sales > Orders"
+              - list [ref=e203]:
+                - listitem [ref=e204]: ◦ Verify order totals, create an Invoice, then create a Shipment (practice complete order flow)
+            - listitem [ref=e205]: • Confirm order/invoice/shipment emails are received
+          - paragraph [ref=e206]: "Checkpoint: End-to-end order flow completes and emails send as expected."
+          - heading "11) Launch Readiness Checklist" [level=3] [ref=e207]
+          - list [ref=e208]:
+            - listitem [ref=e209]:
+              - text: "•Security and URLs: Stores > Configuration > General > Web"
+              - list [ref=e210]:
+                - listitem [ref=e211]: ◦ Use Secure URLs (Storefront and Admin) = Yes
+                - listitem [ref=e212]: ◦ Search Engine Optimization > Use Web Server Rewrites = Yes
+            - listitem [ref=e213]: "• Robots: Content > Design > Configuration > Edit scope > Search Engine Robots = INDEX, FOLLOW (production only)"
+            - listitem [ref=e214]:
+              - text: "•Caching and Indexes:"
+              - list [ref=e215]:
+                - listitem [ref=e216]: "◦ System > Cache Management: Enable all caches and Flush Magento Cache"
+                - listitem [ref=e217]: "◦ System > Tools > Index Management: Reindex any out-of-date indexes"
+            - listitem [ref=e218]: "• Base URLs: Stores > Configuration > General > Web: Confirm Base URLs (secure and unsecure) match your production domain"
+          - paragraph [ref=e219]: "Checkpoint: Storefront loads over HTTPS, friendly URLs work, and search engines can index production."
+          - heading "Practice and Reinforcement" [level=2] [ref=e220]
+          - paragraph [ref=e221]: "Now that you've learned the core process, let's reinforce your skills:"
+          - list [ref=e222]:
+            - listitem [ref=e223]: • Create a configurable product with Size and Color attributes and place a test order
+            - listitem [ref=e224]: • Enable Free Shipping for orders over a threshold and verify the method appears only when eligible
+            - listitem [ref=e225]: • Change the Default Display Currency and update Stores > Currency > Currency Rates; confirm price display on storefront
+          - heading "What You've Accomplished" [level=2] [ref=e226]
+          - paragraph [ref=e227]:
+            - text: 🎉
+            - strong [ref=e228]: Congratulations!
+            - text: "You have successfully:"
+          - list [ref=e229]:
+            - listitem [ref=e230]: • Configured general settings (store info, locale, currency)
+            - listitem [ref=e231]: • Set up taxes, shipping, and payment methods
+            - listitem [ref=e232]: • Built a basic catalog and verified inventory
+            - listitem [ref=e233]: • Assigned a theme and configured checkout and emails
+            - listitem [ref=e234]: • Placed and processed a complete test order (order, invoice, shipment)
+          - heading "Business Impact" [level=3] [ref=e235]
+          - list [ref=e236]:
+            - listitem [ref=e237]: • Reduced time-to-first-sale with a validated checkout
+            - listitem [ref=e238]: • Lower launch risk via a structured checklist and test workflow
+          - heading "Skills Gained" [level=3] [ref=e239]
+          - paragraph [ref=e240]: "You now have the ability to:"
+          - list [ref=e241]:
+            - listitem [ref=e242]: • Navigate core Admin areas confidently
+            - listitem [ref=e243]: • Diagnose and resolve common visibility, tax, shipping, and payment issues
+            - listitem [ref=e244]: • Prepare a store for production with essential security and SEO settings
+          - heading "Next Steps in Your Journey" [level=2] [ref=e245]
+          - paragraph [ref=e246]: "Now that you've mastered this process, here's how to build on your success:"
+          - heading "Immediate Actions" [level=3] [ref=e247]
+          - list [ref=e248]:
+            - listitem [ref=e249]: • Switch payment methods from sandbox/test to live only after all QA passes
+            - listitem [ref=e250]: • Create a simple go-live checklist (payments, shipping, taxes, emails, SSL, robots, cache)
+            - listitem [ref=e251]: • Set up basic monitoring (order failure alerts, email deliverability checks)
+          - heading "Level Up Your Skills" [level=3] [ref=e252]
+          - list [ref=e253]:
+            - listitem [ref=e254]: • Build out category structure and product attributes for scalable catalog management
+            - listitem [ref=e255]: • Create custom transactional email templates and brand your communications
+            - listitem [ref=e256]: • Generate and submit an XML sitemap (Marketing > SEO & Search > Site Map) to search engines
+          - heading "Advanced Applications" [level=3] [ref=e257]
+          - list [ref=e258]:
+            - listitem [ref=e259]: • Enable persistent cart to improve conversion (Stores > Configuration > Customers > Persistent Shopping Cart)
+            - listitem [ref=e260]:
+              - text: •Set related/upsell/cross-sell products to increase AOV
+              - list [ref=e261]:
+                - listitem [ref=e262]: ◦ Configure related products per item
+            - listitem [ref=e263]: "• Implement basic SEO: metadata on homepage/categories, friendly URLs, and robots best practices"
+          - heading "When Things Don't Go as Expected" [level=2] [ref=e264]
+          - paragraph [ref=e265]: "Even experienced merchants encounter challenges. Here's how to handle common situations:"
+          - heading "Payments" [level=3] [ref=e266]
+          - list [ref=e267]:
+            - listitem [ref=e268]:
+              - text: "•Symptom: Payment method not visible at checkout"
+              - list [ref=e269]:
+                - listitem [ref=e270]: "◦ Likely cause: Method disabled, scope mismatch, or unsupported currency/country"
+                - listitem [ref=e271]: "◦ Fix: Stores > Configuration > Sales > Payment Methods; enable method at the correct scope and ensure store currency and Allowed Countries align with the provider"
+          - heading "Shipping" [level=3] [ref=e272]
+          - list [ref=e273]:
+            - listitem [ref=e274]:
+              - text: "•Symptom: No shipping methods available"
+              - list [ref=e275]:
+                - listitem [ref=e276]: "◦ Likely cause: Shipping Origin missing, product has no weight, or method restrictions"
+                - listitem [ref=e277]: "◦ Fix: Set Origin (Stores > Configuration > Sales > Shipping Settings); ensure product Weight > 0 and In Stock; review method restrictions in Sales > Delivery Methods"
+          - heading "Taxes" [level=3] [ref=e278]
+          - list [ref=e279]:
+            - listitem [ref=e280]:
+              - text: "•Symptom: Taxes not applied or incorrect"
+              - list [ref=e281]:
+                - listitem [ref=e282]: "◦ Likely cause: Missing tax rates/rules or default destination mismatch"
+                - listitem [ref=e283]: "◦ Fix: Stores > Taxes > Tax Zones and Rates; Stores > Taxes > Tax Rules; verify Default Tax Destination Calculation (Stores > Configuration > Sales > Tax) and customer address"
+          - heading "Catalog & Inventory" [level=3] [ref=e284]
+          - list [ref=e285]:
+            - listitem [ref=e286]:
+              - text: "•Symptom: Product not visible on storefront"
+              - list [ref=e287]:
+                - listitem [ref=e288]: "◦ Likely cause: Disabled product, wrong visibility, not assigned to website/category, or no salable qty"
+                - listitem [ref=e289]: "◦ Fix: Catalog > Products: Enable Product, set Visibility = Catalog, Search; assign to website and category; ensure In Stock and quantity > 0; if needed, System > Tools > Index Management: Reindex"
+          - heading "Caching & Indexing" [level=3] [ref=e290]
+          - list [ref=e291]:
+            - listitem [ref=e292]:
+              - text: "•Symptom: Changes not appearing"
+              - list [ref=e293]:
+                - listitem [ref=e294]: "◦ Likely cause: Cache not flushed or indexes outdated"
+                - listitem [ref=e295]: "◦ Fix: System > Cache Management: Flush Magento Cache; System > Tools > Index Management: Reindex updated indexes"
+          - heading "Access & Security (2FA)" [level=3] [ref=e296]
+          - list [ref=e297]:
+            - listitem [ref=e298]:
+              - text: "•Symptom: Locked out by 2FA"
+              - list [ref=e299]:
+                - listitem [ref=e300]: "◦ Fix: Ask an Admin with higher privileges to reset your 2FA or use backup codes per your configured provider"
+          - heading "Continue Learning" [level=2] [ref=e301]
+          - heading "Related Tutorials" [level=3] [ref=e302]
+          - list [ref=e303]:
+            - listitem [ref=e304]: • Configure Taxes by Region
+            - listitem [ref=e305]: • Shipping Methods Deep Dive
+            - listitem [ref=e306]: • Payment Methods and PayPal Sandbox
+            - listitem [ref=e307]: • Theme Customization Basics
+            - listitem [ref=e308]: • Inventory (MSI) for Multi-Location
+          - heading "How-To Guides" [level=3] [ref=e309]
+          - list [ref=e310]:
+            - listitem [ref=e311]: • Create Configurable Products
+            - listitem [ref=e312]: • Set Up Email Templates
+            - listitem [ref=e313]: • Manage URL Rewrites and Sitemaps
+          - heading "Reference Materials" [level=3] [ref=e314]
+          - list [ref=e315]:
+            - listitem [ref=e316]: "• Magento 2.4 User Guide: Configuration, Catalog, Sales, Marketing"
+          - heading "Summary" [level=2] [ref=e317]
+          - paragraph [ref=e318]: A structured, end-to-end setup reduces launch risk and speeds time-to-first-sale. With core configuration, catalog, payments, shipping, checkout, and emails in place—and a successful test order—you are ready to finalize production settings and go live.
+          - heading "Key Takeaways" [level=3] [ref=e319]
+          - list [ref=e320]:
+            - listitem [ref=e321]: • Follow a proven sequence to avoid rework and missed settings
+            - listitem [ref=e322]: • Validate end-to-end with a real test order and emails
+            - listitem [ref=e323]: "• Lock in production essentials: HTTPS, rewrites, robots, caches, and indexes"
+          - heading "Remember" [level=3] [ref=e324]
+          - list [ref=e325]:
+            - listitem [ref=e326]: • Switch to live payments only after passing your QA checklist
+            - listitem [ref=e327]: • Set Search Engine Robots to INDEX, FOLLOW only on production
+            - listitem [ref=e328]: • Revisit taxes, shipping, and payment configurations whenever your business rules change
+        - link "Edit this page on GitHub" [ref=e330] [cursor=pointer]:
+          - /url: https://github.com/magentoopensource/docs/edit/main/getting-started/tutorial-complete-store-setup-from-scratch.md
+          - img [ref=e331]
+          - text: Edit this page on GitHub
+      - button "Toggle navigation menu" [ref=e334] [cursor=pointer]:
+        - img [ref=e335]
+        - generic [ref=e337]: Menu
+  - contentinfo [ref=e338]:
+    - generic [ref=e339]:
+      - link "Merchant Documentation" [ref=e341] [cursor=pointer]:
+        - /url: /
+        - img [ref=e342]
+        - generic [ref=e349]: Merchant Documentation
+      - generic [ref=e350]:
+        - generic [ref=e351]:
+          - paragraph [ref=e352]: Your comprehensive guide to managing and growing your Magento 2 store. From setting up your first product to advanced marketing strategies, we provide clear, actionable documentation for merchants of all experience levels.
+          - list [ref=e353]:
+            - listitem [ref=e354]:
+              - link "GitHub" [ref=e355] [cursor=pointer]:
+                - /url: https://github.com/magento/magento2
+                - img "GitHub" [ref=e356]
+        - generic [ref=e357]:
+          - text: Documentation
+          - list [ref=e359]:
+            - listitem [ref=e360]:
+              - link "Start Selling" [ref=e361] [cursor=pointer]:
+                - /url: /merchant/start-selling
+            - listitem [ref=e362]:
+              - link "Manage Catalog" [ref=e363] [cursor=pointer]:
+                - /url: /merchant/manage-catalog
+            - listitem [ref=e364]:
+              - link "Handle Orders" [ref=e365] [cursor=pointer]:
+                - /url: /merchant/handle-orders
+            - listitem [ref=e366]:
+              - link "Grow Store" [ref=e367] [cursor=pointer]:
+                - /url: /merchant/grow-store
+            - listitem [ref=e368]:
+              - link "Improve UX" [ref=e369] [cursor=pointer]:
+                - /url: /merchant/improve-ux
+            - listitem [ref=e370]:
+              - link "Stay Compliant" [ref=e371] [cursor=pointer]:
+                - /url: /merchant/stay-compliant
+        - generic [ref=e372]:
+          - text: Resources
+          - list [ref=e374]:
+            - listitem [ref=e375]:
+              - link "Getting Started" [ref=e376] [cursor=pointer]:
+                - /url: /merchant/getting-started
+            - listitem [ref=e377]:
+              - link "Magento StackExchange" [ref=e378] [cursor=pointer]:
+                - /url: https://magento.stackexchange.com/
+        - generic [ref=e379]:
+          - text: Community
+          - list [ref=e381]:
+            - listitem [ref=e382]:
+              - link "Magento Community" [ref=e383] [cursor=pointer]:
+                - /url: https://community.magento.com/
+            - listitem [ref=e384]:
+              - link "Magento Forums" [ref=e385] [cursor=pointer]:
+                - /url: https://community.magento.com/forums/
+            - listitem [ref=e386]:
+              - link "Magento Marketplace" [ref=e387] [cursor=pointer]:
+                - /url: https://marketplace.magento.com/
+            - listitem [ref=e388]:
+              - link "Magento Blog" [ref=e389] [cursor=pointer]:
+                - /url: https://magento.com/blog
+            - listitem [ref=e390]:
+              - link "GitHub" [ref=e391] [cursor=pointer]:
+                - /url: https://github.com/magento/magento2
+        - generic [ref=e392]:
+          - text: Support
+          - list [ref=e394]:
+            - listitem [ref=e395]:
+              - link "Contact Support" [ref=e396] [cursor=pointer]:
+                - /url: https://github.com/magentoopensource/docs/issues
+            - listitem [ref=e397]:
+              - link "Report Issues" [ref=e398] [cursor=pointer]:
+                - /url: https://github.com/magentoopensource/docs/issues
+            - listitem [ref=e399]:
+              - link "Community Resources" [ref=e400] [cursor=pointer]:
+                - /url: https://community.magento.com/
+      - generic [ref=e401]:
+        - paragraph [ref=e402]: © 2025 Magento 2 Merchant Documentation Magento® is a registered trademark of Adobe Inc.
+        - paragraph [ref=e403]:
+          - text: This documentation provides guidance for Magento 2 merchants and store owners. For developer documentation, visit the
+          - link "official developer documentation" [ref=e404] [cursor=pointer]:
+            - /url: https://developer.adobe.com/commerce/
+          - text: .
+```

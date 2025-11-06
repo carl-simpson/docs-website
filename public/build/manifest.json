@@ -292,7 +292,7 @@
     "src": "node_modules/mermaid/dist/timeline-definition-46a17596.js"
   },
   "resources/css/app.css": {
-    "file": "assets/app-966feecc.css",
+    "file": "assets/app-60cf1c8e.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },

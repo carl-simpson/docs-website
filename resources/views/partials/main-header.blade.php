@@ -47,7 +47,7 @@
         {{-- Mobile burger menu button (visible on mobile only) --}}
         <button
             data-mobile-menu-toggle
-            class="lg:hidden flex items-center justify-center w-10 h-10 text-charcoal hover:text-orange transition-colors"
+            class="lg:hidden flex items-center justify-center w-10 h-10 text-charcoal hover:text-orange transition-colors focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2 rounded-md"
             aria-label="Toggle navigation menu"
             aria-expanded="false"
         >
