@@ -7,38 +7,74 @@
     }
     
     &.warning {
-        @apply bg-lightningYellow-300 border-lightningYellow-500;
-        p { @apply text-orange-800; }
+        @apply bg-yellow border-yellow;
+        p { @apply text-brown; }
     }
-    
+
     &.error {
-        @apply bg-red-50 border-red-400;
-        p { @apply text-red-800; }
+        @apply bg-red border-red;
+        p { @apply text-white; }
     }
-    
+
     &.success {
         @apply bg-green-50 border-green-400;
         p { @apply text-green-800; }
     }
-    
+
     &.tip {
-        @apply bg-sweetCorn-400 border-sweetCorn-600;
-        p { @apply text-sweetCorn-800; }
+        @apply bg-yellow border-yellow;
+        p { @apply text-brown; }
     }
-    
+
     &.featured {
-        @apply bg-flamingo-50 border-flamingo-400;
-        p { @apply text-flamingo-800; }
+        @apply bg-orange border-orange;
+        p { @apply text-white; }
     }
 }
 
 .docs_main {
+    /* Lead paragraph emphasis */
+    > p:first-of-type {
+        @apply text-lg text-charcoal font-medium leading-relaxed mb-8;
+    }
+
+    /* Enhanced section headings with accent bar */
+    h2 {
+        @apply border-b border-gray-lighter pb-4 mb-6 mt-16 relative pl-6;
+
+        &::before {
+            content: "";
+            @apply absolute left-0 top-0 w-1.5 h-7 bg-gradient-to-b from-orange to-yellow rounded-full;
+        }
+    }
+
+    h3 {
+        @apply mt-12 mb-4 text-charcoal;
+    }
+
+    /* Better spacing after headings */
+    h2 + p,
+    h3 + p,
+    h2 + ul,
+    h3 + ul {
+        @apply mt-0;
+    }
+
+    /* Enhanced blockquotes */
+    blockquote {
+        @apply bg-off-white border-l-4 border-orange p-6 my-8 rounded-r shadow-sm;
+
+        p {
+            @apply text-charcoal italic mb-0;
+        }
+    }
+
     /* Enhanced anchor styling for KB pages */
     a[name] {
         @apply relative block invisible -top-[45px] sm:-top-[30px];
     }
 
-    /* Modern table styling */
+    /* Modern table styling with hover effect */
     table {
         @apply border-collapse w-full text-base mb-8 bg-white rounded-lg shadow-sm overflow-hidden;
 
@@ -63,26 +99,26 @@
     /* Enhanced code blocks */
     pre {
         @apply bg-gray-900 text-gray-100 rounded-lg p-6 mb-8 overflow-x-auto shadow-lg;
-        
+
         code {
             @apply text-sm font-mono;
         }
     }
 
-    /* Inline code styling */
+    /* Enhanced inline code styling */
     :not(pre) > code {
-        @apply bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm font-mono;
+        @apply bg-gray-50 text-red px-2 py-1 rounded text-sm font-mono border border-gray-lighter;
     }
 
     ul:not(:first-of-type),
     .content-list ul {
-        @apply list-none p-0 mx-0 mt-0 mb-4;
+        @apply list-none p-0 mx-0 mt-0 mb-4 space-y-3;
 
         li {
-            @apply relative block ml-5 mb-4 text-gray-700;
+            @apply relative block ml-5 text-gray-700;
 
             a {
-                @apply no-underline;
+                @apply no-underline hover:text-orange transition-colors;
             }
 
             &::before {
@@ -91,6 +127,11 @@
                 background: url(/img/icons/ul_marker.min.svg) no-repeat center;
             }
         }
+    }
+
+    /* Ordered lists with better spacing */
+    ol {
+        @apply space-y-3;
     }
 
     h1 + ul {

@@ -2,14 +2,14 @@
 
 @section('content')
 <div class="relative bg-white">
-    <div class="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-        <div class="flex gap-8 py-8">
+    <div class="mx-auto max-w-[1440px] px-6 lg:px-8">
+        <div class="flex py-8">
             {{-- Left Sidebar: Category Articles --}}
-            <aside class="hidden lg:block w-64 flex-shrink-0">
+            <aside class="hidden lg:block w-[400px] flex-shrink-0 pr-8 lg:pr-12">
                 <div class="sticky top-24">
                     {{-- Category Header --}}
                     <div class="mb-6">
-                        <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">
+                        <h3 class="text-sm font-semibold text-orange uppercase tracking-wider mb-4">
                             {{ ucwords(str_replace('-', ' ', $category)) }}
                         </h3>
                     </div>
@@ -18,13 +18,15 @@
                     <nav class="space-y-1" aria-label="Category navigation">
                         @foreach($categoryArticles as $article)
                             <a
-                                href="/docs/{{ $article['path'] }}"
-                                class="group flex items-start gap-3 px-3 py-2 text-sm rounded-lg transition-colors duration-150 no-underline
-                                    {{ $article['slug'] === $page ? 'bg-lightning-yellow-500 text-mine-shaft-500 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900' }}"
+                                href="/merchant/{{ $article['path'] }}"
+                                class="group flex items-start gap-3 px-3 py-2 text-sm transition-colors duration-150 no-underline border-l-2 rounded-r
+                                    {{ $article['slug'] === $page
+                                        ? 'bg-yellow border-orange text-charcoal font-semibold shadow-sm'
+                                        : 'border-transparent text-gray-700 hover:bg-off-white hover:border-gray-300 hover:text-charcoal' }}"
                             >
                                 <span class="flex-1">{{ $article['title'] }}</span>
                                 @if($article['slug'] === $page)
-                                    <svg class="w-5 h-5 text-mine-shaft-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="w-5 h-5 text-orange flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
                                     </svg>
                                 @endif
@@ -35,7 +37,7 @@
                     {{-- View All in Category --}}
                     <div class="mt-6 pt-6 border-t border-gray-200">
                         <a
-                            href="/docs/{{ $category }}"
+                            href="/merchant/{{ $category }}"
                             class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors no-underline"
                         >
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,7 +94,7 @@
 
             {{-- Right Sidebar: Table of Contents --}}
             @if(count($tableOfContents) > 0)
-            <aside class="hidden xl:block w-64 flex-shrink-0">
+            <aside class="hidden xl:block w-64 flex-shrink-0 pl-8">
                 <div class="sticky top-24">
                     <div class="mb-4">
                         <h3 class="text-xs font-semibold text-gray-900 uppercase tracking-wider">
@@ -187,9 +189,9 @@
                 <nav class="space-y-1">
                     @foreach($categoryArticles as $article)
                         <a
-                            href="/docs/{{ $article['path'] }}"
+                            href="/merchant/{{ $article['path'] }}"
                             class="block px-3 py-2 text-sm rounded-lg transition-colors no-underline
-                                {{ $article['slug'] === $page ? 'bg-lightning-yellow-500 text-mine-shaft-500 font-medium' : 'text-gray-700 hover:bg-gray-50' }}"
+                                {{ $article['slug'] === $page ? 'bg-yellow text-charcoal font-medium' : 'text-gray-700 hover:bg-gray-50' }}"
                         >
                             {{ $article['title'] }}
                         </a>

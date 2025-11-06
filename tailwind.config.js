@@ -146,9 +146,10 @@ export default {
                 400: "#f87171",
                 500: "#ef4444",
                 600: "#dc2626",
-                700: "#b91c1c",
+                700: "#BC3312", // Updated to Figma Red for inline code
                 800: "#991b1b",
                 900: "#7f1d1d",
+                DEFAULT: "#BC3312", // Set default to Figma Red
             },
             orange: {
                 50: "#fff7ed",
@@ -156,11 +157,12 @@ export default {
                 200: "#fed7aa",
                 300: "#fdba74",
                 400: "#fb923c",
-                500: "#ff6500", // Keep for backward compatibility
+                500: "#F26423", // Updated to Figma Orange from design system
                 600: "#e85d04",
                 700: "#d9480f",
                 800: "#8a2e13",
                 900: "#73230d",
+                DEFAULT: "#F26423", // Set default to Figma Orange
             },
             blue: {
                 50: "#eff6ff",
@@ -190,13 +192,14 @@ export default {
                 50: "#fefce8",
                 100: "#fef3c7",
                 200: "#fde68a",
-                300: "#fcd34d", 
+                300: "#fcd34d",
                 400: "#fbbf24",
-                500: "#f59e0b",
+                500: "#F1BC1B", // Updated to Lightning Yellow/500 from Figma
                 600: "#d97706",
                 700: "#b45309",
                 800: "#92400e",
                 900: "#78350f",
+                DEFAULT: "#F1BC1B", // Set default to Figma Lightning Yellow
             },
             purple: {
                 600: "#8338ec",
@@ -248,6 +251,12 @@ export default {
                 900: "#996100",
                 950: "#6c3d08", // Sweet Corn/950 from Figma
             },
+            // Simple color aliases for docs styling (from Figma design)
+            // Note: orange, red, yellow already defined above with full palettes
+            'charcoal': '#2C2C2C',    // Body text color
+            'off-white': '#FAFAFA',   // Subtle backgrounds
+            'gray-lighter': '#E5E7EB', // Border color
+            'brown': '#442204',       // Lightning Yellow/950 from Figma (text on yellow backgrounds)
         },
         fontFamily: {
             sans: ["Inter Tight", ...defaultTheme.fontFamily.sans],
