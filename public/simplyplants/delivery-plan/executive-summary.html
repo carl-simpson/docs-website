@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Summary | SimplyPlants MVP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'sp': {
+                            'darkest': '#002C1B',
+                            'dark': '#3A4D39',
+                            'forest': '#506055',
+                            'primary': '#008236',
+                            'sage': '#8A9A7B',
+                            'olive': '#56624B',
+                            'light': '#E5E7EB',
+                            'lightest': '#F3F4F6',
+                        },
+                        'sp-accent': {
+                            'gold': '#FDC700',
+                            'teal': '#4B828F',
+                            'rust': '#BB4D00',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        [x-cloak] { display: none !important; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-hero {
+            background: linear-gradient(135deg, #002C1B 0%, #3A4D39 50%, #506055 100%);
+        }
+
+        /* Callout styles - NO BORDER RADIUS per brand guidelines */
+        .callout {
+            padding: 1rem 1rem 1rem 1.25rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid currentColor;
+        }
+        .callout-note { background-color: #EFF6FF; color: #3B82F6; }
+        .callout-tip { background-color: #F0FDF4; color: #008236; }
+        .callout-warning { background-color: #FFFBEB; color: #F59E0B; }
+        .callout-important { background-color: #FEF2F2; color: #EF4444; }
+
+        /* Step container - NO BORDER RADIUS */
+        .step-container {
+            background: linear-gradient(to right, rgba(0, 130, 54, 0.05), transparent);
+            border-left: 4px solid #008236;
+            padding: 1.25rem 1rem 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        /* Section overview - NO BORDER RADIUS */
+        .section-overview {
+            background: linear-gradient(135deg, #F3F4F6 0%, white 100%);
+            border: 1px solid #E5E7EB;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        /* Collapsible Section Styling - NO BORDER RADIUS */
+        .section-wrapper {
+            margin-bottom: 2rem;
+            border: 2px solid #E5E7EB;
+            border-left: 4px solid;
+            background: white;
+            transition: all 200ms ease-out;
+        }
+
+        .section-wrapper:hover {
+            border-color: currentColor;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 1.5rem;
+            text-align: left;
+            transition: all 200ms ease-out;
+            cursor: pointer;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.02), transparent);
+        }
+
+        .section-header:hover {
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.05), transparent);
+        }
+
+        .section-header:focus {
+            outline: 2px solid #008236;
+            outline-offset: 2px;
+        }
+
+        .section-content {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+        }
+
+        /* Accent colors for different sections */
+        .section-primary {
+            border-left-color: #008236;
+        }
+        .section-primary:hover {
+            border-color: #008236;
+        }
+        .section-primary .section-header {
+            background: linear-gradient(to right, rgba(0, 130, 54, 0.05), transparent);
+        }
+        .section-primary .section-header:hover {
+            background: linear-gradient(to right, rgba(0, 130, 54, 0.1), transparent);
+        }
+
+        .section-gold {
+            border-left-color: #FDC700;
+        }
+        .section-gold:hover {
+            border-color: #FDC700;
+        }
+        .section-gold .section-header {
+            background: linear-gradient(to right, rgba(253, 199, 0, 0.05), transparent);
+        }
+        .section-gold .section-header:hover {
+            background: linear-gradient(to right, rgba(253, 199, 0, 0.1), transparent);
+        }
+
+        .section-teal {
+            border-left-color: #4B828F;
+        }
+        .section-teal:hover {
+            border-color: #4B828F;
+        }
+        .section-teal .section-header {
+            background: linear-gradient(to right, rgba(75, 130, 143, 0.05), transparent);
+        }
+        .section-teal .section-header:hover {
+            background: linear-gradient(to right, rgba(75, 130, 143, 0.1), transparent);
+        }
+
+        .section-rust {
+            border-left-color: #BB4D00;
+        }
+        .section-rust:hover {
+            border-color: #BB4D00;
+        }
+        .section-rust .section-header {
+            background: linear-gradient(to right, rgba(187, 77, 0, 0.05), transparent);
+        }
+        .section-rust .section-header:hover {
+            background: linear-gradient(to right, rgba(187, 77, 0, 0.1), transparent);
+        }
+
+        /* Badge Styling - NO BORDER RADIUS */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+        }
+
+        .badge-primary {
+            background-color: #002C1B;
+            color: white;
+        }
+
+        .badge-gold {
+            background-color: #FDC700;
+            color: #002C1B;
+        }
+
+        .badge-outline {
+            background-color: transparent;
+            border: 2px solid currentColor;
+            padding: 0.25rem 0.625rem;
+        }
+
+        .metric-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.375rem 0.875rem;
+            background-color: #F3F4F6;
+            color: #3A4D39;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid #E5E7EB;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Code blocks - NO BORDER RADIUS */
+        pre {
+            background-color: #002C1B;
+            color: #E5E7EB;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        code:not(pre code) {
+            background-color: #F3F4F6;
+            color: #3A4D39;
+            padding: 0.125rem 0.375rem;
+            font-size: 0.875em;
+            border: 1px solid #E5E7EB;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        /* Tables - NO BORDER RADIUS */
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            border: 1px solid #E5E7EB;
+        }
+
+        .doc-table th {
+            background-color: #3A4D39;
+            color: white;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .doc-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #E5E7EB;
+            vertical-align: top;
+        }
+
+        .doc-table tr:hover td {
+            background-color: #F3F4F6;
+            transition: background-color 150ms ease-in-out;
+        }
+
+        .doc-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Responsive table wrapper */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 1.5rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .table-wrapper {
+                border: 1px solid #E5E7EB;
+            }
+        }
+
+        /* Anchors */
+        h1, h2, h3, h4, h5, h6 {
+            scroll-margin-top: 5rem;
+        }
+
+        /* Focus visible for keyboard navigation */
+        *:focus-visible {
+            outline: 2px solid #008236;
+            outline-offset: 2px;
+        }
+
+        /* Print */
+        @media print {
+            nav, .no-print, header { display: none !important; }
+            main { max-width: 100% !important; margin: 0 !important; }
+        }
+    </style>
+</head>
+<body class="bg-sp-lightest min-h-screen" x-data="{ mobileMenuOpen: false, tocOpen: false }">
+    <!-- Skip to main content -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-sp-primary text-white px-4 py-2 z-50 font-medium focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2">
+        Skip to main content
+    </a>
+
+    <!-- Header -->
+    <header class="gradient-hero text-white sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="index.html" class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-sp-accent-gold" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold">SimplyPlants</h1>
+                        <p class="text-xs text-white/70">MVP Delivery Plan</p>
+                    </div>
+                </a>
+
+                <nav class="hidden md:flex items-center gap-1" aria-label="Main navigation">
+                    <a href="executive-summary.html" class="px-3 py-2 text-sm font-medium text-white bg-white/10 transition-colors" aria-current="page">Executive Summary</a>
+                    <a href="delivery-plan.html" class="px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors">Delivery Plan</a>
+                    <a href="jira-mapping.html" class="px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors">Jira Mapping</a>
+                </nav>
+
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 hover:bg-white/10" aria-label="Toggle menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div x-show="mobileMenuOpen" x-transition class="md:hidden border-t border-white/10">
+            <nav class="px-4 py-3 space-y-1" aria-label="Mobile navigation">
+                <a href="executive-summary.html" class="block px-3 py-2 text-sm font-medium text-white bg-white/10" aria-current="page">Executive Summary</a>
+                <a href="delivery-plan.html" class="block px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10">Delivery Plan</a>
+                <a href="jira-mapping.html" class="block px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10">Jira Mapping</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Title Banner -->
+    <section class="gradient-hero text-white py-8 lg:py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-3xl">
+                <h2 class="text-3xl lg:text-4xl font-bold mb-3">Executive Summary</h2>
+                <p class="text-lg text-white/80">Project overview, objectives, timeline, and success criteria</p>
+            </div>
+        </div>
+    </section>
+
+    <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="lg:flex lg:gap-8">
+            <!-- Mobile Table of Contents -->
+            <div class="lg:hidden mb-8">
+                <button @click="tocOpen = !tocOpen"
+                        class="w-full flex items-center justify-between px-4 py-3 bg-white border border-sp-light text-left font-medium text-sp-darkest hover:bg-sp-lightest transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2"
+                        :aria-expanded="tocOpen.toString()"
+                        aria-controls="mobile-toc">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-sp-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                        </svg>
+                        Table of Contents
+                    </span>
+                    <svg :class="tocOpen ? 'rotate-180' : ''" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+
+                <nav id="mobile-toc"
+                     x-show="tocOpen"
+                     x-cloak
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 -translate-y-2"
+                     class="bg-white border border-t-0 border-sp-light p-4 space-y-2"
+                     aria-label="Mobile table of contents">
+                    <a href="#project-overview" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">
+                        Project Overview
+                    </a>
+                    <a href="#project-scope" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">
+                        Project Scope
+                    </a>
+                    <a href="#timeline-milestones" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">
+                        Timeline & Milestones
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Table of Contents (desktop sidebar) -->
+            <aside class="hidden lg:block lg:w-64 flex-shrink-0">
+            <nav class="sticky top-24 bg-white border border-sp-light p-4 max-h-[calc(100vh-8rem)] overflow-y-auto">
+                <h4 class="text-sm font-semibold text-sp-darkest mb-4 uppercase tracking-wide">On This Page</h4>
+                <div class="space-y-2"><a href="#executive-summary" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Executive Summary</a>
+<a href="#simplyplants-12-week-mvp-delivery-plan" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">SimplyPlants 12-Week MVP Delivery Plan</a>
+<a href="#project-overview" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Project Overview</a>
+<a href="#key-objectives" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2pl-4">Key Objectives</a>
+<a href="#success-metrics" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2pl-4">Success Metrics</a>
+<a href="#project-scope" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Project Scope</a>
+<a href="#in-scope-mvp-launch-11-weeks" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2pl-4">In Scope (MVP Launch - 11 Weeks)</a>
+<a href="#out-of-scope-explicitly-deferred-post-mvp" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2pl-4">Out of Scope (Explicitly Deferred Post-MVP)</a>
+<a href="#timeline-milestones" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Timeline & Milestones</a>
+<a href="#12-week-critical-path-feb-2-apr-23-2026" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2pl-4">12-Week Critical Path (Feb 2 → Apr 23, 2026)</a>
+<a href="#key-milestones" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2pl-4">Key Milestones</a>
+<a href="#jira-integration" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2pl-4">Jira Integration</a>
+</div></nav></aside>
+
+            <!-- Main Content -->
+            <div class="flex-1 min-w-0">
+                <article class="prose prose-slate max-w-none prose-headings:text-sp-darkest prose-h1:text-3xl prose-h2:text-2xl prose-h2:border-b prose-h2:border-sp-light prose-h2:pb-3 prose-h2:mb-12 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-4 prose-a:text-sp-primary hover:prose-a:text-sp-dark prose-a:transition-colors focus:prose-a:outline-none focus:prose-a:ring-2 focus:prose-a:ring-sp-primary focus:prose-a:ring-offset-2 prose-strong:text-sp-darkest">
+                    <h1 id="executive-summary">Executive Summary</h1>
+<!-- SimplyPlants 12-Week MVP Delivery Plan Section (Collapsible) -->
+<div x-data="{ open: true }" class="section-wrapper section-primary mb-12">
+    <button @click="open = !open"
+            class="section-header"
+            :aria-expanded="open.toString()"
+            aria-controls="section-simplyplants-12-week-mvp-delivery-plan">
+        <h2 id="simplyplants-12-week-mvp-delivery-plan" class="text-2xl font-semibold text-sp-darkest !mt-0 !mb-0 flex-1">
+            SimplyPlants 12-Week MVP Delivery Plan
+        </h2>
+        <svg :class="open ? 'rotate-180' : ''" class="w-6 h-6 transition-transform flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" style="color: currentColor;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+
+    <div id="section-simplyplants-12-week-mvp-delivery-plan"
+         x-show="open"
+         x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 -translate-y-2"
+         class="section-content">
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-sp-lightest border-l-4 border-sp-primary p-4">
+        <p class="text-sm text-sp-forest mb-1 font-medium">Timeline</p>
+        <p class="text-lg font-semibold text-sp-darkest">12 weeks</p>
+        <p class="text-sm text-sp-forest">Feb 2 → Apr 23, 2026</p>
+    </div>
+    <div class="bg-sp-lightest border-l-4 border-sp-accent-gold p-4">
+        <p class="text-sm text-sp-forest mb-1 font-medium">GO LIVE Target</p>
+        <p class="text-lg font-semibold text-sp-darkest">May 1, 2026</p>
+        <p class="text-sm text-sp-forest">NBL-36</p>
+    </div>
+    <div class="bg-sp-lightest border-l-4 border-sp-accent-teal p-4">
+        <p class="text-sm text-sp-forest mb-1 font-medium">UAT Period</p>
+        <p class="text-lg font-semibold text-sp-darkest">Apr 6-30, 2026</p>
+        <p class="text-sm text-sp-forest">NBL-35</p>
+    </div>
+</div>
+
+<hr class="my-8 border-sp-light">
+
+<div class="section-overview"><h3 id="project-overview" class="!mt-0 !mb-3">Project Overview</h3>
+<p>SimplyPlants is launching a new Magento 2.4.8 e-commerce store with Hyva theme, designed to showcase <strong>13,130 SKUs</strong> across a sophisticated Nike-style product listing page (PLP) architecture. The 12-week MVP will deliver <strong>47 PLPs</strong> for initial launch (of 440 total planned), with URL-based filtering, performance optimization, and exceptional user experience.</p>
+</div>
+<h3 id="key-objectives">Key Objectives</h3>
+<ol class="space-y-2 my-4">
+<li class="flex gap-3"><span class="flex-shrink-0 w-6 h-6 bg-sp-primary/10 text-sp-primary flex items-center justify-center text-sm font-semibold"></span><span><strong>Fresh Magento 2.4.8 + Hyva Installation</strong>: Latest Hyva theme, Hyva Checkout, OpenSearch 2.12, optimized for 13K SKUs</span></li>
+<li class="flex gap-3"><span class="flex-shrink-0 w-6 h-6 bg-sp-primary/10 text-sp-primary flex items-center justify-center text-sm font-semibold"></span><span><strong>Nike-Style URL Filtering</strong>: SEO-friendly URL pattern with 5-char filter codes, dynamic facets, filter persistence</span></li>
+<li class="flex gap-3"><span class="flex-shrink-0 w-6 h-6 bg-sp-primary/10 text-sp-primary flex items-center justify-center text-sm font-semibold"></span><span><strong>SimplyPlants Child Theme</strong>: TailwindCSS 4.x + Alpine.js, responsive Nike-style 4-section sidebar, product badges</span></li>
+<li class="flex gap-3"><span class="flex-shrink-0 w-6 h-6 bg-sp-primary/10 text-sp-primary flex items-center justify-center text-sm font-semibold"></span><span><strong>Performance Excellence</strong>: LCP ≤2500ms, CLS <0.1, TBT ≤200ms with 13K SKU catalog</span></li>
+<li class="flex gap-3"><span class="flex-shrink-0 w-6 h-6 bg-sp-primary/10 text-sp-primary flex items-center justify-center text-sm font-semibold"></span><span><strong>Accessibility Compliance</strong>: WCAG 2.1 AA across all PLPs and interactions</span></li>
+</ol>
+<h3 id="success-metrics">Success Metrics</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><strong>Time to Market</strong>: UAT-ready by April 6 (9 weeks), GO LIVE May 1 (12 weeks)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><strong>Performance</strong>: LCP ≤2500ms desktop, ≤3000ms mobile with 13,130 SKUs indexed</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><strong>Catalog Readiness</strong>: 47 PLPs with filtering, 13K products imported and searchable</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><strong>Quality</strong>: Zero critical defects in UAT, WCAG 2.1 AA compliance, cross-browser compatibility</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><strong>SEO</strong>: All 47 PLPs indexable with canonical URLs, rich snippets, optimized crawlability</span></li>
+</ul>
+<hr class="my-8 border-sp-light">
+    </div>
+</div>
+
+<!-- Project Scope Section (Collapsible) -->
+<div x-data="{ open: true }" class="section-wrapper section-gold mb-12">
+    <button @click="open = !open"
+            class="section-header"
+            :aria-expanded="open.toString()"
+            aria-controls="section-project-scope">
+        <h2 id="project-scope" class="text-2xl font-semibold text-sp-darkest !mt-0 !mb-0 flex-1">
+            Project Scope
+        </h2>
+        <svg :class="open ? 'rotate-180' : ''" class="w-6 h-6 transition-transform flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" style="color: currentColor;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+
+    <div id="section-project-scope"
+         x-show="open"
+         x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 -translate-y-2"
+         class="section-content">
+
+<h3 id="in-scope-mvp-launch-11-weeks" class="text-xl font-semibold text-sp-darkest mb-6">In Scope (MVP Launch - 11 Weeks)</h3>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Magento Installation Card -->
+    <div class="bg-white border-2 border-sp-light hover:border-sp-primary transition-colors p-6">
+        <div class="flex items-start gap-4 mb-4">
+            <div class="w-10 h-10 bg-sp-primary/10 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-sp-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold text-sp-darkest">Fresh Magento 2.4.8 Installation</h4>
+                <span class="text-sm text-sp-forest">Week 2-3</span>
+            </div>
+        </div>
+        <ul class="space-y-2 text-sm text-sp-forest">
+            <li class="flex gap-2"><span class="text-sp-primary">•</span>Mark Shust Docker configuration</li>
+            <li class="flex gap-2"><span class="text-sp-primary">•</span>Hyva theme + Hyva Checkout</li>
+            <li class="flex gap-2"><span class="text-sp-primary">•</span>OpenSearch 2.12 for 13K SKUs</li>
+            <li class="flex gap-2"><span class="text-sp-primary">•</span>MariaDB 11.4, Valkey/Redis 8.1</li>
+        </ul>
+    </div>
+
+    <!-- Nike URL Filtering Card -->
+    <div class="bg-white border-2 border-sp-light hover:border-sp-accent-rust transition-colors p-6">
+        <div class="flex items-start gap-4 mb-4">
+            <div class="w-10 h-10 bg-sp-accent-rust/10 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-sp-accent-rust" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold text-sp-darkest">Nike-Style URL Filtering</h4>
+                <span class="text-sm text-sp-accent-rust font-medium">Week 4-7 (MAX 4 WEEKS)</span>
+            </div>
+        </div>
+        <ul class="space-y-2 text-sm text-sp-forest">
+            <li class="flex gap-2"><span class="text-sp-accent-rust">•</span>Custom URL routing with 5-char codes</li>
+            <li class="flex gap-2"><span class="text-sp-accent-rust">•</span>133 filter codes registry</li>
+            <li class="flex gap-2"><span class="text-sp-accent-rust">•</span>16 HIGH priority attributes</li>
+            <li class="flex gap-2"><span class="text-sp-accent-rust">•</span>Filter persistence & canonical URLs</li>
+        </ul>
+    </div>
+
+    <!-- Child Theme Card -->
+    <div class="bg-white border-2 border-sp-light hover:border-sp-accent-teal transition-colors p-6">
+        <div class="flex items-start gap-4 mb-4">
+            <div class="w-10 h-10 bg-sp-accent-teal/10 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-sp-accent-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold text-sp-darkest">SimplyPlants Child Theme</h4>
+                <span class="text-sm text-sp-forest">Week 4-9</span>
+            </div>
+        </div>
+        <ul class="space-y-2 text-sm text-sp-forest">
+            <li class="flex gap-2"><span class="text-sp-accent-teal">•</span>TailwindCSS 4.x + Alpine.js</li>
+            <li class="flex gap-2"><span class="text-sp-accent-teal">•</span>3-section sidebar (Hot Keys deferred)</li>
+            <li class="flex gap-2"><span class="text-sp-accent-teal">•</span>Product grid (3-4 col desktop, 2 mobile)</li>
+            <li class="flex gap-2"><span class="text-sp-accent-teal">•</span>Mobile drawer + filter chips</li>
+        </ul>
+    </div>
+
+    <!-- Product Badges Card -->
+    <div class="bg-white border-2 border-sp-light hover:border-sp-accent-gold transition-colors p-6">
+        <div class="flex items-start gap-4 mb-4">
+            <div class="w-10 h-10 bg-sp-accent-gold/10 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-sp-accent-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold text-sp-darkest">Product Badge System</h4>
+                <span class="text-sm text-sp-forest">Week 6-8</span>
+            </div>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <span class="px-2 py-1 text-xs font-medium bg-sp-primary/10 text-sp-primary">BESTSELLER</span>
+            <span class="px-2 py-1 text-xs font-medium bg-sp-accent-teal/10 text-sp-accent-teal">NEW_ARRIVAL</span>
+            <span class="px-2 py-1 text-xs font-medium bg-sp-accent-rust/10 text-sp-accent-rust">SALE</span>
+            <span class="px-2 py-1 text-xs font-medium bg-sp-accent-gold/10 text-sp-darkest">RHS_AGM</span>
+            <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600">+3 more</span>
+        </div>
+    </div>
+
+    <!-- Category Structure Card -->
+    <div class="bg-white border-2 border-sp-light hover:border-sp-primary transition-colors p-6">
+        <div class="flex items-start gap-4 mb-4">
+            <div class="w-10 h-10 bg-sp-primary/10 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-sp-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold text-sp-darkest">Category Structure & PLPs</h4>
+                <span class="text-sm text-sp-forest">Week 3-4</span>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+            <div class="bg-sp-lightest p-3 text-center">
+                <div class="text-2xl font-bold text-sp-primary">47</div>
+                <div class="text-sp-forest">PLPs for launch</div>
+            </div>
+            <div class="bg-sp-lightest p-3 text-center">
+                <div class="text-2xl font-bold text-sp-primary">16+31</div>
+                <div class="text-sp-forest">L1 + L2 categories</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEO & Performance Card -->
+    <div class="bg-white border-2 border-sp-light hover:border-sp-primary transition-colors p-6">
+        <div class="flex items-start gap-4 mb-4">
+            <div class="w-10 h-10 bg-sp-primary/10 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-sp-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold text-sp-darkest">SEO & Performance</h4>
+                <span class="text-sm text-sp-forest">Week 8-10</span>
+            </div>
+        </div>
+        <ul class="space-y-2 text-sm text-sp-forest">
+            <li class="flex gap-2"><span class="text-sp-primary">•</span>Schema.org Product + BreadcrumbList</li>
+            <li class="flex gap-2"><span class="text-sp-primary">•</span>Canonical URLs, noindex for filters</li>
+            <li class="flex gap-2"><span class="text-sp-primary">•</span>FPC with >80% hit rate</li>
+            <li class="flex gap-2"><span class="text-sp-primary">•</span>Core Web Vitals monitoring</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Testing & Documentation Row -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="bg-sp-lightest border-l-4 border-sp-primary p-5">
+        <h4 class="font-semibold text-sp-darkest mb-3">Testing & QA (Week 10-12)</h4>
+        <p class="text-sm text-sp-forest">Playwright E2E, visual regression, cross-browser, WCAG 2.1 AA audit, load testing</p>
+    </div>
+    <div class="bg-sp-lightest border-l-4 border-sp-accent-teal p-5">
+        <h4 class="font-semibold text-sp-darkest mb-3">Documentation (Week 10-11)</h4>
+        <p class="text-sm text-sp-forest">User guide, developer runbook, architecture docs, API contracts, ERD</p>
+    </div>
+</div>
+<h3 id="out-of-scope-explicitly-deferred-post-mvp" class="text-xl font-semibold text-sp-darkest mb-6">Out of Scope (Deferred Post-MVP)</h3>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+    <!-- Hot Keys Card - DEFERRED -->
+    <div class="bg-gray-50 border-2 border-gray-200 border-l-4 border-l-sp-accent-rust p-5 opacity-75">
+        <div class="flex items-start justify-between mb-3">
+            <h4 class="font-semibold text-gray-700">Hot Keys Quick-Filter Presets</h4>
+            <span class="px-2 py-1 text-xs font-bold bg-sp-accent-rust/10 text-sp-accent-rust uppercase">Deferred</span>
+        </div>
+        <p class="text-sm text-gray-600 mb-3">12 Hot Keys bar in sidebar for quick filters like "Pink Roses", "Low Maintenance"</p>
+        <p class="text-xs text-gray-500 italic">Rationale: Prioritize core filtering first</p>
+    </div>
+
+    <!-- Remaining PLPs Card -->
+    <div class="bg-gray-50 border-2 border-gray-200 border-l-4 border-l-gray-400 p-5 opacity-75">
+        <div class="flex items-start justify-between mb-3">
+            <h4 class="font-semibold text-gray-700">Remaining PLPs</h4>
+            <span class="px-2 py-1 text-xs font-medium bg-gray-200 text-gray-600">Phase 1.5</span>
+        </div>
+        <div class="flex gap-4 text-sm">
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-500">393</div>
+                <div class="text-xs text-gray-500">Deferred</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-sp-primary">47</div>
+                <div class="text-xs text-gray-500">MVP Launch</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attributes Card -->
+    <div class="bg-gray-50 border-2 border-gray-200 border-l-4 border-l-gray-400 p-5 opacity-75">
+        <div class="flex items-start justify-between mb-3">
+            <h4 class="font-semibold text-gray-700">Additional Attributes</h4>
+            <span class="px-2 py-1 text-xs font-medium bg-gray-200 text-gray-600">Phase 1.5-2</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="bg-white p-2 text-center border border-gray-200">
+                <span class="font-semibold text-gray-600">17</span>
+                <span class="text-xs text-gray-500 block">MEDIUM</span>
+            </div>
+            <div class="bg-white p-2 text-center border border-gray-200">
+                <span class="font-semibold text-gray-600">20</span>
+                <span class="text-xs text-gray-500 block">LOW</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Features Card -->
+    <div class="bg-gray-50 border-2 border-gray-200 border-l-4 border-l-gray-400 p-5 opacity-75">
+        <div class="flex items-start justify-between mb-3">
+            <h4 class="font-semibold text-gray-700">Advanced Features</h4>
+            <span class="px-2 py-1 text-xs font-medium bg-gray-200 text-gray-600">Phase 2</span>
+        </div>
+        <div class="flex flex-wrap gap-1">
+            <span class="px-2 py-0.5 text-xs bg-white border border-gray-200 text-gray-500">Bundles</span>
+            <span class="px-2 py-0.5 text-xs bg-white border border-gray-200 text-gray-500">Reviews</span>
+            <span class="px-2 py-0.5 text-xs bg-white border border-gray-200 text-gray-500">Wishlist</span>
+            <span class="px-2 py-0.5 text-xs bg-white border border-gray-200 text-gray-500">Multi-lang</span>
+            <span class="px-2 py-0.5 text-xs bg-white border border-gray-200 text-gray-500">+3 more</span>
+        </div>
+    </div>
+</div>
+<hr class="my-8 border-sp-light">
+    </div>
+</div>
+
+<!-- Timeline & Milestones Section (Collapsible) -->
+<div x-data="{ open: true }" class="section-wrapper section-teal mb-12">
+    <button @click="open = !open"
+            class="section-header"
+            :aria-expanded="open.toString()"
+            aria-controls="section-timeline-milestones">
+        <h2 id="timeline-milestones" class="text-2xl font-semibold text-sp-darkest !mt-0 !mb-0 flex-1">
+            Timeline & Milestones
+        </h2>
+        <svg :class="open ? 'rotate-180' : ''" class="w-6 h-6 transition-transform flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" style="color: currentColor;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+
+    <div id="section-timeline-milestones"
+         x-show="open"
+         x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 -translate-y-2"
+         class="section-content">
+
+<h3 id="12-week-critical-path-feb-2-apr-23-2026">12-Week Critical Path (Feb 2 → Apr 23, 2026)</h3>
+<div class="overflow-x-auto"><table class="doc-table">
+<thead><tr>
+<th>Week</th>
+<th>Dates</th>
+<th>Phase</th>
+<th>Key Deliverables</th>
+<th>Team Focus</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>W1</strong></td>
+<td>Feb 2-13</td>
+<td>Foundation</td>
+<td>Magento 2.4.8 install, Hyva setup, Docker, module scaffolding</td>
+<td>Backend: Infrastructure / Frontend: Theme baseline</td>
+</tr>
+<tr>
+<td><strong>W2</strong></td>
+<td>Feb 14-20</td>
+<td>Foundation</td>
+<td>Category structure (47 PLPs), OpenSearch config, database schema</td>
+<td>Backend: Data / Frontend: Theme structure</td>
+</tr>
+<tr>
+<td><strong>W3</strong></td>
+<td>Feb 21-27</td>
+<td>Core Dev</td>
+<td>URL routing start, filter codes, child theme TailwindCSS</td>
+<td>Both: Parallel dev starts</td>
+</tr>
+<tr>
+<td><strong>W4</strong></td>
+<td>Feb 28-Mar 6</td>
+<td>Core Dev</td>
+<td>URL parsing/generation, facet engine, sidebar UI</td>
+<td>Nike URL filtering (MAX 4 weeks)</td>
+</tr>
+<tr>
+<td><strong>W5</strong></td>
+<td>Mar 7-13</td>
+<td>Core Dev</td>
+<td>Filter persistence, product badges, product grid</td>
+<td>Both: Feature completion</td>
+</tr>
+<tr>
+<td><strong>W6</strong></td>
+<td>Mar 14-20</td>
+<td>Core Dev</td>
+<td>Nike URL filtering complete, badge display, Quick Add</td>
+<td>Nike URL filtering END</td>
+</tr>
+<tr>
+<td><strong>W7</strong></td>
+<td>Mar 21-27</td>
+<td>Integration</td>
+<td>SEO implementation, mobile responsive, performance tuning</td>
+<td>Both: Integration focus</td>
+</tr>
+<tr>
+<td><strong>W8</strong></td>
+<td>Mar 28-Apr 3</td>
+<td>Integration</td>
+<td>OpenSearch optimization, FPC, accessibility audit</td>
+<td>Both: Quality focus</td>
+</tr>
+<tr>
+<td><strong>W9</strong></td>
+<td>Apr 4-10</td>
+<td>QA & Polish</td>
+<td>E2E tests, cross-browser testing, performance benchmarks</td>
+<td><strong>UAT STARTS Apr 6</strong></td>
+</tr>
+<tr>
+<td><strong>W10</strong></td>
+<td>Apr 11-17</td>
+<td>QA & Documentation</td>
+<td>Playwright suite, docs, defect fixes</td>
+<td>QA validation</td>
+</tr>
+<tr>
+<td><strong>W11</strong></td>
+<td>Apr 18-23</td>
+<td>Pre-UAT Prep</td>
+<td>Staging deployment, smoke tests, UAT handoff</td>
+<td><strong>UAT READY Apr 23</strong></td>
+</tr>
+</tbody></table></div>
+<h3 id="key-milestones" class="text-xl font-semibold text-sp-darkest mb-6">Key Milestones</h3>
+
+<!-- Timeline Visual -->
+<div class="relative mb-8">
+    <!-- Timeline line -->
+    <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-sp-light"></div>
+
+    <!-- Milestone Items -->
+    <div class="space-y-4">
+        <!-- Gate 0 -->
+        <div class="flex gap-4 items-start">
+            <div class="w-12 h-12 bg-sp-primary flex items-center justify-center flex-shrink-0 relative z-10">
+                <span class="text-white font-bold text-sm">G0</span>
+            </div>
+            <div class="bg-white border-2 border-sp-light p-3 flex-1 hover:border-sp-primary transition-colors">
+                <div class="flex flex-wrap items-center gap-2 mb-1">
+                    <span class="font-semibold text-sp-darkest">Week 1</span>
+                    <span class="text-xs text-sp-forest">Feb 13</span>
+                </div>
+                <p class="text-sm text-sp-forest">Magento 2.4.8 + Hyva installed, Docker stack operational</p>
+            </div>
+        </div>
+
+        <!-- Gate 1 -->
+        <div class="flex gap-4 items-start">
+            <div class="w-12 h-12 bg-sp-primary flex items-center justify-center flex-shrink-0 relative z-10">
+                <span class="text-white font-bold text-sm">G1</span>
+            </div>
+            <div class="bg-white border-2 border-sp-light p-3 flex-1 hover:border-sp-primary transition-colors">
+                <div class="flex flex-wrap items-center gap-2 mb-1">
+                    <span class="font-semibold text-sp-darkest">Week 2</span>
+                    <span class="text-xs text-sp-forest">Feb 20</span>
+                </div>
+                <p class="text-sm text-sp-forest">47 categories created, database schema installed</p>
+            </div>
+        </div>
+
+        <!-- Gate 2 -->
+        <div class="flex gap-4 items-start">
+            <div class="w-12 h-12 bg-sp-primary flex items-center justify-center flex-shrink-0 relative z-10">
+                <span class="text-white font-bold text-sm">G2</span>
+            </div>
+            <div class="bg-white border-2 border-sp-light p-3 flex-1 hover:border-sp-primary transition-colors">
+                <div class="flex flex-wrap items-center gap-2 mb-1">
+                    <span class="font-semibold text-sp-darkest">Week 4</span>
+                    <span class="text-xs text-sp-forest">Mar 6</span>
+                </div>
+                <p class="text-sm text-sp-forest">URL routing functional, filter parsing complete</p>
+            </div>
+        </div>
+
+        <!-- Gate 3 -->
+        <div class="flex gap-4 items-start">
+            <div class="w-12 h-12 bg-sp-accent-rust flex items-center justify-center flex-shrink-0 relative z-10">
+                <span class="text-white font-bold text-sm">G3</span>
+            </div>
+            <div class="bg-white border-2 border-sp-light p-3 flex-1 hover:border-sp-accent-rust transition-colors">
+                <div class="flex flex-wrap items-center gap-2 mb-1">
+                    <span class="font-semibold text-sp-darkest">Week 6</span>
+                    <span class="text-xs text-sp-forest">Mar 20</span>
+                    <span class="px-2 py-0.5 text-xs bg-sp-accent-rust/10 text-sp-accent-rust font-medium">Critical</span>
+                </div>
+                <p class="text-sm text-sp-forest">Nike URL filtering complete, filter persistence working</p>
+            </div>
+        </div>
+
+        <!-- Gate 4 -->
+        <div class="flex gap-4 items-start">
+            <div class="w-12 h-12 bg-sp-primary flex items-center justify-center flex-shrink-0 relative z-10">
+                <span class="text-white font-bold text-sm">G4</span>
+            </div>
+            <div class="bg-white border-2 border-sp-light p-3 flex-1 hover:border-sp-primary transition-colors">
+                <div class="flex flex-wrap items-center gap-2 mb-1">
+                    <span class="font-semibold text-sp-darkest">Week 8</span>
+                    <span class="text-xs text-sp-forest">Apr 3</span>
+                </div>
+                <p class="text-sm text-sp-forest">Frontend UI polished, mobile responsive, badges operational</p>
+            </div>
+        </div>
+
+        <!-- Gate 5 -->
+        <div class="flex gap-4 items-start">
+            <div class="w-12 h-12 bg-sp-primary flex items-center justify-center flex-shrink-0 relative z-10">
+                <span class="text-white font-bold text-sm">G5</span>
+            </div>
+            <div class="bg-white border-2 border-sp-light p-3 flex-1 hover:border-sp-primary transition-colors">
+                <div class="flex flex-wrap items-center gap-2 mb-1">
+                    <span class="font-semibold text-sp-darkest">Week 10</span>
+                    <span class="text-xs text-sp-forest">Apr 17</span>
+                </div>
+                <p class="text-sm text-sp-forest">Performance optimized (LCP ≤2500ms), accessibility compliant</p>
+            </div>
+        </div>
+
+        <!-- Gate 6 - UAT Ready -->
+        <div class="flex gap-4 items-start">
+            <div class="w-12 h-12 bg-sp-accent-gold flex items-center justify-center flex-shrink-0 relative z-10">
+                <span class="text-sp-darkest font-bold text-sm">G6</span>
+            </div>
+            <div class="bg-sp-accent-gold/10 border-2 border-sp-accent-gold p-3 flex-1">
+                <div class="flex flex-wrap items-center gap-2 mb-1">
+                    <span class="font-semibold text-sp-darkest">Week 11</span>
+                    <span class="text-xs text-sp-forest">Apr 23</span>
+                    <span class="px-2 py-0.5 text-xs bg-sp-accent-gold text-sp-darkest font-bold">UAT READY</span>
+                </div>
+                <p class="text-sm text-sp-forest">QA sign-off, documentation complete</p>
+            </div>
+        </div>
+
+        <!-- GO LIVE -->
+        <div class="flex gap-4 items-start">
+            <div class="w-12 h-12 bg-sp-darkest flex items-center justify-center flex-shrink-0 relative z-10">
+                <svg class="w-6 h-6 text-sp-accent-gold" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            </div>
+            <div class="bg-sp-darkest text-white p-3 flex-1">
+                <div class="flex flex-wrap items-center gap-2 mb-1">
+                    <span class="font-bold">GO LIVE</span>
+                    <span class="text-xs text-white/70">May 1, 2026</span>
+                    <span class="px-2 py-0.5 text-xs bg-sp-accent-gold text-sp-darkest font-bold">NBL-36</span>
+                </div>
+                <p class="text-sm text-white/80">UAT Period: Apr 6-30 (NBL-35)</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3 id="jira-integration" class="text-xl font-semibold text-sp-darkest mb-6">Jira Integration</h3>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+    <!-- Primary Epic -->
+    <div class="lg:col-span-1 bg-sp-primary/5 border-2 border-sp-primary p-4">
+        <div class="text-xs font-medium text-sp-primary uppercase tracking-wide mb-2">Primary Epic</div>
+        <div class="flex items-center gap-2">
+            <span class="px-2 py-1 bg-sp-primary text-white text-sm font-bold">NBL-3</span>
+            <span class="text-sm text-sp-darkest font-medium">Website Development - MVP1</span>
+        </div>
+        <p class="text-xs text-sp-forest mt-2">Feb 2 - Apr 3, 2026</p>
+    </div>
+
+    <!-- Key Tickets -->
+    <div class="lg:col-span-2 bg-white border-2 border-sp-light p-4">
+        <div class="text-xs font-medium text-sp-forest uppercase tracking-wide mb-3">Key Tickets</div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div class="flex items-center gap-2 p-2 bg-sp-lightest">
+                <span class="px-1.5 py-0.5 bg-sp-accent-teal text-white text-xs font-bold">NBL-62</span>
+                <span class="text-xs text-sp-darkest">Theme</span>
+            </div>
+            <div class="flex items-center gap-2 p-2 bg-sp-lightest">
+                <span class="px-1.5 py-0.5 bg-sp-accent-rust text-white text-xs font-bold">NBL-125</span>
+                <span class="text-xs text-sp-darkest">URL Filter</span>
+            </div>
+            <div class="flex items-center gap-2 p-2 bg-sp-lightest">
+                <span class="px-1.5 py-0.5 bg-sp-primary text-white text-xs font-bold">NBL-155</span>
+                <span class="text-xs text-sp-darkest">Core</span>
+            </div>
+            <div class="flex items-center gap-2 p-2 bg-sp-lightest">
+                <span class="px-1.5 py-0.5 bg-sp-forest text-white text-xs font-bold">NBL-124</span>
+                <span class="text-xs text-sp-darkest">Dev Setup</span>
+            </div>
+            <div class="flex items-center gap-2 p-2 bg-sp-lightest">
+                <span class="px-1.5 py-0.5 bg-sp-forest text-white text-xs font-bold">NBL-67</span>
+                <span class="text-xs text-sp-darkest">Products</span>
+            </div>
+            <div class="flex items-center gap-2 p-2 bg-sp-lightest">
+                <span class="px-1.5 py-0.5 bg-sp-forest text-white text-xs font-bold">NBL-146</span>
+                <span class="text-xs text-sp-darkest">Attributes</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-sp-lightest border-l-4 border-sp-accent-teal p-4 mb-6">
+    <p class="text-sm text-sp-forest">See <a href="jira-mapping.html" class="text-sp-primary font-medium hover:underline">Jira Mapping</a> for complete task-to-ticket breakdown with sub-tasks.</p>
+</div>
+<hr class="my-8 border-sp-light">
+    </div>
+</div>
+
+                </article>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-sp-darkest text-white py-12 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/10 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-sp-accent-gold" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="font-semibold">SimplyPlants MVP</p>
+                        <p class="text-xs text-white/60">Delivery Plan Documentation</p>
+                    </div>
+                </div>
+                <div class="text-center md:text-right">
+                    <p class="text-sm text-white/60">Last updated: February 5, 2026</p>
+                    <p class="text-xs text-white/40 mt-1">QB Digital Software</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

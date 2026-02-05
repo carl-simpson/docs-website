@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Plan | SimplyPlants MVP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'sp': {
+                            'darkest': '#002C1B',
+                            'dark': '#3A4D39',
+                            'forest': '#506055',
+                            'primary': '#008236',
+                            'sage': '#8A9A7B',
+                            'olive': '#56624B',
+                            'light': '#E5E7EB',
+                            'lightest': '#F3F4F6',
+                        },
+                        'sp-accent': {
+                            'gold': '#FDC700',
+                            'teal': '#4B828F',
+                            'rust': '#BB4D00',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        [x-cloak] { display: none !important; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-hero {
+            background: linear-gradient(135deg, #002C1B 0%, #3A4D39 50%, #506055 100%);
+        }
+
+        /* Callout styles - NO BORDER RADIUS per brand guidelines */
+        .callout {
+            padding: 1rem 1rem 1rem 1.25rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid currentColor;
+        }
+        .callout-note { background-color: #EFF6FF; color: #3B82F6; }
+        .callout-tip { background-color: #F0FDF4; color: #008236; }
+        .callout-warning { background-color: #FFFBEB; color: #F59E0B; }
+        .callout-important { background-color: #FEF2F2; color: #EF4444; }
+
+        /* Step container - NO BORDER RADIUS */
+        .step-container {
+            background: linear-gradient(to right, rgba(0, 130, 54, 0.05), transparent);
+            border-left: 4px solid #008236;
+            padding: 1.25rem 1rem 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        /* Section overview - NO BORDER RADIUS */
+        .section-overview {
+            background: linear-gradient(135deg, #F3F4F6 0%, white 100%);
+            border: 1px solid #E5E7EB;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        /* Phase Cards - NO BORDER RADIUS */
+        .phase-card {
+            background: white;
+            border: 2px solid #E5E7EB;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            transition: border-color 200ms ease-out;
+        }
+        .phase-card:hover {
+            border-color: #008236;
+        }
+
+        /* Code blocks - NO BORDER RADIUS */
+        pre {
+            background-color: #002C1B;
+            color: #E5E7EB;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        code:not(pre code) {
+            background-color: #F3F4F6;
+            color: #3A4D39;
+            padding: 0.125rem 0.375rem;
+            font-size: 0.875em;
+            border: 1px solid #E5E7EB;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        /* Tables - NO BORDER RADIUS */
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            border: 1px solid #E5E7EB;
+        }
+
+        .doc-table th {
+            background-color: #3A4D39;
+            color: white;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .doc-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .doc-table tr:hover td {
+            background-color: #F3F4F6;
+        }
+
+        /* Anchors */
+        h1, h2, h3, h4, h5, h6 {
+            scroll-margin-top: 5rem;
+        }
+
+        /* Print */
+        @media print {
+            nav, .no-print, header { display: none !important; }
+            main { max-width: 100% !important; margin: 0 !important; }
+        }
+    </style>
+</head>
+<body class="bg-sp-lightest min-h-screen" x-data="{ mobileMenuOpen: false, tocOpen: false }">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-sp-primary text-white px-4 py-2 z-50 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Skip to main content</a>
+
+    <!-- Header -->
+    <header class="gradient-hero text-white sticky top-0 z-40 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="index.html" class="flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-sp-darkest">
+                    <div class="w-10 h-10 bg-white/20 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-sp-accent-gold" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold">SimplyPlants</h1>
+                        <p class="text-xs text-white/70">MVP Delivery Plan</p>
+                    </div>
+                </a>
+
+                <nav class="hidden md:flex items-center gap-1" aria-label="Main navigation">
+                    <a href="executive-summary.html" class="px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-sp-darkest">Executive Summary</a>
+                    <a href="delivery-plan.html" class="px-3 py-2 text-sm font-medium text-white bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-sp-darkest" aria-current="page">Delivery Plan</a>
+                    <a href="jira-mapping.html" class="px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-sp-darkest">Jira Mapping</a>
+                </nav>
+
+                <button @click="mobileMenuOpen = !mobileMenuOpen"
+                        class="md:hidden p-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white"
+                        aria-label="Toggle menu"
+                        :aria-expanded="mobileMenuOpen.toString()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div x-show="mobileMenuOpen"
+             x-cloak
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-2"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             class="md:hidden border-t border-white/10">
+            <nav class="px-4 py-3 space-y-1" aria-label="Mobile navigation">
+                <a href="executive-summary.html" class="block px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-sp-darkest">Executive Summary</a>
+                <a href="delivery-plan.html" class="block px-3 py-2 text-sm font-medium text-white bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-sp-darkest" aria-current="page">Delivery Plan</a>
+                <a href="jira-mapping.html" class="block px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-sp-darkest">Jira Mapping</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Title Banner -->
+    <section class="gradient-hero text-white py-8 lg:py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-3xl">
+                <h2 class="text-3xl lg:text-4xl font-bold tracking-tight mb-3">Delivery Plan</h2>
+                <p class="text-lg text-white/80 leading-7">Phase structure, tasks, quality gates, and risk management</p>
+            </div>
+        </div>
+    </section>
+
+    <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div class="lg:flex lg:gap-8">
+            <!-- Table of Contents (desktop sidebar) -->
+            <aside class="hidden lg:block lg:w-64 flex-shrink-0">
+                <nav class="sticky top-24 bg-white border border-sp-light p-6 max-h-[calc(100vh-8rem)] overflow-y-auto shadow-sm" aria-label="Table of contents">
+                    <h3 class="text-sm font-semibold text-sp-darkest mb-4 uppercase tracking-wide">On This Page</h3>
+                    <div class="space-y-1">
+                        <a href="#overview" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Overview</a>
+                        <a href="#context" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Context</a>
+                        <a href="#phases" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Phases</a>
+                        <a href="#week-1" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Week 1: Setup</a>
+                        <a href="#week-2" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Week 2: Foundation</a>
+                        <a href="#week-3-6" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Week 3-6: Nike Filtering</a>
+                        <a href="#week-7-8" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Week 7-8: Integration</a>
+                        <a href="#week-9-11" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Week 9-11: QA & Testing</a>
+                        <a href="#risks" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Risks</a>
+                        <a href="#quality-gates" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Quality Gates</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Mobile TOC Toggle -->
+            <div class="lg:hidden mb-6">
+                <button @click="tocOpen = !tocOpen"
+                        class="w-full flex items-center justify-between px-4 py-3 bg-white border border-sp-light text-left font-medium text-sp-darkest hover:bg-sp-lightest transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2"
+                        :aria-expanded="tocOpen.toString()"
+                        aria-controls="mobile-toc">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-sp-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                        </svg>
+                        Table of Contents
+                    </span>
+                    <svg :class="tocOpen ? 'rotate-180' : ''" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+
+                <nav x-show="tocOpen"
+                     x-cloak
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 -translate-y-2"
+                     id="mobile-toc"
+                     class="bg-white border border-t-0 border-sp-light p-4 space-y-1 max-h-96 overflow-y-auto"
+                     aria-label="Mobile table of contents">
+                    <a href="#overview" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Overview</a>
+                    <a href="#context" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Context</a>
+                    <a href="#phases" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Phases</a>
+                    <a href="#week-1" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Week 1: Setup</a>
+                    <a href="#week-2" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Week 2: Foundation</a>
+                    <a href="#week-3-6" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Week 3-6: Nike Filtering</a>
+                    <a href="#week-7-8" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Week 7-8: Integration</a>
+                    <a href="#week-9-11" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Week 9-11: QA & Testing</a>
+                    <a href="#risks" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Risks</a>
+                    <a href="#quality-gates" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Quality Gates</a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 min-w-0">
+                <article class="bg-white border border-sp-light p-6 sm:p-8 lg:p-10 shadow-sm">
+                    <h1 id="overview" class="text-4xl font-bold tracking-tight text-sp-darkest mb-6">SimplyPlants 12-Week MVP Delivery Plan</h1>
+
+                    <!-- Context Section - Collapsible -->
+                    <div x-data="{ open: true }" class="mb-8 border-l-4 border-sp-primary bg-gradient-to-r from-sp-primary/5 to-transparent">
+                        <button @click="open = !open"
+                                class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-sp-primary/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2"
+                                :aria-expanded="open.toString()"
+                                aria-controls="context-section">
+                            <h2 id="context" class="text-2xl font-semibold text-sp-darkest !mt-0 !mb-0">
+                                Context
+                            </h2>
+                            <svg :class="open ? 'rotate-180' : ''" class="w-6 h-6 transition-transform text-sp-primary flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+
+                        <div x-show="open"
+                             x-cloak
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 -translate-y-2"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             id="context-section"
+                             class="px-6 pb-6 space-y-6">
+
+                            <div class="section-overview">
+                                <h3 class="text-lg font-semibold text-sp-darkest mb-4">Problem Statement</h3>
+                                <p class="text-base leading-7 text-sp-forest">
+                                    Launch SimplyPlants e-commerce store with 13,130 SKUs across 47 PLPs (of 440 total) using Magento 2.4.8 + Hyva theme with Nike-style URL filtering. 12-week delivery (Feb 2 → Apr 23, 2026). Week 1 is setup, refinement and planning. UAT starts Apr 6, GO LIVE target May 1, 2026.
+                                </p>
+                            </div>
+
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-sp-darkest mb-4">Scope In</h3>
+                                    <ul class="space-y-2 text-base leading-7">
+                                        <li class="flex gap-3">
+                                            <svg class="w-5 h-5 text-sp-primary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="text-sp-forest">Fresh Magento 2.4.8 installation with Hyva + Hyva Checkout</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <svg class="w-5 h-5 text-sp-primary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="text-sp-forest">47 PLPs (16 L1 + 31 L2 categories) for initial launch</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <svg class="w-5 h-5 text-sp-primary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="text-sp-forest">Custom URL routing with 5-char filter codes</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <svg class="w-5 h-5 text-sp-primary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="text-sp-forest">133 filter codes registry</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <svg class="w-5 h-5 text-sp-primary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="text-sp-forest">16 HIGH priority product attributes (MVP-critical only)</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <svg class="w-5 h-5 text-sp-primary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="text-sp-forest">Nike-style 3-section sidebar (Hot Keys DEFERRED)</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <svg class="w-5 h-5 text-sp-primary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="text-sp-forest">Product badge system (7 badge types)</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <svg class="w-5 h-5 text-sp-primary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="text-sp-forest">Filter persistence across categories</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <svg class="w-5 h-5 text-sp-primary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="text-sp-forest">Mobile responsive with drawer sidebar</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <svg class="w-5 h-5 text-sp-primary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="text-sp-forest">Performance optimization for 13K SKUs (LCP ≤2500ms)</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <svg class="w-5 h-5 text-sp-primary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="text-sp-forest">WCAG 2.1 AA accessibility compliance</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <svg class="w-5 h-5 text-sp-primary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="text-sp-forest">E2E testing with Playwright</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div>
+                                    <h3 class="text-lg font-semibold text-sp-darkest mb-4">Scope Out</h3>
+                                    <ul class="space-y-2 text-base leading-7">
+                                        <li class="flex gap-3">
+                                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="text-gray-600">Hot Keys quick-filter presets (DEFERRED by team decision)</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="text-gray-600">Remaining 393 PLPs (add in Phase 1.5 post-launch)</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="text-gray-600">MEDIUM/LOW priority attributes (37 attributes deferred)</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="text-gray-600">Advanced features (grouped/bundle products, personalization)</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phases Section - Collapsible -->
+                    <!-- Phases Section - Collapsible -->
+                    <div x-data="{ open: true }" class="mb-8 border-l-4 border-sp-accent-rust bg-gradient-to-r from-red-50/50 to-transparent">
+                        <button @click="open = !open"
+                                class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-red-50/50 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-accent-rust focus:ring-offset-2"
+                                :aria-expanded="open.toString()"
+                                aria-controls="phases-section">
+                            <h2 id="phases" class="text-2xl font-semibold text-sp-darkest !mt-0 !mb-0">
+                                Phases
+                            </h2>
+                            <svg :class="open ? 'rotate-180' : ''" class="w-6 h-6 transition-transform text-sp-accent-rust flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+
+                        <div x-show="open"
+                             x-cloak
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 -translate-y-2"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             id="phases-section"
+                             class="px-6 pb-6 space-y-6">
+
+                            <!-- Phase 1: Week 1 -->
+                            <div class="phase-card" id="week-1">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-sp-darkest mb-2">Week 1: Setup, Refinement & Planning</h3>
+                                        <p class="text-sm text-sp-forest">Feb 2-7, 2026</p>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wide bg-blue-100 text-blue-800 border border-blue-200">Week 1</span>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="text-sm font-semibold text-sp-dark mb-2">Goal</div>
+                                    <p class="text-base leading-7 text-sp-forest">Project setup complete, delivery plan finalized, environments configured</p>
+                                </div>
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <div class="text-sm font-semibold text-sp-dark mb-3">Frontend Tasks</div>
+                                        <ul class="space-y-2 text-sm leading-6">
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Finalize delivery plan documentation</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Configure local development environment</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Review Figma designs and create component inventory</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Setup Playwright test infrastructure</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-semibold text-sp-dark mb-3">Backend Tasks</div>
+                                        <ul class="space-y-2 text-sm leading-6">
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Review technical architecture</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Prepare staging environment configuration</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Document database schema requirements</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Coordinate with hosting provider</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Phase 2: Week 2 -->
+                            <div class="phase-card" id="week-2">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-sp-darkest mb-2">Week 2: Foundation & Backend Setup</h3>
+                                        <p class="text-sm text-sp-forest">Feb 10-14, 2026</p>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wide bg-green-100 text-green-800 border border-green-200">Week 2</span>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="text-sm font-semibold text-sp-dark mb-2">Goal</div>
+                                    <p class="text-base leading-7 text-sp-forest">Magento installation complete, child theme initialized, categories imported, foundation ready</p>
+                                </div>
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <div class="text-sm font-semibold text-sp-dark mb-3">Frontend Tasks</div>
+                                        <ul class="space-y-2 text-sm leading-6">
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Create SimplyPlants child theme boilerplate</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Configure TailwindCSS 4.x build process</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Setup Alpine.js and verify Hyva integration</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Create base component templates</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Write first Playwright test (homepage smoke test)</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-semibold text-sp-dark mb-3">Backend Tasks</div>
+                                        <ul class="space-y-2 text-sm leading-6">
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Install Magento 2.4.8 on staging</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Install Hyva theme + Hyva Checkout</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Import 47 PLPs (16 L1 + 31 L2 categories)</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Configure OpenSearch connection</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Import 13,130 SKUs with base attributes</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Verify category routing and product assignment</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Phase 3: Week 3-6 -->
+                            <div class="phase-card" id="week-3-6">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-sp-darkest mb-2">Week 3-6: Nike URL Filtering</h3>
+                                        <p class="text-sm text-sp-forest">Feb 17 - Mar 13, 2026</p>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wide bg-purple-100 text-purple-800 border border-purple-200">Week 3-6</span>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="text-sm font-semibold text-sp-dark mb-2">Goal</div>
+                                    <p class="text-base leading-7 text-sp-forest">Nike-style URL filtering fully functional with 133 filter codes, sidebar complete, mobile responsive</p>
+                                </div>
+                                <div class="space-y-4">
+                                    <div class="callout callout-warning">
+                                        <strong>Critical Path:</strong> This is the highest-risk phase. MAX 4 WEEKS time-box enforced. Daily burn-down tracking required.
+                                    </div>
+                                    <div class="grid md:grid-cols-2 gap-6">
+                                        <div>
+                                            <div class="text-sm font-semibold text-sp-dark mb-3">Frontend Tasks</div>
+                                            <ul class="space-y-2 text-sm leading-6">
+                                                <li class="flex gap-2"><span class="text-sp-primary">•</span> Frontend URL composer and parser</li>
+                                                <li class="flex gap-2"><span class="text-sp-primary">•</span> Build Nike-style 3-section sidebar</li>
+                                                <li class="flex gap-2"><span class="text-sp-primary">•</span> Implement mobile drawer with Alpine.js</li>
+                                                <li class="flex gap-2"><span class="text-sp-primary">•</span> Filter state persistence (Alpine store)</li>
+                                                <li class="flex gap-2"><span class="text-sp-primary">•</span> Add filter visual feedback (count badges)</li>
+                                                <li class="flex gap-2"><span class="text-sp-primary">•</span> Write E2E tests for filter flows</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-semibold text-sp-dark mb-3">Backend Tasks</div>
+                                            <ul class="space-y-2 text-sm leading-6">
+                                                <li class="flex gap-2"><span class="text-sp-primary">•</span> Custom URL routing module</li>
+                                                <li class="flex gap-2"><span class="text-sp-primary">•</span> Filter code registry (133 codes)</li>
+                                                <li class="flex gap-2"><span class="text-sp-primary">•</span> URL-to-filter decoder</li>
+                                                <li class="flex gap-2"><span class="text-sp-primary">•</span> OpenSearch query builder integration</li>
+                                                <li class="flex gap-2"><span class="text-sp-primary">•</span> Product count aggregation API</li>
+                                                <li class="flex gap-2"><span class="text-sp-primary">•</span> Performance optimization for filter queries</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Phase 4: Week 7-8 -->
+                            <div class="phase-card" id="week-7-8">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-sp-darkest mb-2">Week 7-8: Integration & Performance</h3>
+                                        <p class="text-sm text-sp-forest">Mar 16-27, 2026</p>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wide bg-yellow-100 text-yellow-800 border border-yellow-200">Week 7-8</span>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="text-sm font-semibold text-sp-dark mb-2">Goal</div>
+                                    <p class="text-base leading-7 text-sp-forest">All features integrated, performance targets met, accessibility validated, code quality gates passed</p>
+                                </div>
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <div class="text-sm font-semibold text-sp-dark mb-3">Frontend Tasks</div>
+                                        <ul class="space-y-2 text-sm leading-6">
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Complete all PLP/PDP templates</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Product badge system implementation</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Mobile responsiveness audit and fixes</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Accessibility compliance testing (axe-core)</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Cross-browser testing</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Expand E2E test coverage</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-semibold text-sp-dark mb-3">Backend Tasks</div>
+                                        <ul class="space-y-2 text-sm leading-6">
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> OpenSearch query optimization</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Full Page Cache (FPC) tuning</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Redis/Varnish configuration</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Load testing with 13K SKUs</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Database query optimization</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> PHPStan + PHPCS compliance</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Phase 5: Week 9-11 -->
+                            <div class="phase-card" id="week-9-11">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-sp-darkest mb-2">Week 9-11: QA, Testing & UAT Prep</h3>
+                                        <p class="text-sm text-sp-forest">Mar 30 - Apr 17, 2026</p>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wide bg-red-100 text-red-800 border border-red-200">Week 9-11</span>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="text-sm font-semibold text-sp-dark mb-2">Goal</div>
+                                    <p class="text-base leading-7 text-sp-forest">All P0/P1 defects resolved, UAT handoff package complete, staging deployment validated</p>
+                                </div>
+                                <div class="space-y-4">
+                                    <div class="section-overview">
+                                        <h4 class="text-base font-semibold text-sp-darkest mb-3">Key Activities</h4>
+                                        <ul class="space-y-2 text-sm leading-6">
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Internal UAT (Week 9-10)</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Comprehensive regression testing</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Performance benchmarking with 13K SKUs</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> QA validation by QA Team</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Fix P0/P1 defects</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> User guide and developer runbook</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> Staging deployment and smoke testing</li>
+                                            <li class="flex gap-2"><span class="text-sp-primary">•</span> UAT handoff package and training</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Risks Section - Collapsible -->
+                    <div x-data="{ open: true }" class="mb-8 border-l-4 border-sp-accent-rust bg-gradient-to-r from-red-50/50 to-transparent">
+                        <button @click="open = !open"
+                                class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-red-50/50 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-accent-rust focus:ring-offset-2"
+                                :aria-expanded="open.toString()"
+                                aria-controls="risks-section">
+                            <h2 id="risks" class="text-2xl font-semibold text-sp-darkest !mt-0 !mb-0">
+                                Risks
+                            </h2>
+                            <svg :class="open ? 'rotate-180' : ''" class="w-6 h-6 transition-transform text-sp-accent-rust flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+
+                        <div x-show="open"
+                             x-cloak
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 -translate-y-2"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             id="risks-section"
+                             class="px-6 pb-6 space-y-4">
+
+                            <div class="bg-white border-l-4 border-red-500 p-6">
+                                <div class="flex items-start justify-between mb-3">
+                                    <h3 class="text-lg font-semibold text-sp-darkest">Nike URL filtering exceeds 4-week time-box</h3>
+                                    <div class="flex gap-2 flex-shrink-0 ml-4">
+                                        <span class="inline-flex items-center px-2 py-1 text-xs font-semibold uppercase tracking-wide bg-yellow-100 text-yellow-800 border border-yellow-200">Medium Prob</span>
+                                        <span class="inline-flex items-center px-2 py-1 text-xs font-semibold uppercase tracking-wide bg-red-100 text-red-800 border border-red-200">High Impact</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-semibold text-sp-dark mb-2">Mitigation</div>
+                                    <p class="text-sm leading-6 text-sp-forest">Daily burn-down tracking, simplify if needed, fallback to query params</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-white border-l-4 border-red-500 p-6">
+                                <div class="flex items-start justify-between mb-3">
+                                    <h3 class="text-lg font-semibold text-sp-darkest">Performance targets not met with 13K SKUs</h3>
+                                    <div class="flex gap-2 flex-shrink-0 ml-4">
+                                        <span class="inline-flex items-center px-2 py-1 text-xs font-semibold uppercase tracking-wide bg-yellow-100 text-yellow-800 border border-yellow-200">Medium Prob</span>
+                                        <span class="inline-flex items-center px-2 py-1 text-xs font-semibold uppercase tracking-wide bg-red-100 text-red-800 border border-red-200">High Impact</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-semibold text-sp-dark mb-2">Mitigation</div>
+                                    <p class="text-sm leading-6 text-sp-forest">Early benchmarking, incremental optimization, dedicated OpenSearch tuning</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-white border-l-4 border-red-500 p-6">
+                                <div class="flex items-start justify-between mb-3">
+                                    <h3 class="text-lg font-semibold text-sp-darkest">QA uncovers >10 P0/P1 defects</h3>
+                                    <div class="flex gap-2 flex-shrink-0 ml-4">
+                                        <span class="inline-flex items-center px-2 py-1 text-xs font-semibold uppercase tracking-wide bg-yellow-100 text-yellow-800 border border-yellow-200">Medium Prob</span>
+                                        <span class="inline-flex items-center px-2 py-1 text-xs font-semibold uppercase tracking-wide bg-red-100 text-red-800 border border-red-200">High Impact</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-semibold text-sp-dark mb-2">Mitigation</div>
+                                    <p class="text-sm leading-6 text-sp-forest">Continuous testing, internal UAT in Week 9, aggressive triage</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quality Gates Section - Collapsible -->
+                    <div x-data="{ open: true }" class="mb-8 border-l-4 border-sp-accent-teal bg-gradient-to-r from-sp-accent-teal/5 to-transparent">
+                        <button @click="open = !open"
+                                class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-sp-accent-teal/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-accent-teal focus:ring-offset-2"
+                                :aria-expanded="open.toString()"
+                                aria-controls="quality-gates-section">
+                            <h2 id="quality-gates" class="text-2xl font-semibold text-sp-darkest !mt-0 !mb-0">
+                                Quality Gates
+                            </h2>
+                            <svg :class="open ? 'rotate-180' : ''" class="w-6 h-6 transition-transform text-sp-accent-teal flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+
+                        <div x-show="open"
+                             x-cloak
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 -translate-y-2"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             id="quality-gates-section"
+                             class="px-6 pb-6">
+
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-4 p-4 bg-white border-2 border-sp-light hover:border-sp-primary transition-colors">
+                                    <div class="flex-shrink-0 w-12 h-12 bg-sp-primary/10 flex items-center justify-center text-sp-primary font-bold text-lg">0</div>
+                                    <div class="flex-1">
+                                        <h3 class="text-base font-semibold text-sp-darkest">Gate 0: Foundation Complete</h3>
+                                        <p class="text-sm text-sp-forest mt-1">Feb 13, 2026</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-4 p-4 bg-white border-2 border-sp-light hover:border-sp-primary transition-colors">
+                                    <div class="flex-shrink-0 w-12 h-12 bg-sp-primary/10 flex items-center justify-center text-sp-primary font-bold text-lg">1</div>
+                                    <div class="flex-1">
+                                        <h3 class="text-base font-semibold text-sp-darkest">Gate 1: Backend Foundation Complete</h3>
+                                        <p class="text-sm text-sp-forest mt-1">Feb 20, 2026</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-4 p-4 bg-white border-2 border-sp-light hover:border-sp-primary transition-colors">
+                                    <div class="flex-shrink-0 w-12 h-12 bg-sp-primary/10 flex items-center justify-center text-sp-primary font-bold text-lg">2</div>
+                                    <div class="flex-1">
+                                        <h3 class="text-base font-semibold text-sp-darkest">Gate 2: URL Routing Functional</h3>
+                                        <p class="text-sm text-sp-forest mt-1">Mar 6, 2026</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-4 p-4 bg-white border-2 border-sp-light hover:border-sp-primary transition-colors">
+                                    <div class="flex-shrink-0 w-12 h-12 bg-sp-primary/10 flex items-center justify-center text-sp-primary font-bold text-lg">3</div>
+                                    <div class="flex-1">
+                                        <h3 class="text-base font-semibold text-sp-darkest">Gate 3: Nike URL Filtering Complete</h3>
+                                        <p class="text-sm text-sp-forest mt-1">Mar 20, 2026</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-4 p-4 bg-white border-2 border-sp-light hover:border-sp-primary transition-colors">
+                                    <div class="flex-shrink-0 w-12 h-12 bg-sp-primary/10 flex items-center justify-center text-sp-primary font-bold text-lg">4</div>
+                                    <div class="flex-1">
+                                        <h3 class="text-base font-semibold text-sp-darkest">Gate 4: Integration & Performance Complete</h3>
+                                        <p class="text-sm text-sp-forest mt-1">Apr 3, 2026</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-4 p-4 bg-white border-2 border-sp-light hover:border-sp-primary transition-colors">
+                                    <div class="flex-shrink-0 w-12 h-12 bg-sp-primary/10 flex items-center justify-center text-sp-primary font-bold text-lg">5</div>
+                                    <div class="flex-1">
+                                        <h3 class="text-base font-semibold text-sp-darkest">Gate 5: QA Validation Complete</h3>
+                                        <p class="text-sm text-sp-forest mt-1">Apr 17, 2026</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-4 p-4 bg-white border-2 border-sp-light hover:border-sp-accent-gold transition-colors">
+                                    <div class="flex-shrink-0 w-12 h-12 bg-sp-accent-gold/10 flex items-center justify-center text-sp-accent-gold font-bold text-lg">6</div>
+                                    <div class="flex-1">
+                                        <h3 class="text-base font-semibold text-sp-darkest">Gate 6: UAT-Ready</h3>
+                                        <p class="text-sm text-sp-forest mt-1">Apr 23, 2026</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </article>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-sp-darkest text-white py-12 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/10 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-sp-accent-gold" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="font-semibold">SimplyPlants MVP</p>
+                        <p class="text-xs text-white/60">Delivery Plan Documentation</p>
+                    </div>
+                </div>
+                <div class="text-center md:text-right">
+                    <p class="text-sm text-white/60">Last updated: February 5, 2026</p>
+                    <p class="text-xs text-white/40 mt-1">QB Digital Software</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

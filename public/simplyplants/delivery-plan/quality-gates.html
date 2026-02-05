@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quality Gates | SimplyPlants MVP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'sp': {
+                            'darkest': '#002C1B',
+                            'dark': '#3A4D39',
+                            'forest': '#506055',
+                            'primary': '#008236',
+                            'sage': '#8A9A7B',
+                            'olive': '#56624B',
+                            'light': '#E5E7EB',
+                            'lightest': '#F3F4F6',
+                        },
+                        'sp-accent': {
+                            'gold': '#FDC700',
+                            'teal': '#4B828F',
+                            'rust': '#BB4D00',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        [x-cloak] { display: none !important; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-hero {
+            background: linear-gradient(135deg, #002C1B 0%, #3A4D39 50%, #506055 100%);
+        }
+
+        /* Callout styles - NO BORDER RADIUS per brand guidelines */
+        .callout {
+            padding: 1rem 1rem 1rem 1.25rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid currentColor;
+        }
+        .callout-note { background-color: #EFF6FF; color: #3B82F6; }
+        .callout-tip { background-color: #F0FDF4; color: #008236; }
+        .callout-warning { background-color: #FFFBEB; color: #F59E0B; }
+        .callout-important { background-color: #FEF2F2; color: #EF4444; }
+
+        /* Step container - NO BORDER RADIUS */
+        .step-container {
+            background: linear-gradient(to right, rgba(0, 130, 54, 0.05), transparent);
+            border-left: 4px solid #008236;
+            padding: 1.25rem 1rem 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        /* Section overview - NO BORDER RADIUS */
+        .section-overview {
+            background: linear-gradient(135deg, #F3F4F6 0%, white 100%);
+            border: 1px solid #E5E7EB;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        /* Gate status badges - NO BORDER RADIUS */
+        .gate-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 150ms ease-in-out;
+        }
+        .gate-pass { background-color: #D1FAE5; color: #065F46; border: 2px solid #10B981; }
+        .gate-fail { background-color: #FEE2E2; color: #991B1B; border: 2px solid #EF4444; }
+        .gate-pending { background-color: #FEF3C7; color: #92400E; border: 2px solid #F59E0B; }
+        .gate-na { background-color: #E5E7EB; color: #374151; border: 2px solid #9CA3AF; }
+
+        /* Criteria item - NO BORDER RADIUS */
+        .criteria-item {
+            background: white;
+            border: 1px solid #E5E7EB;
+            padding: 1rem;
+            margin: 0.75rem 0;
+            transition: border-color 150ms ease-out;
+        }
+        .criteria-item:hover {
+            border-color: #008236;
+        }
+
+        /* Code blocks - NO BORDER RADIUS */
+        pre {
+            background-color: #002C1B;
+            color: #E5E7EB;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        code:not(pre code) {
+            background-color: #F3F4F6;
+            color: #3A4D39;
+            padding: 0.125rem 0.375rem;
+            font-size: 0.875em;
+            border: 1px solid #E5E7EB;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        /* Tables - NO BORDER RADIUS */
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            border: 1px solid #E5E7EB;
+        }
+
+        .doc-table th {
+            background-color: #3A4D39;
+            color: white;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .doc-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #E5E7EB;
+            vertical-align: top;
+        }
+
+        .doc-table tr:hover td {
+            background-color: #F3F4F6;
+            transition: background-color 150ms ease-in-out;
+        }
+
+        .doc-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Responsive table wrapper */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 1.5rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .table-wrapper {
+                border: 1px solid #E5E7EB;
+            }
+        }
+
+        /* Anchors */
+        h1, h2, h3, h4, h5, h6 {
+            scroll-margin-top: 5rem;
+        }
+
+        /* Focus visible for keyboard navigation */
+        *:focus-visible {
+            outline: 2px solid #008236;
+            outline-offset: 2px;
+        }
+
+        /* Print */
+        @media print {
+            nav, .no-print, header { display: none !important; }
+            main { max-width: 100% !important; margin: 0 !important; }
+        }
+    </style>
+</head>
+<body class="bg-sp-lightest min-h-screen" x-data="{ mobileMenuOpen: false, tocOpen: false }">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-sp-primary text-white px-4 py-2 z-50 font-medium focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2">Skip to main content</a>
+
+    <!-- Header -->
+    <header class="gradient-hero text-white sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="index.html" class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-sp-accent-gold" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold">SimplyPlants</h1>
+                        <p class="text-xs text-white/70">MVP Delivery Plan</p>
+                    </div>
+                </a>
+
+                <nav class="hidden md:flex items-center gap-1" aria-label="Main navigation">
+                    <a href="executive-summary.html" class="px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors">Executive Summary</a>
+                    <a href="delivery-plan.html" class="px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors">Delivery Plan</a>
+                    <a href="jira-mapping.html" class="px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors">Jira Mapping</a>
+                </nav>
+
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 hover:bg-white/10" aria-label="Toggle menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div x-show="mobileMenuOpen" x-transition class="md:hidden border-t border-white/10">
+            <nav class="px-4 py-3 space-y-1" aria-label="Mobile navigation">
+                <a href="executive-summary.html" class="block px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10">Executive Summary</a>
+                <a href="delivery-plan.html" class="block px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10">Delivery Plan</a>
+                <a href="jira-mapping.html" class="block px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10">Jira Mapping</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Title Banner -->
+    <section class="gradient-hero text-white py-8 lg:py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-3xl">
+                <h2 class="text-3xl lg:text-4xl font-bold mb-3">Quality Gates</h2>
+                <p class="text-lg text-white/80">Validation checklists, evidence requirements, and approvals</p>
+            </div>
+        </div>
+    </section>
+
+    <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="lg:flex lg:gap-8">
+            <!-- Table of Contents (desktop sidebar) -->
+            <aside class="hidden lg:block lg:w-64 flex-shrink-0">
+            <nav class="sticky top-24 bg-white border border-sp-light p-4 max-h-[calc(100vh-8rem)] overflow-y-auto">
+                <h4 class="text-sm font-semibold text-sp-darkest mb-4 uppercase tracking-wide">On This Page</h4>
+                <div class="space-y-2"><a href="#quality-gates-validation-checklist" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Quality Gates & Validation Checklist</a>
+<a href="#simplyplants-plp-filter-architecture" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">SimplyPlants PLP Filter Architecture</a>
+<a href="#gate-0-foundation-readiness-before-p1-start" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Gate 0: Foundation Readiness (Before P1 Start)</a>
+<a href="#environment-validation" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Environment Validation</a>
+<a href="#module-scaffolding" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Module Scaffolding</a>
+<a href="#database-schema" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Database Schema</a>
+<a href="#repository-layer" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Repository Layer</a>
+<a href="#technical-specifications" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Technical Specifications</a>
+<a href="#gate-1-core-url-architecture-complete-before-p2-start" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Gate 1: Core URL Architecture Complete (Before P2 Start)</a>
+<a href="#category-taxonomy" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Category Taxonomy</a>
+<a href="#custom-router" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Custom Router</a>
+<a href="#slug-parsing-generation" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Slug Parsing & Generation</a>
+<a href="#filter-persistence" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Filter Persistence</a>
+<a href="#basic-plp-rendering" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Basic PLP Rendering</a>
+<a href="#gate-2-attribute-facet-system-complete-before-p3-start" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Gate 2: Attribute & Facet System Complete (Before P3 Start)</a>
+<a href="#product-attributes" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Product Attributes</a>
+<a href="#dynamic-facet-loader" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Dynamic Facet Loader</a>
+<a href="#layered-navigation-override" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Layered Navigation Override</a>
+<a href="#filter-state-management" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Filter State Management</a>
+<a href="#hot-keys" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Hot Keys</a>
+<a href="#product-badges" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Product Badges</a>
+<a href="#gate-3-frontend-ui-complete-before-p4-start" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Gate 3: Frontend UI Complete (Before P4 Start)</a>
+<a href="#nike-style-sidebar" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Nike-Style Sidebar</a>
+<a href="#hot-keys-ui" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Hot Keys UI</a>
+<a href="#product-grid" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Product Grid</a>
+<a href="#filter-chips" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Filter Chips</a>
+<a href="#breadcrumbs" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Breadcrumbs</a>
+<a href="#mobile-responsive" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Mobile Responsive</a>
+<a href="#pagination-sorting" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Pagination & Sorting</a>
+<a href="#accessibility-wcag-2-1-aa" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Accessibility (WCAG 2.1 AA)</a>
+<a href="#tailwindcss-build" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">TailwindCSS Build</a>
+<a href="#gate-4-seo-performance-optimized-before-p5-start" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Gate 4: SEO & Performance Optimized (Before P5 Start)</a>
+<a href="#seo-implementation" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">SEO Implementation</a>
+<a href="#performance-metrics-quality-bars" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Performance Metrics (Quality Bars)</a>
+<a href="#caching-strategy" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Caching Strategy</a>
+<a href="#opensearch-optimization" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">OpenSearch Optimization</a>
+<a href="#lazy-loading-js-optimization" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Lazy Loading & JS Optimization</a>
+<a href="#performance-monitoring" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Performance Monitoring</a>
+<a href="#gate-5-launch-readiness-before-production-deployment" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Gate 5: Launch Readiness (Before Production Deployment)</a>
+<a href="#end-to-end-testing" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">End-to-End Testing</a>
+<a href="#cross-browser-compatibility" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Cross-Browser Compatibility</a>
+<a href="#performance-benchmarking-1-300-skus" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Performance Benchmarking (1,300 SKUs)</a>
+<a href="#accessibility-compliance-wcag-2-1-aa" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Accessibility Compliance (WCAG 2.1 AA)</a>
+<a href="#qa-validation" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">QA Validation</a>
+<a href="#documentation" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Documentation</a>
+<a href="#code-quality" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Code Quality</a>
+<a href="#deployment-readiness" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Deployment Readiness</a>
+<a href="#stakeholder-approval" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Stakeholder Approval</a>
+<a href="#quality-bar-enforcement" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Quality Bar Enforcement</a>
+<a href="#performance-quality-bars-hard-requirements" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Performance Quality Bars (HARD REQUIREMENTS)</a>
+<a href="#accessibility-quality-bars-hard-requirements" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Accessibility Quality Bars (HARD REQUIREMENTS)</a>
+<a href="#code-quality-bars" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Code Quality Bars</a>
+<a href="#evidence-repository-structure" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Evidence Repository Structure</a>
+<a href="#approval-sign-off-template" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Approval Sign-Off Template</a>
+<a href="#checks-passed" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Checks Passed</a>
+<a href="#evidence-reviewed" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Evidence Reviewed</a>
+<a href="#defects-identified" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Defects Identified</a>
+<a href="#decision" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-6 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Decision</a>
+</div></nav></aside>
+
+            <!-- Main Content -->
+            <div class="flex-1 min-w-0">
+                <!-- Mobile TOC Toggle -->
+                <div class="lg:hidden mb-6">
+                    <button @click="tocOpen = !tocOpen"
+                            class="w-full flex items-center justify-between px-4 py-3 bg-white border border-sp-light text-left font-medium text-sp-darkest hover:bg-sp-lightest transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2"
+                            :aria-expanded="tocOpen.toString()">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-sp-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                            </svg>
+                            Table of Contents
+                        </span>
+                        <svg :class="tocOpen ? 'rotate-180' : ''" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <nav x-show="tocOpen"
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 -translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 -translate-y-2"
+                         class="bg-white border border-t-0 border-sp-light p-4 space-y-1 max-h-96 overflow-y-auto"
+                         aria-label="Mobile table of contents">
+                        <a href="#quality-gates-validation-checklist" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Quality Gates & Validation Checklist</a>
+                        <a href="#simplyplants-plp-filter-architecture" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">SimplyPlants PLP Filter Architecture</a>
+                        <a href="#gate-0-foundation-readiness-before-p1-start" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Gate 0: Foundation Readiness</a>
+                        <a href="#gate-1-core-url-architecture-complete-before-p2-start" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Gate 1: Core URL Architecture</a>
+                        <a href="#gate-2-attribute-facet-system-complete-before-p3-start" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Gate 2: Attribute & Facet System</a>
+                        <a href="#gate-3-frontend-ui-complete-before-p4-start" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Gate 3: Frontend UI Complete</a>
+                        <a href="#gate-4-seo-performance-optimized-before-p5-start" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Gate 4: SEO & Performance</a>
+                        <a href="#gate-5-launch-readiness-before-production-deployment" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Gate 5: Launch Readiness</a>
+                        <a href="#quality-bar-enforcement" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Quality Bar Enforcement</a>
+                        <a href="#evidence-repository-structure" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Evidence Repository Structure</a>
+                        <a href="#approval-sign-off-template" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Approval Sign-Off Template</a>
+                    </nav>
+                </div>
+
+                <article class="prose prose-slate max-w-none prose-headings:text-sp-darkest prose-h1:text-3xl prose-h2:text-2xl prose-h2:border-b prose-h2:border-sp-light prose-h2:pb-3 prose-h2:mb-6 prose-h3:text-xl prose-a:text-sp-primary hover:prose-a:text-sp-dark prose-strong:text-sp-darkest">
+                    <h1 id="quality-gates-validation-checklist">Quality Gates & Validation Checklist</h1>
+<h2 id="simplyplants-plp-filter-architecture">SimplyPlants PLP Filter Architecture</h2>
+<p>This document defines mandatory quality gates that must be satisfied before phase transitions and final launch. Gates enforce evidence-based validation and prevent defect leakage.</p>
+<hr class="my-8 border-sp-light">
+
+<div x-data="{ open: true }" class="gate-section mb-8 border-l-4 border-sp-primary bg-gradient-to-r from-sp-primary/5 to-transparent">
+    <button @click="open = !open"
+            class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-sp-primary/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2"
+            :aria-expanded="open.toString()">
+        <h2 id="gate-0-foundation-readiness-before-p1-start" class="text-2xl font-semibold text-sp-darkest !mt-0 !mb-0">
+            Gate 0: Foundation Readiness (Before P1 Start)
+        </h2>
+        <svg :class="open ? 'rotate-180' : ''" class="w-6 h-6 transition-transform text-sp-primary flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+
+    <div x-show="open"
+         x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         class="px-6 pb-6 space-y-6">
+
+<h3 id="environment-validation">Environment Validation</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All 8 Docker containers running (phpfpm, db, opensearch, valkey, rabbitmq, mailcatcher, phpmyadmin, proxy)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Homepage loads at https://simplyplants.local:9443 in <3s with zero console errors</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Hyva theme active and rendering TailwindCSS + Alpine.js</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> OpenSearch health check green in Magento admin</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Playwright E2E framework functional (sample test passing)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Tailwind CSS builds successfully inside Docker container</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Static content clears without errors</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: env-validation-report.md, screenshots/homepage-baseline.png, test-results/env-validation/</p>
+<h3 id="module-scaffolding">Module Scaffolding</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> SimplyPlants_PlpFilter module registered and enabled</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Module appears in admin: Stores > Configuration > Advanced > Advanced</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> PHPCS passes with Magento2 standard (zero violations)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Module structure follows Magento 2 best practices</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: make magento module:status output, PHPCS report</p>
+<h3 id="database-schema">Database Schema</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> 3 tables created: simplyplants<em>filter</em>code, simplyplants<em>category</em>facet, simplyplants_hotkey</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All indexes and foreign keys applied correctly</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> db_schema.xml validates against Magento XSD</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> 133 filter codes populated (SELECT COUNT(*) = 133)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> 480 facet configs populated (30 categories × 16 attributes)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> 12 hot keys populated with valid JSON</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Data patches idempotent (safe to re-run)</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: MySQL table dumps, data-verification-report.md, ERD diagram</p>
+<h3 id="repository-layer">Repository Layer</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> 3 repository interfaces defined with SearchCriteria support</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> 3 repository implementations with proper exception handling</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Unit tests achieve >80% code coverage on repositories</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> PHPStan level 8 passes on Model/ and Api/ directories</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> di.xml preferences configured for all interfaces</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: PHPUnit coverage report, PHPStan output</p>
+<h3 id="technical-specifications">Technical Specifications</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> 7 specification documents complete (ARCHITECTURE, URL-ROUTING-SPEC, FACET-ENGINE-SPEC, HOT-KEYS-SPEC, SEO-SPEC, BADGE-SPEC, API-CONTRACTS)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Each spec includes Given/When/Then acceptance criteria</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Each spec includes 5+ examples with real filter codes</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Each spec includes edge cases and error handling</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Sequence diagrams created for key flows (filter application, category change, hot key)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Product owner reviews and approves all specifications</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Complete docs/ directory with 7 spec files, approval email/sign-off</p>
+<p><strong>Gate Owner</strong>: Development Team</p>
+<p><strong>Gate Approval Required From</strong>: Product Owner</p>
+<p><strong>Failure Action</strong>: Do not proceed to P1 until all checks pass</p>
+<hr class="my-8 border-sp-light">
+
+    </div>
+</div>
+
+<div x-data="{ open: false }" class="gate-section mb-8 border-l-4 border-sp-accent-teal bg-gradient-to-r from-sp-accent-teal/5 to-transparent">
+    <button @click="open = !open"
+            class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-sp-accent-teal/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-accent-teal focus:ring-offset-2"
+            :aria-expanded="open.toString()">
+        <h2 id="gate-1-core-url-architecture-complete-before-p2-start" class="text-2xl font-semibold text-sp-darkest !mt-0 !mb-0">
+            Gate 1: Core URL Architecture Complete (Before P2 Start)
+        </h2>
+        <svg :class="open ? 'rotate-180' : ''" class="w-6 h-6 transition-transform text-sp-accent-teal flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+
+    <div x-show="open"
+         x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         class="px-6 pb-6 space-y-6">
+
+<h3 id="category-taxonomy">Category Taxonomy</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> 30 categories created (16 L1 + 30 L2 sub-categories)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All category URL keys match filter codes from registry</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All categories set to Is Active = Yes</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All categories assigned to Default store view</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> URL rewrites table contains entries for all 30 categories</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All category URLs resolve on frontend (no 404s)</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Admin screenshot, category-export.csv, frontend URL test results</p>
+<h3 id="custom-router">Custom Router</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Router registered in di.xml with sortOrder=25 (before standard router)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Router intercepts /plants/* requests successfully</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Invalid URLs (e.g., /plants/invalid) return 404 (not intercepted)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Router match() performance <5ms per request</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Unit tests cover 20+ slug parsing scenarios</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Integration tests verify routing for 10+ URL patterns</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Router code, unit test report, integration test results, performance benchmark</p>
+<h3 id="slug-parsing-generation">Slug Parsing & Generation</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> SlugParser extracts category + filter codes correctly</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> SlugParser validates codes against registry</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> SlugParser handles edge cases (empty, malformed, invalid codes)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> SlugGenerator builds URLs with correct z-separator logic</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> SlugGenerator expands hot keys to constituent filter codes</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> SlugGenerator caches results in Redis (verified cache hits)</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Unit tests (100% coverage on parser/generator), cache hit rate metrics</p>
+<h3 id="filter-persistence">Filter Persistence</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Persistence rules implemented (color, price, pot_size persist; category-specific drop)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Admin config toggle: Enable Filter Persistence (default: Yes)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Admin multi-select: Persistent Attributes (default: color, price, pot_size)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Unit tests cover 15+ category transition scenarios</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Session storage does not leak filters across sessions</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Admin config screenshots, unit test report, session storage verification</p>
+<h3 id="basic-plp-rendering">Basic PLP Rendering</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> PLP layout XML validates against Magento XSD</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Products display in grid (even if unstyled)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Pagination renders and page navigation works</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Toolbar with sort dropdown renders</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Filter state visible in debug mode (JSON output)</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Frontend screenshots, layout XML validation, page source inspection</p>
+<p><strong>Gate Owner</strong>: Development Team</p>
+<p><strong>Gate Approval Required From</strong>: Product Owner</p>
+<p><strong>Failure Action</strong>: Fix defects before P2 start; extend timeline if needed</p>
+<hr class="my-8 border-sp-light">
+
+    </div>
+</div>
+
+<div x-data="{ open: false }" class="gate-section mb-8 border-l-4 border-sp-accent-rust bg-gradient-to-r from-red-50/50 to-transparent">
+    <button @click="open = !open"
+            class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-red-50/30 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-accent-rust focus:ring-offset-2"
+            :aria-expanded="open.toString()">
+        <h2 id="gate-2-attribute-facet-system-complete-before-p3-start" class="text-2xl font-semibold text-sp-darkest !mt-0 !mb-0">
+            Gate 2: Attribute & Facet System Complete (Before P3 Start)
+        </h2>
+        <svg :class="open ? 'rotate-180' : ''" class="w-6 h-6 transition-transform text-sp-accent-rust flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+
+    <div x-show="open"
+         x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         class="px-6 pb-6 space-y-6">
+
+<h3 id="product-attributes">Product Attributes</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> 16 MVP attributes created (color, pot<em>size, sun</em>exposure, water<em>frequency, growth</em>habit, height, spread, bloom<em>time, fragrance, toxicity, hardiness</em>zone, soil<em>type, maintenance</em>level, foliage<em>color, drought</em>tolerant, deer_resistant)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All attributes set to is<em>filterable=1, is</em>visible<em>on</em>front=1, used<em>in</em>product_listing=1</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All select/multiselect attributes have options defined</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All attribute codes match filter code registry</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Attributes assigned to Default attribute set</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> OpenSearch reindexed successfully (catalogsearch_fulltext)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Attributes appear in product edit form in admin</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Admin attribute grid screenshot, OpenSearch index verification, attribute-mapping.md</p>
+<h3 id="dynamic-facet-loader">Dynamic Facet Loader</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> FacetLoader returns correct attributes for each category</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Facets sorted by sort<em>order from category</em>facet config</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> OpenSearch aggregations return counts per option</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Facet counts reflect current filter context (applied filters)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Facets cached in Redis with 1h TTL</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Cached facets return in <50ms</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Empty categories return empty facet array (no errors)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Integration tests verify OpenSearch queries with real data</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Integration test report, Redis cache verification, query performance logs</p>
+<h3 id="layered-navigation-override">Layered Navigation Override</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Plugin intercepts Magento LayeredNavigation block</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> CustomFilter classes apply filters to product collection</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Multi-select filters use OR logic within attribute (e.g., color=red OR pink)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Cross-attribute filters use AND logic (e.g., color=red AND size=large)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Range filters (price, size) work with min/max</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Filter application performance <500ms for 1,300 SKUs</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Integration tests cover 20+ filter combinations</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> No N+1 query issues (verified with Magento profiler)</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Integration test report, profiler output, performance benchmark</p>
+<h3 id="filter-state-management">Filter State Management</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> FilterState ViewModel returns active filters with remove URLs</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> getFilterUrl() builds correct URLs for adding filters</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> getRemoveFilterUrl() builds correct URLs for removing filters</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> getClearAllUrl() returns category base URL</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Sort and page params preserved in URLs</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Unit tests achieve 100% coverage on FilterState</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Unit test report, URL generation examples</p>
+<h3 id="hot-keys">Hot Keys</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> HotKeyService expands hot key codes to filter codes</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Hot key URLs apply all constituent filters correctly</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Admin grid displays 12 hot keys with CRUD operations</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Hot key expansion performance <10ms</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Unit tests cover hot key expansion and conflict resolution</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Admin screenshot, unit test report, performance benchmark</p>
+<h3 id="product-badges">Product Badges</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> BadgeService evaluates 7 badge types correctly (new<em>arrival, best</em>seller, on<em>sale, low</em>stock, exclusive, top_rated, seasonal)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Badge priority logic returns max 2 badges per product</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Admin config allows enable/disable per badge type</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Admin config allows badge sort order customization</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Unit tests achieve >90% coverage on BadgeService</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Unit test report, admin config screenshot, badge display examples</p>
+<p><strong>Gate Owner</strong>: Development Team</p>
+<p><strong>Gate Approval Required From</strong>: Product Owner</p>
+<p><strong>Failure Action</strong>: Fix P0/P1 defects before P3 start; P2 defects can be deferred if documented</p>
+<hr class="my-8 border-sp-light">
+
+    </div>
+</div>
+
+<div x-data="{ open: false }" class="gate-section mb-8 border-l-4 border-sp-accent-gold bg-gradient-to-r from-sp-accent-gold/5 to-transparent">
+    <button @click="open = !open"
+            class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-sp-accent-gold/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-accent-gold focus:ring-offset-2"
+            :aria-expanded="open.toString()">
+        <h2 id="gate-3-frontend-ui-complete-before-p4-start" class="text-2xl font-semibold text-sp-darkest !mt-0 !mb-0">
+            Gate 3: Frontend UI Complete (Before P4 Start)
+        </h2>
+        <svg :class="open ? 'rotate-180' : ''" class="w-6 h-6 transition-transform text-sp-accent-gold flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+
+    <div x-show="open"
+         x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         class="px-6 pb-6 space-y-6">
+
+<h3 id="nike-style-sidebar">Nike-Style Sidebar</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> 4 sections render: Hot Keys, Primary Filters, Secondary Filters, More Filters</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Alpine.js x-collapse works smoothly (300ms transition)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Multi-select checkboxes apply filters on click</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Product counts display next to each filter option</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Sidebar sticky on scroll (desktop)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Sidebar max-height with internal scroll for long lists</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Clear All button removes all filters correctly</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Active filters show checked checkboxes</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Frontend screenshots, manual interaction test, Alpine.js console verification</p>
+<h3 id="hot-keys-ui">Hot Keys UI</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Hot Keys bar renders above product grid with 12 buttons</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Buttons display icon + label (e.g., 🌹 Best Sellers)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Active hot key highlighted (border or background color)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Horizontal scroll works on mobile viewports</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Keyboard navigation works (tab to buttons, Enter to activate)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Touch targets ≥44x44px on mobile</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Frontend screenshots (desktop + mobile), keyboard navigation test, touch target measurements</p>
+<h3 id="product-grid">Product Grid</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Responsive grid: 1 col mobile, 3 col tablet, 4 col desktop</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Product cards display: image, name, price, badges (max 2)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Configurable products show pot_size option buttons</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Quick Add button adds to cart via AJAX</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Loading spinner shows during AJAX request</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Success toast notification appears for 3s after add</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Images lazy load below fold (verified with Network tab)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Stock status displays (In Stock, Low Stock, Out of Stock)</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Frontend screenshots (desktop + mobile), AJAX cart test, Lighthouse lazy load verification</p>
+<h3 id="filter-chips">Filter Chips</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Active filters display as chips above grid</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Each chip shows label + X remove button</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> X button removes filter and updates URL</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Clear All chip appears when >1 filter active</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Chips wrap to multiple lines on narrow screens</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Remove buttons keyboard accessible (Enter key)</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Frontend screenshots, keyboard interaction test</p>
+<h3 id="breadcrumbs">Breadcrumbs</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Breadcrumbs display: Home > Plants > Category > [Filters]</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Applied filters included in breadcrumb trail (e.g., Pink)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Breadcrumb links navigate correctly</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Schema.org BreadcrumbList JSON-LD present in page source</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> JSON-LD validates with Google Rich Results Test</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Frontend screenshot, page source, Google Rich Results Test pass</p>
+<h3 id="mobile-responsive">Mobile Responsive</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Filters button fixed at bottom on mobile (<768px)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Drawer slides in from left on button click</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Overlay closes drawer on click</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Close button at top of drawer works</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Body scroll prevented when drawer open</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Drawer content scrollable independently</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Touch targets ≥44x44px on all buttons</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Alpine.js transitions smooth (300ms)</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Mobile screenshots, interaction test video, touch target measurements</p>
+<h3 id="pagination-sorting">Pagination & Sorting</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Sort dropdown renders: Best Match, Price Low-High, Price High-Low, Newest</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Sort change adds ?sort=price_asc to URL</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Pagination renders: Previous, 1, 2, 3, Next</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Page click adds ?p=2 to URL</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Page >1 includes <meta name="robots" content="noindex,follow"></span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Product count displays: "Showing 1-48 of 300 products"</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Frontend screenshots, page source (meta tag verification), URL parameter test</p>
+<h3 id="accessibility-wcag-2-1-aa">Accessibility (WCAG 2.1 AA)</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All interactive elements keyboard accessible (tab navigation)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All interactive elements have visible focus indicators</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All images have alt attributes</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All buttons have aria-labels where needed</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Collapsible sections have aria-expanded attributes</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Color contrast ratios ≥4.5:1 for text</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Touch targets ≥44x44px on mobile</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> axe DevTools audit shows zero critical/serious issues</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: axe DevTools report, keyboard navigation test video, contrast ratio measurements</p>
+<h3 id="tailwindcss-build">TailwindCSS Build</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Tailwind CSS builds inside Docker container without errors</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Static content cleared after CSS changes</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Compiled CSS output at web/css/styles.css</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> CSS changes visible on frontend after cache flush</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> No CSS conflicts with Hyva core styles</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Build command output, CSS file verification, frontend visual inspection</p>
+<p><strong>Gate Owner</strong>: Development Team</p>
+<p><strong>Gate Approval Required From</strong>: Product Owner + QA Team (accessibility sign-off)</p>
+<p><strong>Failure Action</strong>: Fix P0/P1 UI defects before P4 start; accessibility violations block progression</p>
+<hr class="my-8 border-sp-light">
+
+    </div>
+</div>
+
+<div x-data="{ open: false }" class="gate-section mb-8 border-l-4 border-blue-500 bg-gradient-to-r from-blue-50/50 to-transparent">
+    <button @click="open = !open"
+            class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-blue-50/30 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            :aria-expanded="open.toString()">
+        <h2 id="gate-4-seo-performance-optimized-before-p5-start" class="text-2xl font-semibold text-sp-darkest !mt-0 !mb-0">
+            Gate 4: SEO & Performance Optimized (Before P5 Start)
+        </h2>
+        <svg :class="open ? 'rotate-180' : ''" class="w-6 h-6 transition-transform text-blue-500 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+
+    <div x-show="open"
+         x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         class="px-6 pb-6 space-y-6">
+
+<h3 id="seo-implementation">SEO Implementation</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Canonical URLs generated correctly (category base URL, hot keys exception)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Page >1 includes X-Robots-Tag: noindex,follow</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Filter pages include noindex (configurable in admin)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Admin config: Index Filter Pages (default: No)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Admin config: Indexable Filter Attributes (multi-select)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Schema.org Product JSON-LD present for each product</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Schema.org BreadcrumbList JSON-LD present</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Google Rich Results Test passes for Product and Breadcrumb</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Page source inspection, HTTP headers, Google Rich Results Test screenshots, admin config screenshots</p>
+<h3 id="performance-metrics-quality-bars">Performance Metrics (Quality Bars)</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> <strong>LCP ≤2500ms desktop</strong> (Lighthouse audit)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> <strong>LCP ≤3000ms mobile</strong> (Lighthouse audit)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> <strong>CLS <0.1</strong> (Lighthouse audit)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> <strong>TBT ≤200ms</strong> (Lighthouse audit)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Lighthouse Performance score ≥90 desktop, ≥80 mobile</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> OpenSearch query response <500ms (slow query log verification)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Facet loading <200ms (Magento profiler verification)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Initial bundle size ≤300KB gzipped</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Lighthouse JSON reports (5+ PLPs), OpenSearch slow query log, Magento profiler output, bundle size analysis</p>
+<h3 id="caching-strategy">Caching Strategy</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Full-page cache enabled for PLP blocks</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Cache key includes: category<em>id, filters</em>hash, customer<em>group, store</em>id</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> FPC hit rate >80% after warming (Redis stats)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Cache invalidation on product save (observer fires)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Cache invalidation on category save (observer fires)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> ESI configured for dynamic blocks (if Varnish used)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> X-Magento-Cache-Debug: HIT on cached requests</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Redis cache stats, X-Magento-Cache-Debug headers, cache invalidation test results</p>
+<h3 id="opensearch-optimization">OpenSearch Optimization</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> No queries >500ms in slow query log</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Query result caching in Redis (5min TTL)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Aggregation caching in Redis (1h TTL)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Product collection selects only required attributes (not *)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> EAV attributes preloaded (batch load, no N+1)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Cached queries return in <50ms</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: OpenSearch slow query log, Redis cache hit rate, query performance benchmark</p>
+<h3 id="lazy-loading-js-optimization">Lazy Loading & JS Optimization</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Images below fold have loading="lazy" attribute</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Hyva lazy load helper used for product images</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Critical CSS inline in <head></span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Non-critical CSS deferred</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Alpine.js initialization deferred for off-screen components</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Font-display: swap for custom fonts</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Page source inspection, Network tab waterfall, Lighthouse image lazy load verification</p>
+<h3 id="performance-monitoring">Performance Monitoring</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> RUM script active (Google Analytics 4 or custom)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Core Web Vitals tracked: LCP, CLS, FID</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Custom events tracked: filter<em>applied, hot</em>key<em>clicked, quick</em>add_clicked</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Timing metrics sent to GA4: page<em>load</em>time, opensearch<em>query</em>time</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Admin dashboard widget displays: Average LCP, CLS, Filter Application Time</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Alerts configured: LCP >3s or CLS >0.1 trigger notification</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: GA4 event verification, admin dashboard screenshot, alert configuration</p>
+<p><strong>Gate Owner</strong>: Development Team</p>
+<p><strong>Gate Approval Required From</strong>: Product Owner</p>
+<p><strong>Failure Action</strong>: Performance quality bars are hard requirements; must achieve before P5 start or extend timeline for optimization</p>
+<hr class="my-8 border-sp-light">
+
+    </div>
+</div>
+
+<div x-data="{ open: false }" class="gate-section mb-8 border-l-4 border-purple-500 bg-gradient-to-r from-purple-50/50 to-transparent">
+    <button @click="open = !open"
+            class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-purple-50/30 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+            :aria-expanded="open.toString()">
+        <h2 id="gate-5-launch-readiness-before-production-deployment" class="text-2xl font-semibold text-sp-darkest !mt-0 !mb-0">
+            Gate 5: Launch Readiness (Before Production Deployment)
+        </h2>
+        <svg :class="open ? 'rotate-180' : ''" class="w-6 h-6 transition-transform text-purple-500 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+
+    <div x-show="open"
+         x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         class="px-6 pb-6 space-y-6">
+
+<h3 id="end-to-end-testing">End-to-End Testing</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> 12 Playwright E2E tests written covering all critical flows</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All 12 tests pass on Chrome, Firefox, Safari</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Test execution time <5 minutes total</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Tests cover happy paths and error scenarios (invalid URLs, no results)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Tests stable (0% flakiness over 10 consecutive runs)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Screenshots captured on failure for debugging</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Playwright HTML report, test-results/ directory with 10 run results</p>
+<h3 id="cross-browser-compatibility">Cross-Browser Compatibility</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Chrome 120+ tested (Windows, Mac) - zero layout breaks</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Firefox 120+ tested (Windows, Mac) - zero layout breaks</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Safari 17+ tested (Mac, iOS) - zero layout breaks</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Edge 120+ tested (Windows) - zero layout breaks</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Chrome Android tested (mobile) - zero layout breaks</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Safari iOS tested (mobile) - zero layout breaks</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All interactions functional across browsers</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Alpine.js transitions smooth across browsers</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Browser compatibility matrix, screenshots from each browser, test notes</p>
+<h3 id="performance-benchmarking-1-300-skus">Performance Benchmarking (1,300 SKUs)</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> 1,300 SKUs imported and indexed (600 Simple, 400 Configurable, 300 placeholder)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All products assigned 16 MVP attributes with realistic values</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Configurable products have pot_size variants</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Lighthouse audits run on 5 representative PLPs</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All quality bars met: LCP ≤2500ms desktop/≤3000ms mobile, CLS <0.1, TBT ≤200ms</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> WebPageTest.org tests from 3 locations show Speed Index <3.0s</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> OpenSearch slow query log shows no queries >500ms</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Facet loading <200ms (profiler verification)</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Performance benchmark report, Lighthouse JSON reports, WebPageTest PDFs, slow query log</p>
+<h3 id="accessibility-compliance-wcag-2-1-aa">Accessibility Compliance (WCAG 2.1 AA)</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> axe DevTools audit shows zero critical issues</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> axe DevTools audit shows zero serious issues</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Keyboard navigation tested - all elements reachable</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Screen reader tested (NVDA or VoiceOver) - all labels read correctly</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Focus indicators visible on all interactive elements</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Color contrast ratios ≥4.5:1 verified</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Touch targets ≥44x44px verified on mobile</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> WCAG 2.1 AA conformance documented</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Accessibility audit report, axe DevTools screenshots (before/after), keyboard/screen reader test notes</p>
+<h3 id="qa-validation">QA Validation</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> QA handoff package delivered to QA Team</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> QA validation complete with defect report</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Zero P0 defects remaining</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Zero P1 defects remaining (or all accepted with mitigation)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> P2/P3 defects documented in backlog for post-launch</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> QA sign-off obtained</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: QA handoff package, QA report from QA Team, defect list with status</p>
+<h3 id="documentation">Documentation</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> User Guide complete (HTML/Tailwind/Alpine) for merchants</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Developer Runbook complete with setup, troubleshooting, API reference</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Technical specifications up to date (7 docs)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Database schema documented with ERD</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> API contracts documented</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Go-live checklist ready</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Rollback plan documented and tested</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: docs/ directory with all artifacts, user-guide/index.html, developer-runbook/index.html</p>
+<h3 id="code-quality">Code Quality</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> PHPCS passes with Magento2 standard (zero violations)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> PHPStan level 8 passes (zero errors)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Unit tests achieve >85% code coverage</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Integration tests pass with real OpenSearch queries</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All code reviewed (self-review or peer review)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> No security vulnerabilities (OWASP Top 10 checks)</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: PHPCS report, PHPStan output, PHPUnit coverage report, security checklist</p>
+<h3 id="deployment-readiness">Deployment Readiness</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Go-live checklist complete (30+ items)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Rollback plan tested on staging</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Rollback can complete within 5 minutes</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Database backup created before deployment</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Staging deployment successful (smoke tests pass)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Production deployment runbook ready</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Monitoring alerts configured (error rate, performance)</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Go-live checklist, rollback test results, staging smoke test results, deployment runbook</p>
+<h3 id="stakeholder-approval">Stakeholder Approval</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Stakeholder demo completed with product owner</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> All critical acceptance criteria validated live</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Product owner sign-off obtained (documented approval)</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Known issues accepted with mitigation plans</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Launch date confirmed and communicated</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> Post-launch support plan defined</span></li>
+</ul>
+<p><strong>Evidence Required</strong>: Demo script, demo recording (optional), sign-off decision log entry, launch communication</p>
+<p><strong>Gate Owner</strong>: Development Team</p>
+<p><strong>Gate Approval Required From</strong>: Product Owner, QA Team, Documentation Team</p>
+<p><strong>Failure Action</strong>: No production deployment until all checks pass; extend timeline if needed to resolve blocking issues</p>
+<hr class="my-8 border-sp-light">
+
+    </div>
+</div>
+
+<h2 id="quality-bar-enforcement">Quality Bar Enforcement</h2>
+
+<h3 id="performance-quality-bars-hard-requirements">Performance Quality Bars (HARD REQUIREMENTS)</h3>
+<div class="overflow-x-auto"><table class="doc-table">
+<thead><tr>
+<th>Metric</th>
+<th>Desktop</th>
+<th>Mobile</th>
+<th>Verification Method</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>LCP</td>
+<td>≤2500ms</td>
+<td>≤3000ms</td>
+<td>Lighthouse audit</td>
+</tr>
+<tr>
+<td>CLS</td>
+<td><0.1</td>
+<td><0.1</td>
+<td>Lighthouse audit</td>
+</tr>
+<tr>
+<td>TBT</td>
+<td>≤200ms</td>
+<td>≤200ms</td>
+<td>Lighthouse audit</td>
+</tr>
+<tr>
+<td>OpenSearch Query</td>
+<td>≤500ms</td>
+<td>≤500ms</td>
+<td>Slow query log</td>
+</tr>
+<tr>
+<td>Facet Loading</td>
+<td>≤200ms</td>
+<td>≤200ms</td>
+<td>Magento profiler</td>
+</tr>
+<tr>
+<td>FPC Hit Rate</td>
+<td>>80%</td>
+<td>>80%</td>
+<td>Redis stats</td>
+</tr>
+<tr>
+<td>Lighthouse Score</td>
+<td>≥90</td>
+<td>≥80</td>
+<td>Lighthouse audit</td>
+</tr>
+</tbody></table></div>
+<p><strong>Enforcement</strong>: CI/CD pipeline must block merge if performance budgets exceeded (future enhancement)</p>
+<h3 id="accessibility-quality-bars-hard-requirements">Accessibility Quality Bars (HARD REQUIREMENTS)</h3>
+<div class="overflow-x-auto"><table class="doc-table">
+<thead><tr>
+<th>Requirement</th>
+<th>Standard</th>
+<th>Verification Method</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>WCAG Level</td>
+<td>2.1 AA</td>
+<td>axe DevTools audit</td>
+</tr>
+<tr>
+<td>Critical Issues</td>
+<td>0</td>
+<td>axe DevTools</td>
+</tr>
+<tr>
+<td>Serious Issues</td>
+<td>0</td>
+<td>axe DevTools</td>
+</tr>
+<tr>
+<td>Color Contrast</td>
+<td>≥4.5:1 text, ≥3:1 large text</td>
+<td>Manual measurement</td>
+</tr>
+<tr>
+<td>Touch Targets</td>
+<td>≥44x44px mobile</td>
+<td>Manual measurement</td>
+</tr>
+<tr>
+<td>Keyboard Navigation</td>
+<td>100% reachable</td>
+<td>Manual test</td>
+</tr>
+<tr>
+<td>Screen Reader</td>
+<td>100% labels</td>
+<td>Manual test (NVDA/VoiceOver)</td>
+</tr>
+</tbody></table></div>
+<p><strong>Enforcement</strong>: Accessibility gate blocks P4 → P5 transition</p>
+<h3 id="code-quality-bars">Code Quality Bars</h3>
+<div class="overflow-x-auto"><table class="doc-table">
+<thead><tr>
+<th>Tool</th>
+<th>Threshold</th>
+<th>Enforcement</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>PHPCS</td>
+<td>Zero violations (Magento2 standard)</td>
+<td>Pre-commit hook</td>
+</tr>
+<tr>
+<td>PHPStan</td>
+<td>Level 8, zero errors</td>
+<td>Pre-commit hook</td>
+</tr>
+<tr>
+<td>PHPUnit</td>
+<td>>85% coverage</td>
+<td>CI/CD report</td>
+</tr>
+<tr>
+<td>Integration Tests</td>
+<td>100% pass rate</td>
+<td>CI/CD blocker</td>
+</tr>
+</tbody></table></div>
+<p><strong>Enforcement</strong>: Pre-commit hooks prevent commits with PHPCS/PHPStan violations</p>
+<hr class="my-8 border-sp-light">
+<h2 id="evidence-repository-structure">Evidence Repository Structure</h2>
+<p>All quality gate evidence stored in project repository:</p>
+<pre><code class="language-text">
+/home/carl/QBDigitalSoftware/projects/SimplyPlants/
+├── docs/
+│   ├── ARCHITECTURE.md
+│   ├── URL-ROUTING-SPEC.md
+│   ├── FACET-ENGINE-SPEC.md
+│   ├── HOT-KEYS-SPEC.md
+│   ├── SEO-SPEC.md
+│   ├── BADGE-SPEC.md
+│   ├── API-CONTRACTS.md
+│   ├── database-schema.md
+│   ├── erd-diagram.mmd
+│   ├── performance-benchmark-report.md
+│   ├── accessibility-audit-report.md
+│   ├── browser-compatibility-matrix.md
+│   ├── go-live-checklist.md
+│   ├── rollback-plan.md
+│   ├── env-validation-report.md
+│   └── data-verification-report.md
+├── screenshots/
+│   ├── homepage-baseline.png
+│   ├── admin-category-tree.png
+│   ├── sidebar-desktop.png
+│   ├── product-grid-desktop.png
+│   ├── mobile-filters-open.png
+│   ├── axe-audit-before.png
+│   ├── axe-audit-after.png
+│   └── [browser-specific screenshots]
+├── test-results/
+│   ├── env-validation/
+│   ├── phpunit-*.xml
+│   ├── playwright-report/
+│   └── [E2E test results]
+├── lighthouse-reports/
+│   ├── clsccl.json
+│   ├── clrss.json
+│   └── [5 representative PLPs]
+├── webpagetest-results/
+│   ├── us-east-1.pdf
+│   ├── us-west-1.pdf
+│   └── eu-west-1.pdf
+└── qa-handoff-package.md
+</code></pre>
+<hr class="my-8 border-sp-light">
+<h2 id="approval-sign-off-template">Approval Sign-Off Template</h2>
+<p><strong>Gate</strong>: [Gate Number and Name]</p>
+<p><strong>Date</strong>: [YYYY-MM-DD]</p>
+<p><strong>Approver</strong>: [Name/Role]</p>
+<h3 id="checks-passed">Checks Passed</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-primary">✅</span> Check 1 description</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-primary">✅</span> Check 2 description</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-primary">✅</span> Check 3 description</span></li>
+</ul>
+<h3 id="evidence-reviewed">Evidence Reviewed</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span>[Link to evidence artifact 1]</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span>[Link to evidence artifact 2]</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span>[Link to evidence artifact 3]</span></li>
+</ul>
+<h3 id="defects-identified">Defects Identified</h3>
+<div class="overflow-x-auto"><table class="doc-table">
+<thead><tr>
+<th>ID</th>
+<th>Severity</th>
+<th>Description</th>
+<th>Status</th>
+<th>Mitigation</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>D001</td>
+<td>P2</td>
+<td>Minor UI alignment issue</td>
+<td>Open</td>
+<td>Fix in post-launch sprint</td>
+</tr>
+</tbody></table></div>
+<h3 id="decision">Decision</h3>
+<ul class="space-y-2 my-4">
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> <strong>APPROVED</strong> - Proceed to next phase</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> <strong>CONDITIONAL APPROVAL</strong> - Proceed with documented exceptions</span></li>
+<li class="flex gap-3"><svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span><span class="text-sp-sage">⬜</span> <strong>REJECTED</strong> - Rework required before progression</span></li>
+</ul>
+<p><strong>Approver Signature</strong>: [Name, Date]</p>
+<p><strong>Notes</strong>: [Any additional context or conditions]</p>
+<hr class="my-8 border-sp-light">
+<p><strong>Document Version</strong>: 1.0</p>
+<p><strong>Last Updated</strong>: 2026-02-02</p>
+<p><strong>Owner</strong>: Development Team</p>
+                </article>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-sp-darkest text-white py-12 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/10 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-sp-accent-gold" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="font-semibold">SimplyPlants MVP</p>
+                        <p class="text-xs text-white/60">Delivery Plan Documentation</p>
+                    </div>
+                </div>
+                <div class="text-center md:text-right">
+                    <p class="text-sm text-white/60">Last updated: February 5, 2026</p>
+                    <p class="text-xs text-white/40 mt-1">QB Digital Software</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

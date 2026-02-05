@@ -1,0 +1,2033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jira Ticket Mapping | SimplyPlants MVP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'sp': {
+                            'darkest': '#002C1B',
+                            'dark': '#3A4D39',
+                            'forest': '#506055',
+                            'primary': '#008236',
+                            'sage': '#8A9A7B',
+                            'olive': '#56624B',
+                            'light': '#E5E7EB',
+                            'lightest': '#F3F4F6',
+                        },
+                        'sp-accent': {
+                            'gold': '#FDC700',
+                            'teal': '#4B828F',
+                            'rust': '#BB4D00',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        [x-cloak] { display: none !important; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-hero {
+            background: linear-gradient(135deg, #002C1B 0%, #3A4D39 50%, #506055 100%);
+        }
+
+        /* Callout styles - NO BORDER RADIUS per brand guidelines */
+        .callout {
+            padding: 1rem 1rem 1rem 1.25rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid currentColor;
+        }
+        .callout-note { background-color: #EFF6FF; color: #3B82F6; }
+        .callout-tip { background-color: #F0FDF4; color: #008236; }
+        .callout-warning { background-color: #FFFBEB; color: #F59E0B; }
+        .callout-important { background-color: #FEF2F2; color: #EF4444; }
+
+        /* Step container - NO BORDER RADIUS */
+        .step-container {
+            background: linear-gradient(to right, rgba(0, 130, 54, 0.05), transparent);
+            border-left: 4px solid #008236;
+            padding: 1.25rem 1rem 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        /* Section overview - NO BORDER RADIUS */
+        .section-overview {
+            background: linear-gradient(135deg, #F3F4F6 0%, white 100%);
+            border: 1px solid #E5E7EB;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        /* Ticket Cards - NO BORDER RADIUS */
+        .ticket-card {
+            background: white;
+            border: 2px solid #E5E7EB;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            transition: border-color 200ms ease-out;
+        }
+        .ticket-card:hover {
+            border-color: #008236;
+        }
+
+        /* Ticket reference styling with interaction states */
+        .ticket-ref {
+            font-weight: 600;
+            color: #008236;
+            transition: all 150ms ease-in-out;
+            cursor: pointer;
+            text-decoration: none;
+            padding: 0.125rem 0.25rem;
+            margin: -0.125rem -0.25rem;
+            font-family: 'Courier New', monospace;
+        }
+        .ticket-ref:hover {
+            background-color: rgba(0, 130, 54, 0.1);
+            color: #002C1B;
+        }
+        .ticket-ref:focus {
+            outline: 2px solid #008236;
+            outline-offset: 2px;
+        }
+
+        /* Ticket Badge - NO BORDER RADIUS, Interactive */
+        .ticket-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            background-color: #002C1B;
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.025em;
+            cursor: pointer;
+            transition: all 150ms ease-in-out;
+        }
+
+        .ticket-badge:hover {
+            background-color: #008236;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .ticket-badge:focus {
+            outline: 2px solid #008236;
+            outline-offset: 2px;
+        }
+
+        /* Status Badge - NO BORDER RADIUS, SimplyPlants colors */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.625rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .status-in-progress { background-color: #D1FAE5; color: #065F46; }
+        .status-todo { background-color: #FEF3C7; color: #92400E; }
+        .status-deferred { background-color: #E5E7EB; color: #374151; }
+        .status-complete { background-color: #DBEAFE; color: #1E40AF; }
+
+        /* Priority Badge - NO BORDER RADIUS */
+        .priority-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.625rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .priority-critical { background-color: #FEE2E2; color: #991B1B; border: 1px solid #DC2626; }
+        .priority-high { background-color: #FED7AA; color: #9A3412; border: 1px solid #EA580C; }
+        .priority-medium { background-color: #FEF3C7; color: #92400E; border: 1px solid #F59E0B; }
+
+        /* Sub-task Item */
+        .subtask-item {
+            padding-left: 2rem;
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-left: 3px solid #E5E7EB;
+            margin-left: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Code blocks - NO BORDER RADIUS */
+        pre {
+            background-color: #002C1B;
+            color: #E5E7EB;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        code:not(pre code) {
+            background-color: #F3F4F6;
+            color: #3A4D39;
+            padding: 0.125rem 0.375rem;
+            font-size: 0.875em;
+            border: 1px solid #E5E7EB;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        /* Tables - NO BORDER RADIUS */
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            border: 1px solid #E5E7EB;
+        }
+
+        .doc-table th {
+            background-color: #3A4D39;
+            color: white;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .doc-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #E5E7EB;
+            vertical-align: top;
+        }
+
+        .doc-table tr:hover td {
+            background-color: #F3F4F6;
+            transition: background-color 150ms ease-in-out;
+        }
+
+        .doc-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Responsive table wrapper */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 1.5rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .table-wrapper {
+                border: 1px solid #E5E7EB;
+            }
+        }
+
+        /* Anchors */
+        h1, h2, h3, h4, h5, h6 {
+            scroll-margin-top: 5rem;
+        }
+
+        /* Focus visible for keyboard navigation */
+        *:focus-visible {
+            outline: 2px solid #008236;
+            outline-offset: 2px;
+        }
+
+        /* Print */
+        @media print {
+            nav, .no-print, header, footer, aside { display: none !important; }
+            main { max-width: 100% !important; margin: 0 !important; padding: 1rem !important; }
+            .ticket-section { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body class="bg-sp-lightest min-h-screen" x-data="{ mobileMenuOpen: false, tocOpen: false }">
+    <!-- Skip to main content -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-sp-primary text-white px-4 py-2 z-50 font-medium focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2">
+        Skip to main content
+    </a>
+
+    <!-- Header -->
+    <header class="gradient-hero text-white sticky top-0 z-40 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="index.html" class="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-white/50" aria-label="SimplyPlants MVP Home">
+                    <div class="w-10 h-10 bg-white/20 flex items-center justify-center transition-colors group-hover:bg-white/30">
+                        <svg class="w-6 h-6 text-sp-accent-gold" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="text-lg font-bold">SimplyPlants</div>
+                        <p class="text-xs text-white/70">MVP Delivery Plan</p>
+                    </div>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center gap-1" aria-label="Main navigation">
+                    <a href="executive-summary.html" class="px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50">
+                        Executive Summary
+                    </a>
+                    <a href="delivery-plan.html" class="px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50">
+                        Delivery Plan
+                    </a>
+                    <a href="jira-mapping.html" class="px-3 py-2 text-sm font-medium text-white bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50" aria-current="page">
+                        Jira Mapping
+                    </a>
+                </nav>
+
+                <!-- Mobile Menu Toggle -->
+                <button @click="mobileMenuOpen = !mobileMenuOpen"
+                        class="md:hidden p-2 hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+                        :aria-expanded="mobileMenuOpen.toString()"
+                        aria-label="Toggle menu"
+                        aria-controls="mobile-menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path x-show="!mobileMenuOpen" x-cloak stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        <path x-show="mobileMenuOpen" x-cloak stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div x-show="mobileMenuOpen"
+             x-cloak
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-2"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-2"
+             class="md:hidden border-t border-white/10"
+             id="mobile-menu"
+             @keydown.escape.window="mobileMenuOpen = false">
+            <nav class="px-4 py-3 space-y-1" aria-label="Mobile navigation">
+                <a href="executive-summary.html" class="block px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50">
+                    Executive Summary
+                </a>
+                <a href="delivery-plan.html" class="block px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50">
+                    Delivery Plan
+                </a>
+                <a href="jira-mapping.html" class="block px-3 py-2 text-sm font-medium text-white bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50" aria-current="page">
+                    Jira Mapping
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Title Banner -->
+    <section class="gradient-hero text-white py-8 lg:py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-3xl">
+                <h2 class="text-3xl lg:text-4xl font-bold tracking-tight mb-3">Jira Ticket Mapping</h2>
+                <p class="text-lg text-white/80 leading-7">Task-to-ticket mapping, sub-tasks, and templates</p>
+            </div>
+        </div>
+    </section>
+
+    <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div class="lg:flex lg:gap-8">
+            <!-- Table of Contents (desktop sidebar) -->
+            <aside class="hidden lg:block lg:w-64 flex-shrink-0">
+            <nav class="sticky top-24 bg-white border border-sp-light p-6 max-h-[calc(100vh-8rem)] overflow-y-auto shadow-sm" aria-label="Table of contents">
+                <h3 class="text-sm font-semibold text-sp-darkest mb-4 uppercase tracking-wide">On This Page</h3>
+                <div class="space-y-1"><a href="#jira-ticket-mapping" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Jira Ticket Mapping</a>
+<a href="#simplyplants-12-week-mvp-delivery-plan" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">12-Week MVP Delivery Plan</a>
+<a href="#overview" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Overview</a>
+<a href="#epic-structure" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Epic Structure</a>
+<a href="#primary-epic-nbl-3-website-development-mvp1" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Primary Epic: NBL-3</a>
+<a href="#supporting-epics" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Supporting Epics</a>
+<a href="#detailed-task-to-ticket-mapping" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Task-to-Ticket Mapping</a>
+<a href="#week-1-2-foundation-environment-setup-feb-2-20" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Week 1-2: Foundation</a>
+<a href="#week-3-6-nike-url-filtering-feb-21-mar-20-max-4-weeks" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Week 3-6: Nike Filtering</a>
+<a href="#week-7-8-integration-performance-mar-21-apr-3" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Week 7-8: Integration</a>
+<a href="#week-9-11-qa-testing-uat-prep-apr-4-23" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Week 9-11: QA & Testing</a>
+<a href="#new-tickets-to-create" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">New Tickets to Create</a>
+<a href="#high-priority-create-immediately" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">High Priority</a>
+<a href="#medium-priority-create-by-week-2" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Medium Priority</a>
+<a href="#ticket-status-summary-as-of-feb-2-2026" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Ticket Status Summary</a>
+<a href="#in-progress" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">In Progress</a>
+<a href="#to-do-starting-week-2" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">To Do</a>
+<a href="#deferred-post-mvp" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Deferred</a>
+<a href="#milestones" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Milestones</a>
+<a href="#sub-task-creation-templates" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Sub-Task Templates</a>
+<a href="#template-backend-sub-task" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Backend Template</a>
+<a href="#template-frontend-sub-task" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Frontend Template</a>
+<a href="#daily-standup-format" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Daily Standup Format</a>
+<a href="#jira-board-configuration" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Jira Board Configuration</a>
+<a href="#recommended-columns" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Recommended Columns</a>
+<a href="#recommended-filters" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Recommended Filters</a>
+<a href="#recommended-labels" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Recommended Labels</a>
+<a href="#communication-escalation" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Communication & Escalation</a>
+<a href="#daily-updates" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Daily Updates</a>
+<a href="#weekly-updates" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Weekly Updates</a>
+<a href="#escalation-triggers" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Escalation Triggers</a>
+<a href="#quality-gate-approvals" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Quality Gate Approvals</a>
+<a href="#appendix-jira-quick-reference" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Jira Quick Reference</a>
+<a href="#creating-sub-tasks-in-jira" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Creating Sub-tasks</a>
+<a href="#updating-ticket-progress" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Updating Progress</a>
+<a href="#closing-tickets" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">Closing Tickets</a>
+</div></nav></aside>
+
+            <!-- Mobile TOC Toggle -->
+            <div class="lg:hidden mb-6">
+                <button @click="tocOpen = !tocOpen"
+                        class="w-full flex items-center justify-between px-4 py-3 bg-white border border-sp-light text-left font-medium text-sp-darkest hover:bg-sp-lightest transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2"
+                        :aria-expanded="tocOpen.toString()">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-sp-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                        </svg>
+                        Table of Contents
+                    </span>
+                    <svg :class="tocOpen ? 'rotate-180' : ''" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+
+                <nav x-show="tocOpen"
+                     x-cloak
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 -translate-y-2"
+                     class="bg-white border border-t-0 border-sp-light p-4 space-y-1 max-h-96 overflow-y-auto"
+                     aria-label="Mobile table of contents">
+                    <a href="#jira-ticket-mapping" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">
+                        Jira Ticket Mapping
+                    </a>
+                    <a href="#overview" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">
+                        Overview
+                    </a>
+                    <a href="#epic-structure" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">
+                        Epic Structure
+                    </a>
+                    <a href="#detailed-task-to-ticket-mapping" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">
+                        Task-to-Ticket Mapping
+                    </a>
+                    <a href="#week-1-2-foundation-environment-setup-feb-2-20" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">
+                        Week 1-2: Foundation
+                    </a>
+                    <a href="#week-3-6-nike-url-filtering-feb-21-mar-20-max-4-weeks" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">
+                        Week 3-6: Nike Filtering
+                    </a>
+                    <a href="#week-7-8-integration-performance-mar-21-apr-3" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">
+                        Week 7-8: Integration
+                    </a>
+                    <a href="#week-9-11-qa-testing-uat-prep-apr-4-23" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 pl-4 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">
+                        Week 9-11: QA & Testing
+                    </a>
+                    <a href="#new-tickets-to-create" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">
+                        New Tickets to Create
+                    </a>
+                    <a href="#ticket-status-summary-as-of-feb-2-2026" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">
+                        Ticket Status Summary
+                    </a>
+                    <a href="#sub-task-creation-templates" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">
+                        Sub-Task Templates
+                    </a>
+                    <a href="#jira-board-configuration" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">
+                        Jira Board Configuration
+                    </a>
+                    <a href="#communication-escalation" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">
+                        Communication
+                    </a>
+                    <a href="#appendix-jira-quick-reference" @click="tocOpen = false" class="block text-sm text-sp-forest hover:text-sp-primary hover:bg-sp-primary/5 transition-colors px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2">
+                        Jira Quick Reference
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 min-w-0">
+                <article class="bg-white border border-sp-light p-6 sm:p-8 lg:p-10 shadow-sm">
+                    <h1 id="jira-ticket-mapping" class="text-4xl font-bold tracking-tight text-sp-darkest mb-6">Jira Ticket Mapping</h1>
+
+<h2 id="simplyplants-12-week-mvp-delivery-plan" class="text-3xl font-semibold text-sp-darkest mt-12 mb-4">SimplyPlants 12-Week MVP Delivery Plan</h2>
+
+<p class="text-base leading-7 text-sp-forest mb-6">
+    <strong>Created</strong>: February 2, 2026<br>
+    <strong>Workstreams</strong>: Frontend (Theme/UI/Integration) + Backend (Data/Modules/Testing)
+</p>
+
+<div class="section-overview">
+    <h2 id="overview" class="!mt-0 !mb-3 text-2xl font-semibold text-sp-darkest">Overview</h2>
+    <p class="text-base leading-7 text-sp-forest mb-0">This document provides the complete Jira ticket mapping for the SimplyPlants MVP delivery. All tasks from the 12-week delivery plan are mapped to existing or new Jira tickets, with sub-task breakdowns, owners, and acceptance criteria.</p>
+</div>
+
+<h2 id="epic-structure" class="text-3xl font-semibold text-sp-darkest mt-12 mb-6">Epic Structure</h2>
+
+<!-- Primary Epic Card -->
+<div class="ticket-card">
+    <div class="flex flex-wrap items-start gap-3 mb-4">
+        <span class="ticket-badge">NBL-3</span>
+        <div class="flex-1 min-w-0">
+            <h3 id="primary-epic-nbl-3-website-development-mvp1" class="text-xl font-semibold text-sp-darkest mb-2">Primary Epic: Website Development - MVP1</h3>
+            <div class="flex flex-wrap gap-4 text-sm text-sp-forest">
+                <span class="flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Feb 2 - Apr 3, 2026
+                </span>
+                <span class="flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    Product Owner
+                </span>
+            </div>
+        </div>
+    </div>
+    <p class="text-sp-dark mb-4">Core website development for SimplyPlants MVP launch</p>
+
+    <div class="mt-4 pt-4 border-t border-sp-light">
+        <h4 class="text-sm font-semibold text-sp-darkest mb-3 uppercase tracking-wide">Key Tickets</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="flex items-start gap-2 p-3 bg-sp-lightest">
+                <svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <div>
+                    <span class="ticket-badge text-xs">NBL-62</span>
+                    <p class="text-sm text-sp-darkest mt-1">Create theme (Frontend)</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-2 p-3 bg-sp-lightest">
+                <svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <div>
+                    <span class="ticket-badge text-xs">NBL-125</span>
+                    <p class="text-sm text-sp-darkest mt-1">PLP Page filtering (Frontend + Backend)</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-2 p-3 bg-sp-lightest">
+                <svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <div>
+                    <span class="ticket-badge text-xs">NBL-155</span>
+                    <p class="text-sm text-sp-darkest mt-1">Core functionality (Backend)</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-2 p-3 bg-sp-lightest">
+                <svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <div>
+                    <span class="ticket-badge text-xs">NBL-112</span>
+                    <p class="text-sm text-sp-darkest mt-1">Outline of site developed (Frontend)</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-2 p-3 bg-sp-lightest">
+                <svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <div>
+                    <span class="ticket-badge text-xs">NBL-141</span>
+                    <p class="text-sm text-sp-darkest mt-1">1-step Check out (Frontend + Backend)</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-2 p-3 bg-sp-lightest">
+                <svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <div>
+                    <span class="ticket-badge text-xs">NBL-46</span>
+                    <p class="text-sm text-sp-darkest mt-1">PDP (Frontend + Backend)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<h3 id="supporting-epics" class="text-2xl font-semibold text-sp-darkest mt-8 mb-4">Supporting Epics</h3>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Epic: Website Content -->
+    <div class="ticket-card">
+        <div class="flex items-start gap-3 mb-3">
+            <span class="ticket-badge">NBL-66</span>
+            <h4 class="text-lg font-semibold text-sp-darkest">Website Content</h4>
+        </div>
+        <ul class="space-y-2">
+            <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-sp-primary mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <div>
+                    <span class="ticket-badge text-xs">NBL-67</span>
+                    <span class="text-sm text-sp-dark ml-2">Product setup (Backend - 13,130 SKUs import)</span>
+                </div>
+            </li>
+            <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-sp-primary mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <div>
+                    <span class="ticket-badge text-xs">NBL-146</span>
+                    <span class="text-sm text-sp-dark ml-2">Define item attributes (Backend - 16 HIGH priority attributes)</span>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Epic: Infrastructure -->
+    <div class="ticket-card">
+        <div class="flex items-start gap-3 mb-3">
+            <span class="ticket-badge">NBL-17</span>
+            <h4 class="text-lg font-semibold text-sp-darkest">Infrastructure</h4>
+        </div>
+        <ul class="space-y-2">
+            <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-sp-primary mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <div>
+                    <span class="ticket-badge text-xs">NBL-124</span>
+                    <span class="text-sm text-sp-dark ml-2">Dev environment setup (Backend - Due: Feb 13, Week 2)</span>
+                </div>
+            </li>
+            <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-sp-primary mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <div>
+                    <span class="ticket-badge text-xs">NBL-122</span>
+                    <span class="text-sm text-sp-dark ml-2">Deployment strategy (Backend)</span>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Epic: Integration -->
+    <div class="ticket-card lg:col-span-2">
+        <div class="flex items-start gap-3 mb-3">
+            <span class="ticket-badge">NBL-126</span>
+            <h4 class="text-lg font-semibold text-sp-darkest">Integration - Magento to Business Central</h4>
+        </div>
+        <ul class="space-y-2">
+            <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-sp-primary mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="ticket-badge text-xs">NBL-127</span>
+                    <span class="status-badge status-deferred">Deferred</span>
+                    <span class="text-sm text-sp-dark">Item with attributes (DEFERRED post-MVP)</span>
+                </div>
+            </li>
+            <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-sp-primary mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="ticket-badge text-xs">NBL-128</span>
+                    <span class="status-badge status-deferred">Deferred</span>
+                    <span class="text-sm text-sp-dark">Inventory and associated messaging (DEFERRED post-MVP)</span>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Milestones -->
+<div class="ticket-card mt-6 bg-gradient-to-r from-sp-lightest to-white">
+    <h4 class="text-lg font-semibold text-sp-darkest mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-sp-accent-gold" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+        </svg>
+        Milestones
+    </h4>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex items-start gap-3">
+            <svg class="w-5 h-5 text-sp-accent-teal mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            <div>
+                <span class="ticket-badge text-xs">NBL-35</span>
+                <p class="text-sm text-sp-dark mt-1">User Acceptance Testing (Apr 6-30, 2026)</p>
+            </div>
+        </div>
+        <div class="flex items-start gap-3">
+            <svg class="w-5 h-5 text-sp-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            <div>
+                <span class="ticket-badge text-xs">NBL-36</span>
+                <p class="text-sm text-sp-dark mt-1 font-semibold">GO LIVE (May 1, 2026)</p>
+            </div>
+        </div>
+    </div>
+</div>
+<h2 id="detailed-task-to-ticket-mapping" class="text-3xl font-semibold text-sp-darkest mt-12 mb-6">Detailed Task-to-Ticket Mapping</h2>
+
+<!-- Week 1-2: Foundation & Environment Setup -->
+<div x-data="{ open: true }" class="ticket-section mb-8 border-l-4 border-sp-primary bg-gradient-to-r from-sp-primary/5 to-transparent">
+    <button @click="open = !open"
+            class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-sp-primary/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-primary focus:ring-offset-2"
+            :aria-expanded="open.toString()">
+        <h3 id="week-1-2-foundation-environment-setup-feb-2-20" class="text-2xl font-semibold text-sp-darkest !mt-0 !mb-0">
+            Week 1-2: Foundation & Environment Setup (Feb 2-20)
+        </h3>
+        <svg :class="open ? 'rotate-180' : ''" class="w-6 h-6 transition-transform text-sp-primary flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+
+    <div x-show="open"
+         x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         class="px-6 pb-6 space-y-6">
+
+<!-- Ticket Card: NBL-124 -->
+<div class="ticket-card">
+    <div class="flex flex-wrap items-start gap-3 mb-4">
+        <span class="ticket-badge">NBL-124</span>
+        <div class="flex-1 min-w-0">
+            <h4 id="nbl-124-dev-environment-setup-due-feb-13" class="text-lg font-semibold text-sp-darkest mb-2">Dev environment setup</h4>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <span class="status-badge status-in-progress">In Progress</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Owner:</strong> Backend</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Sprint:</strong> Week 1</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Due:</strong> Feb 13</span>
+        </div>
+    </div>
+
+    <div class="border-t border-sp-light pt-4">
+        <h5 class="text-sm font-semibold text-sp-darkest mb-3 uppercase tracking-wide">Sub-tasks to Create</h5>
+
+        <!-- Sub-task 1 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-124-1</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Fresh Magento 2.4.8 installation with Mark Shust Docker</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Install Magento 2.4.8, configure admin, verify all containers running</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Magento admin accessible, zero installation errors</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 2 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-124-2</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Install and configure latest Hyva theme</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Add Hyva to composer, set as active theme, verify TailwindCSS and Alpine.js loaded</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Hyva homepage renders, no console errors</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 3 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-124-3</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Install and configure latest Hyva Checkout</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Add Hyva Checkout to composer, enable for Default Store View, test checkout flow</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> 1-step checkout functional, no JavaScript errors</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 4 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-124-4</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Configure OpenSearch 2.12 for 13K SKU scale</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Set OpenSearch host, increase heap to 1GB, reindex, verify search functional</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Search queries &lt;500ms, OpenSearch health green</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ticket Card: NBL-62 -->
+<div class="ticket-card">
+    <div class="flex flex-wrap items-start gap-3 mb-4">
+        <span class="ticket-badge">NBL-62</span>
+        <div class="flex-1 min-w-0">
+            <h4 id="nbl-62-create-theme-in-progress" class="text-lg font-semibold text-sp-darkest mb-2">Create theme</h4>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <span class="status-badge status-in-progress">In Progress</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Owner:</strong> Frontend</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Sprint:</strong> Week 2</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Type:</strong> Frontend/Theme</span>
+        </div>
+    </div>
+
+    <div class="border-t border-sp-light pt-4">
+        <h5 class="text-sm font-semibold text-sp-darkest mb-3 uppercase tracking-wide">Sub-tasks to Create</h5>
+
+        <!-- Sub-task 1 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-62-1</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Create SimplyPlants child theme structure</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create theme directory, registration.php, theme.xml, set as active</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Child theme active, parent Hyva styles inherited</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 2 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-62-2</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Setup TailwindCSS 4.x build pipeline inside Docker</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create web/tailwind/, package.json, build scripts, compile CSS inside Docker</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> CSS compiles without errors, under 300KB gzipped</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 3 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-62-3</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Create baseline layout templates</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create default.xml, catalog_category_view.xml, product list template</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Category page renders with custom layout</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 4 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-62-4</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Design 3-section sidebar structure (no Hot Keys)</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create Primary, Secondary, More Filters sections (skip Hot Keys section)</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> 3 sections display, collapsible via Alpine.js, ARIA attributes present</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 5 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-62-5</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Create product card component with badge placeholder</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create product card template, add image, name, price, Quick Add button, badge placeholder</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Product card displays, lazy loading works, responsive</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 6 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-62-6</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Implement breadcrumbs with Schema.org BreadcrumbList</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create breadcrumb template, add BreadcrumbList JSON-LD, test validation</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Breadcrumbs display, Schema.org validates in Google Rich Results Test</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Ticket Card: NBL-67 -->
+<div class="ticket-card">
+    <div class="flex flex-wrap items-start gap-3 mb-4">
+        <span class="ticket-badge">NBL-67</span>
+        <div class="flex-1 min-w-0">
+            <h4 id="nbl-67-product-setup-13-130-skus" class="text-lg font-semibold text-sp-darkest mb-2">Product setup - 13,130 SKUs</h4>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <span class="status-badge status-todo">To Do</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Owner:</strong> Backend</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Sprint:</strong> Week 2</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Type:</strong> Data/Setup</span>
+        </div>
+    </div>
+
+    <div class="border-t border-sp-light pt-4">
+        <h5 class="text-sm font-semibold text-sp-darkest mb-3 uppercase tracking-wide">Sub-tasks to Create</h5>
+
+        <!-- Sub-task 1 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-67-1</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Create 47 category structure (16 L1 + 31 L2)</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Import categories from CSV or create manually, set URL keys, verify URL rewrites</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> 47 categories created, all visible in admin tree, no duplicate URL keys</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Ticket Card: NBL-155 -->
+<div class="ticket-card">
+    <div class="flex flex-wrap items-start gap-3 mb-4">
+        <span class="ticket-badge">NBL-155</span>
+        <div class="flex-1 min-w-0">
+            <h4 id="nbl-155-core-functionality-backend-modules" class="text-lg font-semibold text-sp-darkest mb-2">Core functionality - Backend modules</h4>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <span class="status-badge status-in-progress">In Progress</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Owner:</strong> Backend</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Sprint:</strong> Week 2</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Type:</strong> Backend/Module</span>
+        </div>
+    </div>
+
+    <div class="border-t border-sp-light pt-4">
+        <h5 class="text-sm font-semibold text-sp-darkest mb-3 uppercase tracking-wide">Sub-tasks to Create</h5>
+
+        <!-- Sub-task 1 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-155-1</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Design and install database schema for custom modules</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create SimplyPlants_PlpFilter module, design 3 tables, create db_schema.xml</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Tables created, indexes present, module enables without errors</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 2 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-155-2</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Populate filter codes (133) and facet config (752 rows)</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create data patches, populate from CSV, verify data</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> 133 filter codes, 752 facet configs, patches idempotent</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</div>
+
+<!-- Week 3-6: Nike URL Filtering -->
+<div x-data="{ open: true }" class="ticket-section mb-8 border-l-4 border-sp-accent-rust bg-gradient-to-r from-red-50/50 to-transparent">
+    <button @click="open = !open"
+            class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-red-50/50 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-accent-rust focus:ring-offset-2"
+            :aria-expanded="open.toString()">
+        <h3 id="week-3-6-nike-url-filtering-feb-21-mar-20-max-4-weeks" class="text-2xl font-semibold text-sp-darkest !mt-0 !mb-0">
+            Week 3-6: Nike URL Filtering (Feb 21 - Mar 20) - MAX 4 WEEKS
+        </h3>
+        <svg :class="open ? 'rotate-180' : ''" class="w-6 h-6 transition-transform text-sp-accent-rust flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+
+    <div x-show="open"
+         x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         class="px-6 pb-6 space-y-6">
+
+<!-- Critical Ticket Card: NBL-125 -->
+<div class="ticket-card border-sp-accent-rust bg-gradient-to-r from-red-50 to-white">
+    <div class="flex flex-wrap items-start gap-3 mb-4">
+        <span class="ticket-badge bg-sp-accent-rust">NBL-125</span>
+        <div class="flex-1 min-w-0">
+            <h4 id="nbl-125-plp-page-filtering-nike-url-system" class="text-lg font-semibold text-sp-darkest mb-2">PLP Page filtering - Nike URL system</h4>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <span class="status-badge status-todo">To Do</span>
+            <span class="priority-badge priority-critical">Critical</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Owners:</strong> Frontend + Backend</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Sprint:</strong> Week 3</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-accent-rust" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <span class="text-sp-accent-rust font-semibold">Time-boxed: 4 weeks MAX</span>
+        </div>
+    </div>
+
+    <div class="border-t border-sp-accent-rust/30 pt-4">
+        <h5 class="text-sm font-semibold text-sp-darkest mb-3 uppercase tracking-wide flex items-center gap-2">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+            </svg>
+            Backend Sub-tasks
+        </h5>
+
+        <!-- BE Sub-task 1 -->
+        <div class="subtask-item bg-red-50/30 mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-accent-rust bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs bg-sp-accent-rust">NBL-125-BE-1</span>
+                        <span class="text-xs text-sp-accent-rust font-medium">Week 3</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Implement custom router for /plants/[[...slug]] pattern</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create Controller/Router.php, register in di.xml, implement match() method</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> /plants/clsccl routes to Succulents, invalid codes return 404</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- BE Sub-task 2 -->
+        <div class="subtask-item bg-red-50/30 mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-accent-rust bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs bg-sp-accent-rust">NBL-125-BE-2</span>
+                        <span class="text-xs text-sp-accent-rust font-medium">Week 3</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Create slug parser and generator services</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create SlugParser.php and SlugGenerator.php, cache in Redis</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Slugs parse/generate correctly, under 10ms performance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- BE Sub-task 3 -->
+        <div class="subtask-item bg-red-50/30 mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-accent-rust bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs bg-sp-accent-rust">NBL-125-BE-3</span>
+                        <span class="text-xs text-sp-accent-rust font-medium">Week 4</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Create custom PLP controller with filter application</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create Controller/Index/Index.php, apply filters to product collection, set canonical URL</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Products filtered correctly, canonical URL set, noindex on filtered views</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- BE Sub-task 4 -->
+        <div class="subtask-item bg-red-50/30 mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-accent-rust bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs bg-sp-accent-rust">NBL-125-BE-4</span>
+                        <span class="text-xs text-sp-accent-rust font-medium">Week 4</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Implement dynamic facet engine</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create Service/FacetEngine.php, load facets per category, query OpenSearch for counts</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Facets load correctly, counts accurate, under 200ms performance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- BE Sub-task 5 -->
+        <div class="subtask-item bg-red-50/30 mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-accent-rust bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs bg-sp-accent-rust">NBL-125-BE-5</span>
+                        <span class="text-xs text-sp-accent-rust font-medium">Week 5</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Implement filter persistence across categories</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create Service/FilterPersistence.php, define persistence rules, store in session</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Color/price/pot_size carry over, category-specific filters drop</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- BE Sub-task 6 -->
+        <div class="subtask-item bg-red-50/30 mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-accent-rust bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs bg-sp-accent-rust">NBL-125-BE-6</span>
+                        <span class="text-xs text-sp-accent-rust font-medium">Week 6</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Optimize OpenSearch queries for 13K SKU performance</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Review slow query log, optimize aggregations, enable caching</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Query response under 500ms (p95), cache hit rate over 80%</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h5 class="text-sm font-semibold text-sp-darkest mb-3 mt-6 uppercase tracking-wide flex items-center gap-2">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"/>
+            </svg>
+            Frontend Sub-tasks
+        </h5>
+
+        <!-- FE Sub-task 1 -->
+        <div class="subtask-item bg-red-50/30 mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-accent-rust bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs bg-sp-accent-rust">NBL-125-FE-1</span>
+                        <span class="text-xs text-sp-accent-rust font-medium">Week 3</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Integrate sidebar with backend facet data</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Update sidebar template to consume facet data, render options with counts</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Facets display per category, URL updates on filter selection</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- FE Sub-task 2 -->
+        <div class="subtask-item bg-red-50/30 mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-accent-rust bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs bg-sp-accent-rust">NBL-125-FE-2</span>
+                        <span class="text-xs text-sp-accent-rust font-medium">Week 3</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Implement filter chips UI with remove functionality</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create filter chips template, add remove buttons, implement 'Clear All'</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Chips display, remove works, URL updates correctly</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- FE Sub-task 3 -->
+        <div class="subtask-item bg-red-50/30 mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-accent-rust bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs bg-sp-accent-rust">NBL-125-FE-3</span>
+                        <span class="text-xs text-sp-accent-rust font-medium">Week 4</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Style sidebar sections with TailwindCSS and Alpine.js</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Add styles, animations, state persistence in sessionStorage</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Smooth collapse/expand (250ms), state persists, focus indicators visible</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- FE Sub-task 4 -->
+        <div class="subtask-item bg-red-50/30 mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-accent-rust bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs bg-sp-accent-rust">NBL-125-FE-4</span>
+                        <span class="text-xs text-sp-accent-rust font-medium">Week 6</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">End-to-end testing of URL filtering flow</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Manual testing (6 scenarios), write Playwright E2E test</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> All manual tests pass, E2E test passes with 0% flakiness</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ticket Card: NBL-155 (Product Badges) -->
+<div class="ticket-card">
+    <div class="flex flex-wrap items-start gap-3 mb-4">
+        <span class="ticket-badge">NBL-155</span>
+        <div class="flex-1 min-w-0">
+            <h4 id="nbl-155-core-functionality-product-badges" class="text-lg font-semibold text-sp-darkest mb-2">Core functionality - Product Badges</h4>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <span class="status-badge status-in-progress">In Progress</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Owner:</strong> Backend</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Sprint:</strong> Week 5</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Type:</strong> Backend/Module</span>
+        </div>
+    </div>
+
+    <div class="border-t border-sp-light pt-4">
+        <h5 class="text-sm font-semibold text-sp-darkest mb-3 uppercase tracking-wide">Sub-tasks to Create</h5>
+
+        <!-- Sub-task 1 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-155-3</span>
+                        <span class="text-xs text-sp-forest font-medium">Week 5</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Implement product badge rule engine (7 badge types)</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create SimplyPlants_ProductBadges module, implement 7 badge rules, cache in Redis</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Badges display correctly (max 2 per product), admin config functional</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ticket Card: NBL-62 (Product Card Updates) -->
+<div class="ticket-card">
+    <div class="flex flex-wrap items-start gap-3 mb-4">
+        <span class="ticket-badge">NBL-62</span>
+        <div class="flex-1 min-w-0">
+            <h4 id="nbl-62-create-theme-product-card-updates" class="text-lg font-semibold text-sp-darkest mb-2">Create theme - Product Card Updates</h4>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <span class="status-badge status-in-progress">In Progress</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Owner:</strong> Frontend</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Sprint:</strong> Week 4</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Type:</strong> Frontend/Theme</span>
+        </div>
+    </div>
+
+    <div class="border-t border-sp-light pt-4">
+        <h5 class="text-sm font-semibold text-sp-darkest mb-3 uppercase tracking-wide">Sub-tasks to Create</h5>
+
+        <!-- Sub-task 1 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-62-7</span>
+                        <span class="text-xs text-sp-forest font-medium">Week 4</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Update product card with badge display logic</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Consume badge data from BadgeEngine, render max 2 badges per product</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Badges display (top-left corner), colors correct, max 2 displayed</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 2 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-62-8</span>
+                        <span class="text-xs text-sp-forest font-medium">Week 5</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Implement Quick Add to cart button</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Add AJAX add to cart, loading state, success/error notifications</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Product adds to cart, cart count updates, errors handled gracefully</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</div>
+
+<!-- Week 7-8: Integration & Performance -->
+<div x-data="{ open: true }" class="ticket-section mb-8 border-l-4 border-sp-accent-teal bg-gradient-to-r from-sp-accent-teal/5 to-transparent">
+    <button @click="open = !open"
+            class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-sp-accent-teal/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-accent-teal focus:ring-offset-2"
+            :aria-expanded="open.toString()">
+        <h3 id="week-7-8-integration-performance-mar-21-apr-3" class="text-2xl font-semibold text-sp-darkest !mt-0 !mb-0">
+            Week 7-8: Integration & Performance (Mar 21 - Apr 3)
+        </h3>
+        <svg :class="open ? 'rotate-180' : ''" class="w-6 h-6 transition-transform text-sp-accent-teal flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+
+    <div x-show="open"
+         x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         class="px-6 pb-6 space-y-6">
+
+<!-- Ticket Card: NBL-155 (SEO & Performance) -->
+<div class="ticket-card">
+    <div class="flex flex-wrap items-start gap-3 mb-4">
+        <span class="ticket-badge">NBL-155</span>
+        <div class="flex-1 min-w-0">
+            <h4 id="nbl-155-core-functionality-seo-performance" class="text-lg font-semibold text-sp-darkest mb-2">Core functionality - SEO & Performance</h4>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <span class="status-badge status-in-progress">In Progress</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Owner:</strong> Backend</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Sprint:</strong> Week 7</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Type:</strong> Backend/Module</span>
+        </div>
+    </div>
+
+    <div class="border-t border-sp-light pt-4">
+        <h5 class="text-sm font-semibold text-sp-darkest mb-3 uppercase tracking-wide">Sub-tasks to Create</h5>
+
+        <!-- Sub-task 1 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-155-4</span>
+                        <span class="text-xs text-sp-forest font-medium">Week 7</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Implement SEO optimization (canonical URLs, noindex rules)</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create Service/SeoManager.php, add canonical links, noindex meta tags, update robots.txt</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Canonical URLs correct, noindex on filtered/paginated views, robots.txt updated</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 2 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-155-5</span>
+                        <span class="text-xs text-sp-forest font-medium">Week 7</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Implement full-page cache (FPC) with filter cache keys</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create FPC plugin, generate cache keys, implement invalidation, cache warmup script</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Cache hit rate over 80%, cache invalidation works</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 3 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-155-6</span>
+                        <span class="text-xs text-sp-forest font-medium">Week 8</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Performance optimization (database, indexes, caching)</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Add indexes, optimize queries, tune MariaDB, profile PLP rendering</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> No queries over 100ms, reindex under 10min, PLP render under 500ms</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ticket Card: NBL-62 (Mobile & Accessibility) -->
+<div class="ticket-card">
+    <div class="flex flex-wrap items-start gap-3 mb-4">
+        <span class="ticket-badge">NBL-62</span>
+        <div class="flex-1 min-w-0">
+            <h4 id="nbl-62-create-theme-mobile-accessibility" class="text-lg font-semibold text-sp-darkest mb-2">Create theme - Mobile & Accessibility</h4>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <span class="status-badge status-in-progress">In Progress</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Owner:</strong> Frontend</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Sprint:</strong> Week 8</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Type:</strong> Frontend/Theme</span>
+        </div>
+    </div>
+
+    <div class="border-t border-sp-light pt-4">
+        <h5 class="text-sm font-semibold text-sp-darkest mb-3 uppercase tracking-wide">Sub-tasks to Create</h5>
+
+        <!-- Sub-task 1 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-62-9</span>
+                        <span class="text-xs text-sp-forest font-medium">Week 7</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Implement mobile responsive design with drawer sidebar</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Hide sidebar on under 768px, create filter button, implement drawer with Alpine.js</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Drawer opens/closes smoothly, keyboard accessible (Escape to close)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 2 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-62-10</span>
+                        <span class="text-xs text-sp-forest font-medium">Week 7</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Optimize frontend performance (lazy loading, deferred JS, critical CSS)</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Add lazy loading to images, defer JavaScript, inline critical CSS</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> LCP under 2500ms desktop, CLS under 0.1, TBT under 200ms, Lighthouse over 90 desktop</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 3 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-62-11</span>
+                        <span class="text-xs text-sp-forest font-medium">Week 8</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">WCAG 2.1 AA accessibility audit and fixes</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Run axe DevTools audit, fix color contrast, add ARIA labels, test screen reader</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Zero critical/serious issues in axe, keyboard navigable, screen reader compatible</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 4 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-62-12</span>
+                        <span class="text-xs text-sp-forest font-medium">Week 8</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Implement Schema.org Product markup on product cards</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Add Product JSON-LD to product card template, test validation</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Schema.org validates in Google Rich Results Test</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</div>
+
+<!-- Week 9-11: QA, Testing & UAT Prep -->
+<div x-data="{ open: true }" class="ticket-section mb-8 border-l-4 border-sp-accent-gold bg-gradient-to-r from-sp-accent-gold/5 to-transparent">
+    <button @click="open = !open"
+            class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-sp-accent-gold/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sp-accent-gold focus:ring-offset-2"
+            :aria-expanded="open.toString()">
+        <h3 id="week-9-11-qa-testing-uat-prep-apr-4-23" class="text-2xl font-semibold text-sp-darkest !mt-0 !mb-0">
+            Week 9-11: QA, Testing & UAT Prep (Apr 4-23)
+        </h3>
+        <svg :class="open ? 'rotate-180' : ''" class="w-6 h-6 transition-transform text-sp-accent-gold flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+
+    <div x-show="open"
+         x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         class="px-6 pb-6 space-y-6">
+
+<!-- Ticket Card: NBL-125 (E2E Testing) -->
+<div class="ticket-card">
+    <div class="flex flex-wrap items-start gap-3 mb-4">
+        <span class="ticket-badge">NBL-125</span>
+        <div class="flex-1 min-w-0">
+            <h4 id="nbl-125-plp-page-filtering-e2e-testing" class="text-lg font-semibold text-sp-darkest mb-2">PLP Page filtering - E2E Testing</h4>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <span class="status-badge status-todo">To Do</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Owner:</strong> Frontend</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Sprint:</strong> Week 9</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Type:</strong> Frontend/Testing</span>
+        </div>
+    </div>
+
+    <div class="border-t border-sp-light pt-4">
+        <h5 class="text-sm font-semibold text-sp-darkest mb-3 uppercase tracking-wide">Sub-tasks to Create</h5>
+
+        <!-- Sub-task 1 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-125-FE-5</span>
+                        <span class="text-xs text-sp-forest font-medium">Week 9</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Playwright E2E test suite expansion (critical paths)</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Write 6 critical path tests, visual regression tests, performance assertions</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> 6 tests pass with 0% flakiness, visual baselines captured</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 2 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-125-FE-6</span>
+                        <span class="text-xs text-sp-forest font-medium">Week 9</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Cross-browser compatibility testing</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Test on Chrome, Firefox, Safari, Edge (desktop + mobile)</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> All features functional on all browsers, critical issues fixed</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ticket Card: NBL-155 (Performance Benchmarking) -->
+<div class="ticket-card">
+    <div class="flex flex-wrap items-start gap-3 mb-4">
+        <span class="ticket-badge">NBL-155</span>
+        <div class="flex-1 min-w-0">
+            <h4 id="nbl-155-core-functionality-performance-benchmarking" class="text-lg font-semibold text-sp-darkest mb-2">Core functionality - Performance Benchmarking</h4>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <span class="status-badge status-todo">To Do</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Owner:</strong> Backend</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Sprint:</strong> Week 9</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Type:</strong> Backend/Module</span>
+        </div>
+    </div>
+
+    <div class="border-t border-sp-light pt-4">
+        <h5 class="text-sm font-semibold text-sp-darkest mb-3 uppercase tracking-wide">Sub-tasks to Create</h5>
+
+        <!-- Sub-task 1 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-155-7</span>
+                        <span class="text-xs text-sp-forest font-medium">Week 9</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Performance benchmarking with full 13K SKU catalog</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Import 13K SKUs, run Lighthouse audits, load testing, measure Core Web Vitals</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> LCP under 2500ms (p95), CLS under 0.1, OpenSearch under 500ms, FPC over 80% hit rate</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ticket Card: NBL-35 (User Acceptance Testing - QA Prep) -->
+<div class="ticket-card">
+    <div class="flex flex-wrap items-start gap-3 mb-4">
+        <span class="ticket-badge">NBL-35</span>
+        <div class="flex-1 min-w-0">
+            <h4 id="nbl-35-user-acceptance-testing-qa-prep" class="text-lg font-semibold text-sp-darkest mb-2">User Acceptance Testing - QA Prep</h4>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <span class="status-badge status-todo">To Do</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Owners:</strong> Frontend + Backend + QA Team</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Sprint:</strong> Week 10</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Type:</strong> QA/Testing</span>
+        </div>
+    </div>
+
+    <div class="border-t border-sp-light pt-4">
+        <h5 class="text-sm font-semibold text-sp-darkest mb-3 uppercase tracking-wide">Sub-tasks to Create</h5>
+
+        <!-- Sub-task 1 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-35-1</span>
+                        <span class="text-xs text-sp-forest font-medium">16 hours, Week 10</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">QA validation by QA Team</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Functional testing, performance testing, accessibility audit, cross-browser verification</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> QA report delivered, P0/P1/P2/P3 defects classified, sign-off if under 2 P0 defects</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 2 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-35-2</span>
+                        <span class="text-xs text-sp-forest font-medium">Week 10</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Fix P0/P1 defects from QA validation</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Triage defects, fix P0 immediately, fix P1 high priority, defer P2/P3</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Zero P0 defects, over 90% P1 defects fixed, no regressions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ticket Card: NBL-112 (Outline of site developed - Documentation) -->
+<div class="ticket-card">
+    <div class="flex flex-wrap items-start gap-3 mb-4">
+        <span class="ticket-badge">NBL-112</span>
+        <div class="flex-1 min-w-0">
+            <h4 id="nbl-112-outline-of-site-developed-documentation" class="text-lg font-semibold text-sp-darkest mb-2">Outline of site developed - Documentation</h4>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <span class="status-badge status-todo">To Do</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Owners:</strong> Frontend + Docs</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Sprint:</strong> Week 11</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Type:</strong> Documentation</span>
+        </div>
+    </div>
+
+    <div class="border-t border-sp-light pt-4">
+        <h5 class="text-sm font-semibold text-sp-darkest mb-3 uppercase tracking-wide">Sub-tasks to Create</h5>
+
+        <!-- Sub-task 1 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-112-1</span>
+                        <span class="text-xs text-sp-forest font-medium">8 hours, Week 11</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">User guide for merchants by Documentation Team</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create HTML user guide with 7 sections, screenshots, search functionality</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> User guide published, search functional, feedback collected</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 2 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-112-2</span>
+                        <span class="text-xs text-sp-forest font-medium">8 hours, Week 11</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Technical developer documentation</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Document custom modules, API endpoints, database schema, deployment procedures</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Dev docs complete, code examples included, deployment guide verified</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ticket Card: NBL-35 (UAT Final Review) -->
+<div class="ticket-card">
+    <div class="flex flex-wrap items-start gap-3 mb-4">
+        <span class="ticket-badge">NBL-35</span>
+        <div class="flex-1 min-w-0">
+            <h4 id="nbl-35-3-uat-final-review" class="text-lg font-semibold text-sp-darkest mb-2">User Acceptance Testing - UAT Final Review</h4>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <span class="status-badge status-todo">To Do</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Owners:</strong> Frontend + Backend</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Sprint:</strong> Week 11</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-sp-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sp-dark"><strong>Type:</strong> QA/Testing</span>
+        </div>
+    </div>
+
+    <div class="border-t border-sp-light pt-4">
+        <h5 class="text-sm font-semibold text-sp-darkest mb-3 uppercase tracking-wide">Sub-tasks to Create</h5>
+
+        <!-- Sub-task 1 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-35-3</span>
+                        <span class="text-xs text-sp-forest font-medium">Week 11</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Conduct UAT with stakeholders</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Schedule UAT sessions, document feedback, prioritize change requests</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> UAT sessions completed, feedback documented, final sign-off obtained</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-task 2 -->
+        <div class="subtask-item bg-sp-lightest mb-3">
+            <div class="flex items-start gap-3 mb-2">
+                <span class="flex-shrink-0 w-5 h-5 border-2 border-sp-forest bg-white" title="To Do"></span>
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="ticket-badge text-xs">NBL-35-4</span>
+                        <span class="text-xs text-sp-forest font-medium">Week 11</span>
+                    </div>
+                    <p class="text-sm font-medium text-sp-darkest mb-2">Prepare production deployment checklist</p>
+                    <ul class="text-sm text-sp-dark space-y-1 ml-4">
+                        <li class="list-disc">Create deployment runbook, database migration plan, rollback procedures</li>
+                        <li class="list-disc"><strong class="text-sp-darkest">Acceptance:</strong> Deployment checklist approved, backup procedures tested, rollback plan documented</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</div>
+
+</section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</body>
+</html>
