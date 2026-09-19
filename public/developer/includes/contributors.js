@@ -6,6 +6,17 @@
  * place: "Suggest an idea" (GitHub issue form, or email) and "Improve this page"
  * (the page's GitHub edit link).
  *
+ * The same render path also produces the standalone contributors page. A page that
+ * carries <div id="dev-contributors-full"> gets the FULL variant of the same box:
+ * a larger podium, the top 10 open with no toggle, a "how this is counted" note, and
+ * an edit card pointed at the repository root (that page has no upstream source file).
+ * Every other page gets the compact box plus a "See all contributors" link.
+ *
+ * Article pages also get a compact "Suggest an idea" button injected into the page's
+ * own sticky "On this page" panel, so the call to action is reachable without scrolling
+ * to the bottom. It is placed inside that panel on purpose: it then inherits the panel's
+ * own visibility (`hidden xl:block`) instead of hard-coding a breakpoint here.
+ *
  * Data: a locally-baked contributors.json (written by the generator at build time),
  * so visitors never hit the rate-limited GitHub API. The per-page edit URL comes from
  * <meta name="edit-url">; pages without it (the landing) hide the "Improve this page" card.
@@ -22,6 +33,10 @@
      * merchant-docs Blade component.
      */
     var IDEA_ISSUE_URL = 'https://github.com/' + IDEA_REPO + '/issues/new';
+    // Repository root. Used by the contributors page, which has no upstream source file of
+    // its own, so there is nothing for <meta name="edit-url"> to point at. Derived from the
+    // one repo constant above rather than hard-coding a second repository name.
+    var REPO_ROOT_URL = 'https://github.com/' + IDEA_REPO;
     var IDEA_MAIL_PARTS = ['carl', 'qbdigital.co.uk']; // interim inbox until the Association address is confirmed (D1)
     var IDEA_TITLE_SUFFIX = ' — Magento 2 Developer Documentation';
     var IDEA_TYPES = {
@@ -29,6 +44,11 @@
         website: { template: 'idea-website.yml', titlePrefix: '[Website] ', mailLabel: 'Website' }
     };
     var PLACES = 10;
+    // A page carrying this placeholder is the contributors page: render the full variant there.
+    var FULL_TARGET_ID = 'dev-contributors-full';
+    var CONTRIBUTORS_PAGE = 'contributors.html';
+    // Breathing room left under a capped sticky panel so the last control is not flush to the edge.
+    var STICKY_GAP = 24;
     var LINE = 'border-[#e4e2e0]';
     var TINT = 'bg-[#f5f3f1]';
     // Gold / silver / bronze rank badges (tokens from the page's Tailwind config).
@@ -38,6 +58,7 @@
     var EDIT_ICON = '<svg class="w-4 h-4 flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>';
     var INFO_ICON = '<svg class="inline-block w-[13px] h-[13px] mr-1 align-[-2px]" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm6.5-.25A.75.75 0 017.25 7h1a.75.75 0 01.75.75v2.75h.25a.75.75 0 010 1.5h-2a.75.75 0 010-1.5h.25v-2h-.25a.75.75 0 01-.75-.75zM8 6a1 1 0 100-2 1 1 0 000 2z"/></svg>';
     var CHEVRON = '<svg data-cbox-chevron class="w-3.5 h-3.5 group-aria-expanded:rotate-180 transition-transform duration-200 motion-reduce:transition-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+    var ARROW = '<svg class="w-3.5 h-3.5 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
     var FOCUS = 'focus:outline-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-orange';
 
     function esc(s) {
@@ -105,50 +126,55 @@
 
     /* ---------- Head: kicker, heading, podium ---------- */
 
-    function podiumStep(c, rank) {
+    function podiumStep(c, rank, full) {
         var lg = rank === 1;
-        var size = lg ? 'w-[60px] h-[60px]' : 'w-[50px] h-[50px]';
+        var size = full
+            ? (lg ? 'w-[104px] h-[104px]' : 'w-[84px] h-[84px]')
+            : (lg ? 'w-[60px] h-[60px]' : 'w-[50px] h-[50px]');
+        var badge = full ? 'w-[24px] h-[24px] text-[12px]' : 'w-[19px] h-[19px] text-[10px]';
+        var name = full ? 'max-w-[112px] text-sm' : 'max-w-[96px] text-xs';
+        var count = full ? 'text-[13px]' : 'text-[11px]';
         return '' +
             '<a data-cbox-step="' + rank + '" href="' + esc(c.html_url) + '" target="_blank" rel="noopener noreferrer" ' +
             'class="group grid justify-items-center gap-1.5 text-charcoal no-underline ' + FOCUS + '">' +
                 '<span class="relative block ' + size + ' border-2 border-white outline outline-1 outline-[#e4e2e0] bg-charcoal-100">' +
-                    '<img src="' + esc(c.avatar_url) + '" alt="" width="60" height="60" loading="lazy" class="block w-full h-full object-cover" />' +
-                    '<span class="absolute -top-2 -right-2 grid place-items-center w-[19px] h-[19px] text-[10px] font-extrabold ' + RANK[rank - 1] + '" aria-hidden="true">' + rank + '</span>' +
+                    '<img src="' + esc(c.avatar_url) + '" alt="" width="104" height="104" loading="lazy" class="block w-full h-full object-cover" />' +
+                    '<span class="absolute -top-2 -right-2 grid place-items-center ' + badge + ' font-extrabold ' + RANK[rank - 1] + '" aria-hidden="true">' + rank + '</span>' +
                 '</span>' +
-                '<span class="max-w-[96px] truncate text-xs font-semibold group-hover:underline group-hover:decoration-orange group-hover:underline-offset-[3px]">' +
+                '<span class="' + name + ' truncate font-semibold group-hover:underline group-hover:decoration-orange group-hover:underline-offset-[3px]">' +
                     '<span class="sr-only">Rank ' + rank + ', </span>' + esc(c.login) +
                 '</span>' +
-                '<span class="font-mono text-[11px] font-medium tabular-nums text-orange-700">' +
+                '<span class="font-mono ' + count + ' font-medium tabular-nums text-orange-700">' +
                     esc(c.contributions.toLocaleString()) + '<span class="sr-only"> contributions (opens GitHub profile in a new tab)</span>' +
                 '</span>' +
             '</a>';
     }
 
-    function podium(list) {
+    function podium(list, full) {
         if (!list.length) { return ''; }
         // Visual order: #2 left, #1 middle (larger), #3 right.
         var steps = [[list[1], 2], [list[0], 1], [list[2], 3]].filter(function (p) { return p[0]; })
-            .map(function (p) { return podiumStep(p[0], p[1]); }).join('');
-        return '<div data-cbox-podium class="flex items-end gap-2" role="group" aria-label="Top 3 contributors">' + steps + '</div>';
+            .map(function (p) { return podiumStep(p[0], p[1], full); }).join('');
+        return '<div data-cbox-podium class="flex items-end ' + (full ? 'gap-3 sm:gap-4' : 'gap-2') + '" role="group" aria-label="Top 3 contributors">' + steps + '</div>';
     }
 
-    function head(list) {
+    function head(list, full) {
         return '' +
-            '<div class="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto] gap-x-7 gap-y-[18px] items-start sm:items-end px-6 pt-6 pb-5 border-b ' + LINE + '">' +
+            '<div class="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto] gap-x-7 gap-y-[18px] items-start sm:items-end px-6 ' + (full ? 'pt-7 pb-6' : 'pt-6 pb-5') + ' border-b ' + LINE + '">' +
                 '<div>' +
                     '<div class="inline-flex items-center gap-2 mb-2.5 font-mono text-[11px] font-medium leading-none tracking-[0.12em] uppercase text-orange-700">' +
                         '<i class="inline-block w-2.5 h-2.5 bg-orange" aria-hidden="true"></i>Written by the community' +
                     '</div>' +
-                    '<h2 id="dev-cbox-title" class="m-0 mb-1.5 text-xl sm:text-2xl leading-tight font-extrabold tracking-[-0.015em] text-charcoal [text-wrap:balance]">Help build the Magento docs, and get your name on them</h2>' +
+                    '<h2 id="dev-cbox-title" class="m-0 mb-1.5 ' + (full ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl') + ' leading-tight font-extrabold tracking-[-0.015em] text-charcoal [text-wrap:balance]">Help build the Magento docs, and get your name on them</h2>' +
                     '<p class="m-0 max-w-[52ch] text-sm text-charcoal-300">Every merged edit counts toward the top 10 contributors shown on every page. Ideas shape what we write next.</p>' +
                 '</div>' +
-                podium(list) +
+                podium(list, full) +
             '</div>';
     }
 
     /* ---------- Places meter + top 10 ---------- */
 
-    function places(list) {
+    function places(list, full) {
         var taken = list.length;
         var open = PLACES - taken;
         var cells = '';
@@ -161,16 +187,19 @@
             (open > 0
                 ? ' <em class="not-italic font-semibold text-orange-700">' + open + ' open.</em> Place #' + (taken + 1) + ' is yours with 1 contribution.'
                 : '');
+        // The full page shows the list outright, so it has no toggle to offer.
+        var toggle = full ? '' : '' +
+            '<button data-cbox-toggle type="button" aria-expanded="false" aria-controls="dev-cbox-top10" ' +
+            'class="inline-flex items-center gap-1.5 bg-transparent border-0 py-1 px-0 cursor-pointer text-sm font-semibold text-charcoal underline decoration-orange decoration-2 underline-offset-4 group ' + FOCUS + '">' +
+                '<span data-cbox-toggle-label>See the top 10</span>' + CHEVRON +
+            '</button>';
         return '' +
             '<div class="flex flex-wrap items-center justify-between gap-x-5 gap-y-2.5 px-6 py-3.5 ' + TINT + ' border-b ' + LINE + '">' +
                 '<div class="flex flex-wrap items-center gap-3">' +
                     '<div class="grid grid-cols-[repeat(10,16px)] gap-1" aria-hidden="true">' + cells + '</div>' +
                     '<span data-cbox-meter-text class="text-sm text-charcoal">' + text + '</span>' +
                 '</div>' +
-                '<button data-cbox-toggle type="button" aria-expanded="false" aria-controls="dev-cbox-top10" ' +
-                'class="inline-flex items-center gap-1.5 bg-transparent border-0 py-1 px-0 cursor-pointer text-sm font-semibold text-charcoal underline decoration-orange decoration-2 underline-offset-4 group ' + FOCUS + '">' +
-                    '<span data-cbox-toggle-label>See the top 10</span>' + CHEVRON +
-                '</button>' +
+                toggle +
             '</div>';
     }
 
@@ -194,13 +223,41 @@
             '</li>';
     }
 
-    function top10(list) {
+    // D6: the ranking is built from code contributions only. Spelled out on the full page,
+    // where there is room to say it, so nobody expects an idea to move them up the list.
+    function counting() {
+        return '' +
+            '<div data-cbox-counting class="mt-4 pt-4 border-t ' + LINE + '">' +
+                '<h3 class="m-0 mb-1.5 text-sm font-bold text-charcoal">How this is counted</h3>' +
+                '<p class="m-0 max-w-[70ch] text-[13px] leading-relaxed text-charcoal-300">' +
+                    'The ranking counts <strong class="font-semibold text-charcoal">code contributions only</strong> — commits merged into the ' +
+                    '<code class="font-mono">docs</code> and <code class="font-mono">docs-website</code> repositories. ' +
+                    'Ideas sent through “Suggest an idea” are credited in the issue itself and do not change the ranking. ' +
+                    'Counts are baked in when the site is rebuilt.' +
+                '</p>' +
+            '</div>';
+    }
+
+    // Box variant only: the full page must not link to itself.
+    function seeAllLink() {
+        return '' +
+            '<p class="mt-3 mb-0">' +
+                '<a data-cbox-all href="' + CONTRIBUTORS_PAGE + '" ' +
+                'class="inline-flex items-center gap-1.5 text-[13px] font-semibold text-charcoal no-underline hover:text-orange-700 ' + FOCUS + '">' +
+                    '<span class="underline decoration-orange decoration-2 underline-offset-4">See all contributors</span>' + ARROW +
+                '</a>' +
+            '</p>';
+    }
+
+    function top10(list, full) {
         var rows = '';
         for (var p = 1; p <= PLACES; p++) { rows += topRow(list[p - 1], p, list.length); }
         return '' +
-            '<div id="dev-cbox-top10" class="px-6 pt-2 pb-4 border-b ' + LINE + '" hidden>' +
+            '<div id="dev-cbox-top10" class="px-6 pt-2 pb-4 border-b ' + LINE + '"' + (full ? '' : ' hidden') + '>' +
                 '<ol class="list-none m-0 p-0 columns-1 sm:columns-2 gap-x-7">' + rows + '</ol>' +
-                '<p class="mt-3 mb-0 text-xs text-charcoal-300">Counts combine the <code class="font-mono">docs</code> and <code class="font-mono">docs-website</code> repositories. Updated when the site is rebuilt.</p>' +
+                (full
+                    ? counting()
+                    : '<p class="mt-3 mb-0 text-xs text-charcoal-300">Counts combine the <code class="font-mono">docs</code> and <code class="font-mono">docs-website</code> repositories. Updated when the site is rebuilt.</p>' + seeAllLink()) +
             '</div>';
     }
 
@@ -246,11 +303,18 @@
             '</div>';
     }
 
-    function editCard(editUrl) {
+    function editCard(editUrl, full) {
+        // The contributors page has no source file of its own, so its card points at the
+        // repository root and says so, rather than claiming to edit the page you are on.
+        var title = full ? 'Improve a page' : 'Improve this page';
+        var lead = full
+            ? 'Every documentation page carries an “Edit this page on GitHub” button. Open the repository to browse the source and start a pull request.'
+            : 'Spotted something wrong? Fix it directly. Your edit becomes a pull request we review.';
+        var action = full ? 'Open the docs repository' : 'Edit this page on GitHub';
         return '' +
             '<div data-cbox-edit class="grid gap-3.5 content-start px-6 pt-5 pb-[22px] border-t md:border-t-0 md:border-l ' + LINE + '">' +
-                '<div class="flex flex-wrap justify-between items-baseline gap-2.5"><h3 class="m-0 text-base font-bold text-charcoal">Improve this page</h3>' + chip('Counts toward the top 10') + '</div>' +
-                '<p class="-mt-2 mb-0 text-[13px] text-charcoal-300">Spotted something wrong? Fix it directly. Your edit becomes a pull request we review.</p>' +
+                '<div class="flex flex-wrap justify-between items-baseline gap-2.5"><h3 class="m-0 text-base font-bold text-charcoal">' + title + '</h3>' + chip('Counts toward the top 10') + '</div>' +
+                '<p class="-mt-2 mb-0 text-[13px] text-charcoal-300">' + lead + '</p>' +
                 '<ul class="list-none m-0 p-0 grid gap-1.5 text-[13px] text-[#4b4b4b]">' +
                     ['Typos and unclear wording', 'Steps that changed in Magento 2.4.8', 'Missing examples or screenshots'].map(function (t) {
                         return '<li class="grid grid-cols-[10px_minmax(0,1fr)] gap-[9px]"><span class="w-1.5 h-1.5 mt-[7px] bg-orange" aria-hidden="true"></span><span>' + t + '</span></li>';
@@ -259,24 +323,24 @@
                 '<div class="flex flex-wrap items-center gap-x-4 gap-y-2.5">' +
                     '<a data-cbox-edit-link href="' + esc(editUrl) + '" target="_blank" rel="noopener noreferrer" ' +
                     'class="inline-flex items-center justify-center gap-2 px-[15px] py-2.5 bg-white hover:bg-charcoal border-2 border-charcoal text-charcoal hover:text-white text-sm font-semibold no-underline ' + FOCUS + '">' +
-                        EDIT_ICON + 'Edit this page on GitHub<span class="sr-only"> (opens in a new tab)</span>' +
+                        EDIT_ICON + action + '<span class="sr-only"> (opens in a new tab)</span>' +
                     '</a>' +
                 '</div>' +
             '</div>';
     }
 
-    function ways(editUrl) {
+    function ways(editUrl, full) {
         var cols = editUrl ? 'md:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]' : '';
-        return '<div class="grid grid-cols-1 ' + cols + '">' + ideaCard() + (editUrl ? editCard(editUrl) : '') + '</div>';
+        return '<div class="grid grid-cols-1 ' + cols + '">' + ideaCard() + (editUrl ? editCard(editUrl, full) : '') + '</div>';
     }
 
-    function boxHtml(list, editUrl) {
+    function boxHtml(list, editUrl, full) {
         return '' +
-            '<section data-dev-cbox class="mt-9 mb-10 border-2 border-charcoal bg-white font-sans text-charcoal [overflow-wrap:anywhere]" aria-labelledby="dev-cbox-title">' +
-                head(list) +
-                places(list) +
-                top10(list) +
-                ways(editUrl) +
+            '<section data-dev-cbox' + (full ? ' data-dev-cbox-full' : '') + ' class="' + (full ? 'mt-0 mb-10' : 'mt-9 mb-10') + ' border-2 border-charcoal bg-white font-sans text-charcoal [overflow-wrap:anywhere]" aria-labelledby="dev-cbox-title">' +
+                head(list, full) +
+                places(list, full) +
+                top10(list, full) +
+                ways(editUrl, full) +
                 '<div class="flex flex-wrap justify-between gap-x-4 gap-y-1.5 px-6 py-[11px] border-t ' + LINE + ' text-xs text-charcoal-300">' +
                     '<span>' + INFO_ICON + 'Ideas and edits on GitHub are public.</span>' +
                     '<span>Emailed ideas go straight to the docs team.</span>' +
@@ -312,6 +376,7 @@
                 mail.setAttribute('href', ideaMailUrl(selectedType()));
             });
         }
+        // The full variant has no toggle: its list is open from the start.
         if (toggle && list) {
             var label = toggle.querySelector('[data-cbox-toggle-label]');
             toggle.addEventListener('click', function () {
@@ -323,12 +388,98 @@
         }
     }
 
-    function inject(html) {
+    /* ---------- Sticky "Suggest an idea" button (article pages) ---------- */
+
+    /*
+     * The page's own TOC CSS (`.toc-sidebar a { ... }`, specificity 0,2,0) beats any utility
+     * class on an anchor inside that panel, so the button is styled through one scoped rule
+     * with an attribute selector (0,3,0) instead of fighting it with utilities.
+     */
+    var STICKY_CSS = '' +
+        '.toc-sidebar a[data-cbox-sticky-link],a[data-cbox-sticky-link]{' +
+            'display:flex;align-items:center;justify-content:center;gap:.5rem;' +
+            'margin:0;padding:.625rem .75rem;border:2px solid #bc3312;background:#bc3312;' +
+            'color:#fff;font-size:.8125rem;font-weight:600;line-height:1.25;text-decoration:none;' +
+            'transition:background-color .15s ease,border-color .15s ease;}' +
+        '.toc-sidebar a[data-cbox-sticky-link]:hover,a[data-cbox-sticky-link]:hover{' +
+            'background:#962a16;border-color:#962a16;color:#fff;}' +
+        'a[data-cbox-sticky-link]:focus-visible{outline:3px solid #2c2c2c;outline-offset:2px;}';
+
+    function stickyStyle() {
+        if (document.getElementById('dev-cbox-sticky-css')) { return; }
+        var s = document.createElement('style');
+        s.id = 'dev-cbox-sticky-css';
+        s.appendChild(document.createTextNode(STICKY_CSS));
+        document.head.appendChild(s);
+    }
+
+    /*
+     * A long page's TOC panel is taller than the viewport, which would push anything appended
+     * below it off screen for good. Cap the panel to the room under its own sticky offset and
+     * let the nav scroll inside it — but only when it actually overflows, so a short panel is
+     * left with no inline styles at all.
+     */
+    function fitPanel(panel, nav) {
+        panel.removeAttribute('style');
+        nav.removeAttribute('style');
+        var cs = window.getComputedStyle(panel);
+        if (cs.position !== 'sticky') { return; }
+        var offset = parseFloat(cs.top);
+        if (!isFinite(offset)) { return; }
+        var room = window.innerHeight - offset - STICKY_GAP;
+        if (room <= 0) { return; }
+        if (panel.scrollHeight <= room) { return; } // fits as it is — leave it untouched
+        panel.style.display = 'flex';
+        panel.style.flexDirection = 'column';
+        panel.style.maxHeight = room + 'px';
+        nav.style.flex = '1 1 auto';
+        nav.style.minHeight = '0';
+        nav.style.overflowY = 'auto';
+        nav.style.overscrollBehavior = 'contain';
+    }
+
+    function stickyIdea() {
+        var nav = document.getElementById('toc-nav');
+        if (!nav || !nav.closest) { return; }
+        var panel = nav.closest('.sticky');
+        // No sticky panel on this page (the landing, the section indexes): add nothing.
+        if (!panel || panel.querySelector('[data-cbox-sticky]')) { return; }
+
+        stickyStyle();
+        var wrap = document.createElement('div');
+        wrap.setAttribute('data-cbox-sticky', '');
+        wrap.className = 'mt-5 pt-4 border-t ' + LINE;
+        // One action only: the docs-topic issue form from the shared contract (§6).
+        wrap.innerHTML = '' +
+            '<a data-cbox-sticky-link href="' + esc(ideaGithubUrl('content')) + '" target="_blank" rel="noopener noreferrer">' +
+                GITHUB_MARK + '<span>Suggest an idea</span><span class="sr-only"> (opens in a new tab)</span>' +
+            '</a>';
+        panel.appendChild(wrap);
+
+        var link = wrap.querySelector('[data-cbox-sticky-link]');
+        function sync() { link.setAttribute('href', ideaGithubUrl('content')); }
+        link.addEventListener('click', sync);
+        link.addEventListener('auxclick', sync);
+
+        var fit = function () { fitPanel(panel, nav); };
+        fit();
+        // Fonts and lazy content can change the panel's height after first paint.
+        window.addEventListener('load', fit);
+        var t = 0;
+        window.addEventListener('resize', function () {
+            window.clearTimeout(t);
+            t = window.setTimeout(fit, 120);
+        });
+    }
+
+    /* ---------- Injection ---------- */
+
+    function inject(html, fullTarget) {
         var container = document.createElement('div');
         container.innerHTML = html;
         var node = container.firstChild;
-        // Preferred: the #dev-contributors placeholder (inside the content column on guide pages).
-        var target = document.getElementById('dev-contributors');
+        // The contributors page: its own placeholder takes precedence.
+        var target = fullTarget || document.getElementById('dev-contributors');
         if (target) {
             target.appendChild(node);
         } else {
@@ -344,12 +495,19 @@
     }
 
     function init() {
+        var fullTarget = document.getElementById(FULL_TARGET_ID);
+        var full = !!fullTarget;
         var meta = document.querySelector('meta[name="edit-url"]');
-        var editUrl = safeUrl(meta ? meta.getAttribute('content') : '');
+        // The contributors page has no upstream source file, so its edit card goes to the repo root.
+        var editUrl = full ? REPO_ROOT_URL : safeUrl(meta ? meta.getAttribute('content') : '');
+
+        // Independent of the contributor data, and the page's TOC is already built by now.
+        stickyIdea();
+
         fetch('contributors.json', { cache: 'no-cache' })
             .then(function (r) { return r.ok ? r.json() : []; })
-            .then(function (data) { inject(boxHtml(normalise(data), editUrl)); })
-            .catch(function () { inject(boxHtml([], editUrl)); }); // the ways to contribute still render
+            .then(function (data) { inject(boxHtml(normalise(data), editUrl, full), fullTarget); })
+            .catch(function () { inject(boxHtml([], editUrl, full), fullTarget); }); // the ways to contribute still render
     }
 
     if (document.readyState !== 'loading') { init(); }
