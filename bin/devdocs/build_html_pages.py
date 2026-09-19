@@ -1091,7 +1091,7 @@ def _gh_get(url):
         return json.load(resp)
 
 
-def write_contributors_json(out_dir, limit=3):
+def write_contributors_json(out_dir, limit=10):
     """Bake the documentation-platform contributors into contributors.json (consumed
     client-side by includes/contributors.js). Combines the developer/ CONTENT
     (magentoopensource/docs) with the docs-website repo (the site + generator that build
