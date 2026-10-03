@@ -15,6 +15,31 @@
  *   <script src="includes/header.js"></script>
  */
 (function () {
+    // Captured now: document.currentScript is only set while this classic script runs.
+    var SCRIPT_SRC = (document.currentScript && document.currentScript.src) || '';
+
+    /* --- Algolia DocSearch (public, search-only credentials) --------------------
+     * Mirrors the merchant config in config/algolia.php. The index is shared:
+     * the Algolia app contains exactly one index. Keep these in step with the
+     * merchant side — see search/spec-dev.md §3.2 before rotating.
+     *
+     * DOCSEARCH_VERSION is pinned exactly (never a range) and is the only place
+     * the version lives; it resolves to:
+     *   https://cdn.jsdelivr.net/npm/@docsearch/js@3.9.0/dist/umd/index.js
+     *   https://cdn.jsdelivr.net/npm/@docsearch/css@3.9.0/dist/style.css
+     * ------------------------------------------------------------------------ */
+    var DOCSEARCH_APP_ID     = '4K4YE687PF';
+    var DOCSEARCH_API_KEY    = 'abad9b46e045bb213667d569ce70e8f3';
+    var DOCSEARCH_INDEX_NAME = 'Documentation';
+    var DOCSEARCH_VERSION    = '3.9.0';
+    var DOCSEARCH_JS_URL  = 'https://cdn.jsdelivr.net/npm/@docsearch/js@' + DOCSEARCH_VERSION + '/dist/umd/index.js';
+    var DOCSEARCH_CSS_URL = 'https://cdn.jsdelivr.net/npm/@docsearch/css@' + DOCSEARCH_VERSION + '/dist/style.css';
+    // Our colour tokens sit next to this file and must load after the vendor CSS
+    // so they win at equal specificity.
+    var DOCSEARCH_TOKENS_URL = SCRIPT_SRC ?
+        SCRIPT_SRC.replace(/[^\/?#]*([?#].*)?$/, '') + 'docsearch-tokens.css' :
+        'includes/docsearch-tokens.css';
+
     // Magento box mark (icon only) + text wordmark + section label. The icon is
     // the recognisable Magento hexagon-in-box; the text identifies it as the
     // Magento Open Source Developer Documentation.
@@ -139,9 +164,42 @@
         });
     }
 
-    if (document.body) {
+    // Append the DocSearch stylesheet, our tokens, then the library to <head>.
+    // Nothing is mounted here. If the CDN is unreachable the tags simply fail to
+    // load and window.docsearch stays undefined; the header does not depend on it.
+    function loadDocSearch() {
+        if (typeof window.docsearch === 'function') { return; }
+        var head = document.head || document.getElementsByTagName('head')[0];
+        if (!head || head.querySelector('script[src="' + DOCSEARCH_JS_URL + '"]')) { return; }
+
+        var css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = DOCSEARCH_CSS_URL;
+        head.appendChild(css);
+
+        var tokens = document.createElement('link');
+        tokens.rel = 'stylesheet';
+        tokens.href = DOCSEARCH_TOKENS_URL;
+        head.appendChild(tokens);
+
+        var js = document.createElement('script');
+        js.src = DOCSEARCH_JS_URL;
+        js.async = true;
+        head.appendChild(js);
+    }
+
+    function start() {
         init();
+        try {
+            loadDocSearch();
+        } catch (e) {
+            // Search is optional; never let it affect the header.
+        }
+    }
+
+    if (document.body) {
+        start();
     } else {
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', start);
     }
 })();
