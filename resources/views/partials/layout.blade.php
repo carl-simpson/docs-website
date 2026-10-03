@@ -64,6 +64,7 @@
     <link rel="dns-prefetch" href="https://www.google-analytics.com">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.docsearch-tokens')
 
     <script>
         const alwaysLightMode = true;
