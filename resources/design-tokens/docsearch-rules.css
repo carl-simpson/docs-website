@@ -1,0 +1,309 @@
+/* DocSearch selector rules, design option B (square corners, hexagon accents,
+   charcoal selected row). Shared by both docs systems:
+     merchant:  resources/css/_search.css @imports this file (Vite/postcss-import)
+     developer: bin/devdocs/build_docsearch_tokens.py appends it to
+                public/developer/includes/docsearch-tokens.css
+   Plain CSS only. Every colour, radius and spacing comes from a var() defined in
+   docsearch.json; no colour literals here (bin/checks/contrast.py enforces it).
+   Orange (--docsearch-primary-color) is used for borders, icons, the left rule
+   and focus rings, never for text. Targets @docsearch 3.9.0 class names. */
+
+/* Modal container */
+.DocSearch-Modal {
+    font-family: 'Inter Tight', system-ui, -apple-system, sans-serif;
+    border: 2px solid var(--ma-search-border-color);
+    border-top: 6px solid var(--docsearch-primary-color);
+    border-radius: var(--ma-search-radius);
+    overflow: hidden;
+}
+
+.DocSearch-Hit-source,
+.DocSearch-Footer,
+.DocSearch-Hit a {
+    border-radius: var(--ma-search-radius);
+}
+
+/* Search box */
+.DocSearch-SearchBar {
+    padding: var(--docsearch-spacing);
+    border-bottom: 2px solid var(--ma-search-border-color);
+}
+
+.DocSearch-Form {
+    background: var(--docsearch-searchbox-background);
+    border: 2px solid transparent;
+    border-radius: var(--ma-search-radius);
+    box-shadow: none;
+}
+
+.DocSearch-Form:focus-within {
+    background: var(--docsearch-searchbox-focus-background);
+    border-color: var(--docsearch-primary-color);
+}
+
+.DocSearch-Input {
+    font-family: 'Inter Tight', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--docsearch-text-color);
+}
+
+.DocSearch-Input::placeholder {
+    color: var(--docsearch-muted-color);
+}
+
+.DocSearch-MagnifierLabel,
+.DocSearch-LoadingIndicator {
+    color: var(--docsearch-primary-color);
+}
+
+/* The merchant site styles every bare <label> (faded, uppercase, bottom margin);
+   the magnifier is a <label>, so reset it explicitly. */
+.DocSearch-MagnifierLabel {
+    margin: 0;
+    opacity: 1;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.DocSearch-Reset {
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: var(--ma-search-radius);
+    color: var(--docsearch-muted-color);
+}
+
+.DocSearch-Reset:hover {
+    color: var(--docsearch-text-color);
+}
+
+.DocSearch-Reset:focus-visible,
+.DocSearch-Cancel:focus-visible,
+.DocSearch-Prefill:focus-visible,
+.DocSearch-Link:focus-visible,
+.DocSearch-Hit-action-button:focus-visible,
+.DocSearch-Hit a:focus-visible {
+    outline: 2px solid var(--docsearch-primary-color);
+    outline-offset: 2px;
+}
+
+/* Results area */
+.DocSearch-Dropdown {
+    padding: 0 var(--docsearch-spacing);
+}
+
+/* Group labels: hexagon bullet (orange, decorative) plus muted label text */
+.DocSearch-Container .DocSearch-Hit-source {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--docsearch-muted-color);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.DocSearch-Hit-source::before {
+    content: "";
+    flex: none;
+    width: 10px;
+    height: 10px;
+    background: var(--docsearch-primary-color);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.DocSearch-Help,
+.DocSearch-Label {
+    font-family: 'Inter Tight', system-ui, -apple-system, sans-serif;
+    color: var(--docsearch-muted-color);
+}
+
+/* Hit rows. The merchant typography adds bullets and left padding to every
+   ul > li, so the row resets both. */
+.DocSearch-Dropdown .DocSearch-Hit {
+    padding: 0 0 4px;
+    list-style: none;
+}
+
+.DocSearch-Dropdown .DocSearch-Hit::before {
+    content: none;
+}
+
+/* Titles wrap instead of truncating, so long names stay readable at 400px */
+.DocSearch-Hit-Container {
+    height: auto;
+    min-height: var(--docsearch-hit-height);
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.DocSearch-Hit-content-wrapper {
+    overflow: visible;
+    white-space: normal;
+    text-overflow: clip;
+    line-height: 1.35;
+}
+
+.DocSearch-Hit a {
+    background: var(--docsearch-hit-background);
+    border-left: 3px solid transparent;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.DocSearch-Hit a:hover {
+    background: var(--ma-search-hit-hover-background);
+    border-left-color: var(--docsearch-primary-color);
+}
+
+.DocSearch-Container .DocSearch-Hit[aria-selected="true"] a {
+    background-color: var(--ma-search-hit-active-background);
+    border-left-color: var(--docsearch-primary-color);
+}
+
+.DocSearch-Hit-Container {
+    color: var(--docsearch-hit-color);
+}
+
+.DocSearch-Hit-title {
+    font-family: 'Inter Tight', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--docsearch-hit-color);
+}
+
+.DocSearch-Hit-path {
+    font-family: 'Inter Tight', system-ui, -apple-system, sans-serif;
+    font-size: 12px;
+    color: var(--docsearch-muted-color);
+}
+
+.DocSearch-Hit-icon {
+    color: var(--docsearch-primary-color);
+}
+
+.DocSearch-Hit-action,
+.DocSearch-Hit-Tree {
+    color: var(--docsearch-muted-color);
+}
+
+/* Selected row: DocSearch forces --docsearch-hit-active-color with !important,
+   so the secondary text overrides need the same weight and more specificity. */
+.DocSearch-Container .DocSearch-Hit[aria-selected="true"] .DocSearch-Hit-path,
+.DocSearch-Container .DocSearch-Hit[aria-selected="true"] .DocSearch-Hit-action,
+.DocSearch-Container .DocSearch-Hit[aria-selected="true"] .DocSearch-Hit-Tree {
+    color: var(--ma-search-hit-active-muted-color) !important;
+}
+
+/* Match highlighting: weight and an orange underline, not orange text */
+.DocSearch-Hits mark,
+.DocSearch-Hit-title mark,
+.DocSearch-Hit-path mark {
+    background: none;
+    color: var(--ma-search-mark-color);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: var(--docsearch-primary-color);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 2px;
+}
+
+.DocSearch-Container .DocSearch-Hit[aria-selected="true"] mark {
+    color: var(--ma-search-mark-active-color) !important;
+}
+
+/* Footer */
+.DocSearch-Footer {
+    background: var(--docsearch-footer-background);
+    border-top: 2px solid var(--ma-search-border-color);
+    box-shadow: none;
+}
+
+.DocSearch-Commands {
+    color: var(--docsearch-muted-color);
+}
+
+.DocSearch-Commands li,
+.DocSearch-Commands .DocSearch-Label,
+.DocSearch-Logo .DocSearch-Label {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.DocSearch-Commands-Key {
+    background: var(--docsearch-key-gradient);
+    border-radius: var(--ma-search-radius);
+    box-shadow: var(--docsearch-key-shadow);
+    color: var(--docsearch-muted-color);
+}
+
+.DocSearch-Logo svg {
+    color: var(--docsearch-logo-color);
+}
+
+.DocSearch-HitsFooter {
+    color: var(--docsearch-muted-color);
+}
+
+/* Empty, start and error states */
+.DocSearch-StartScreen,
+.DocSearch-NoResults,
+.DocSearch-ErrorScreen,
+.DocSearch-Title {
+    color: var(--docsearch-text-color);
+}
+
+.DocSearch-Screen-Icon {
+    color: var(--docsearch-muted-color);
+}
+
+.DocSearch-Link,
+.DocSearch-Prefill {
+    color: var(--docsearch-text-color);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: var(--docsearch-primary-color);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 2px;
+}
+
+.DocSearch-Prefill:hover,
+.DocSearch-Prefill:focus {
+    text-decoration-thickness: 3px;
+}
+
+/* Header trigger: 44x44 minimum tap target (button.css sets height: 36px),
+   square corners and a charcoal outline as in design B. The vendor left margin
+   is dropped; the header spaces its own items. */
+.DocSearch-Button {
+    min-width: 44px;
+    min-height: 44px;
+    margin: 0;
+    border: 2px solid var(--ma-search-border-color);
+    border-radius: var(--ma-search-radius);
+}
+
+/* Mobile (modal.css makes the modal full screen at 768px and below) */
+@media (max-width: 768px) {
+    .DocSearch-Modal {
+        border-width: 0;
+        border-radius: 0;
+    }
+
+    .DocSearch-Cancel {
+        min-height: 44px;
+        padding: 0 4px;
+        font-weight: 600;
+        color: var(--docsearch-text-color);
+    }
+
+    .DocSearch-Footer {
+        border-radius: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .DocSearch-Hit a {
+        transition: none;
+    }
+}

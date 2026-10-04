@@ -15,6 +15,44 @@
  *   <script src="includes/header.js"></script>
  */
 (function () {
+    // Captured now: document.currentScript is only set while this classic script runs.
+    var SCRIPT_SRC = (document.currentScript && document.currentScript.src) || '';
+
+    /* --- Algolia DocSearch (public, search-only credentials) --------------------
+     * Mirrors the merchant config in config/algolia.php. The index is shared:
+     * the Algolia app contains exactly one index. Keep these in step with the
+     * merchant side (config/algolia.php) when rotating the key.
+     *
+     * DOCSEARCH_VERSION is pinned exactly (never a range) and is the only place
+     * the version lives; it resolves to:
+     *   https://cdn.jsdelivr.net/npm/@docsearch/js@3.9.0/dist/umd/index.js
+     *   https://cdn.jsdelivr.net/npm/@docsearch/css@3.9.0/dist/style.css
+     * ------------------------------------------------------------------------ */
+    var DOCSEARCH_APP_ID     = '4K4YE687PF';
+    var DOCSEARCH_API_KEY    = 'abad9b46e045bb213667d569ce70e8f3';
+    var DOCSEARCH_INDEX_NAME = 'Documentation';
+    var DOCSEARCH_VERSION    = '3.9.0';
+    var DOCSEARCH_JS_URL  = 'https://cdn.jsdelivr.net/npm/@docsearch/js@' + DOCSEARCH_VERSION + '/dist/umd/index.js';
+    var DOCSEARCH_CSS_URL = 'https://cdn.jsdelivr.net/npm/@docsearch/css@' + DOCSEARCH_VERSION + '/dist/style.css';
+    // Our colour tokens sit next to this file and must load after the vendor CSS
+    // so they win at equal specificity.
+    var DOCSEARCH_TOKENS_URL = SCRIPT_SRC ?
+        SCRIPT_SRC.replace(/[^\/?#]*([?#].*)?$/, '') + 'docsearch-tokens.css' :
+        'includes/docsearch-tokens.css';
+
+    // Header search trigger: the same control as the merchant docs header
+    // (resources/views/partials/main-header.blade.php, #header-search). Hidden until
+    // DocSearch has mounted, so a failed CDN load never leaves a dead icon.
+    var SEARCH_ICON =
+        '<svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+            '<path d="M8 16C9.77498 15.9996 11.4988 15.4054 12.897 14.312L17.293 18.708L18.707 17.294L14.311 12.898C15.405 11.4997 15.9996 9.77544 16 8C16 3.589 12.411 0 8 0C3.589 0 0 3.589 0 8C0 12.411 3.589 16 8 16ZM8 2C11.309 2 14 4.691 14 8C14 11.309 11.309 14 8 14C4.691 14 2 11.309 2 8C2 4.691 4.691 2 8 2Z" fill="#F26423"/>' +
+        '</svg>';
+    var SEARCH_TRIGGER_CLASS = 'flex items-center justify-center w-10 h-10 rounded-lg hover:bg-off-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-opacity-50';
+
+    function searchTrigger(id, extraClass) {
+        return '<button type="button" id="' + id + '" class="' + (extraClass ? extraClass + ' ' : '') + SEARCH_TRIGGER_CLASS + '" aria-label="Search the documentation" style="display:none">' + SEARCH_ICON + '</button>';
+    }
+
     // Magento box mark (icon only) + text wordmark + section label. The icon is
     // the recognisable Magento hexagon-in-box; the text identifies it as the
     // Magento Open Source Developer Documentation.
@@ -82,11 +120,18 @@
         '<div class="sticky top-0 z-50 bg-white flex items-center h-16 w-full border-b border-gray-200 shadow-sm">' +
             '<div class="flex items-center justify-between w-full max-w-7xl xl:max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">' +
                 '<a href="/" class="inline-flex items-center" aria-label="Magento home">' + MAGENTO_LOGO + '</a>' +
-                '<button data-mobile-menu-toggle class="lg:hidden flex items-center justify-center w-10 h-10 text-charcoal hover:text-orange transition-all focus:outline-none focus:ring-2 focus:ring-orange" aria-label="Toggle navigation menu" aria-expanded="false">' +
-                    '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>' +
-                '</button>' +
-                '<div class="hidden lg:flex items-center gap-8">' +
-                    '<nav class="flex flex-row gap-x-6 lg:gap-x-7 xl:gap-x-8 items-center">' + desktopNav() + '</nav>' +
+                '<div class="flex items-center gap-2 lg:gap-8">' +
+                    // DocSearch renders its own button into this hidden slot; the visible
+                    // triggers below open it, as on the merchant docs.
+                    '<div id="docsearch" style="display:none"></div>' +
+                    searchTrigger('mobile-header-search', 'lg:hidden') +
+                    '<button data-mobile-menu-toggle class="lg:hidden flex items-center justify-center w-10 h-10 text-charcoal hover:text-orange transition-all focus:outline-none focus:ring-2 focus:ring-orange" aria-label="Toggle navigation menu" aria-expanded="false">' +
+                        '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>' +
+                    '</button>' +
+                    '<div class="hidden lg:flex items-center gap-8">' +
+                        '<nav class="flex flex-row gap-x-6 lg:gap-x-7 xl:gap-x-8 items-center">' + desktopNav() + '</nav>' +
+                        searchTrigger('header-search') +
+                    '</div>' +
                 '</div>' +
             '</div>' +
         '</div>' +
@@ -135,13 +180,161 @@
         if (close) { close.addEventListener('click', closeMenu); }
         if (overlay) { overlay.addEventListener('click', closeMenu); }
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && panel && !panel.classList.contains('hidden')) { closeMenu(); }
+            // While the search modal is open, Escape belongs to DocSearch only.
+            if (e.key === 'Escape' && !document.body.classList.contains('DocSearch--active') &&
+                panel && !panel.classList.contains('hidden')) { closeMenu(); }
         });
     }
 
-    if (document.body) {
+    // DocSearch 3.9 already wraps Tab and handles Cmd/Ctrl+K, '/' and Escape. It does
+    // not return focus to the trigger when it closes, lets Shift+Tab leave the modal
+    // after a click on blank modal space, and gives the modal no dialog role. This
+    // complements it from outside, with no key handling of our own.
+    function setupSearchFocus() {
+        var slot = document.getElementById('docsearch');
+        if (!slot || typeof MutationObserver !== 'function') { return; }
+        var opener = null;
+
+        function visible(el) {
+            return !!el && el.isConnected && el.getClientRects().length > 0;
+        }
+
+        function guard(e) {
+            var modal = document.querySelector('.DocSearch-Modal');
+            var input = document.querySelector('.DocSearch-Input');
+            if (modal && input && !modal.contains(e.target)) { input.focus(); }
+        }
+
+        function onOpen(container) {
+            var active = document.activeElement;
+            if (!opener && active && active !== document.body && !container.contains(active)) { opener = active; }
+            var modal = container.querySelector('.DocSearch-Modal');
+            if (modal) {
+                modal.setAttribute('role', 'dialog');
+                modal.setAttribute('aria-modal', 'true');
+                modal.setAttribute('aria-label', 'Search the documentation');
+            }
+            document.addEventListener('focusin', guard, true);
+        }
+
+        // Restore on the next tick: a click on the overlay closes DocSearch on mousedown,
+        // and the browser then moves focus to BODY as the default action of that mousedown.
+        function onClose() {
+            document.removeEventListener('focusin', guard, true);
+            var from = opener;
+            opener = null;
+            window.setTimeout(function () {
+                var active = document.activeElement;
+                if (active && active !== document.body) { return; }
+                var target = [from, document.getElementById('header-search'), document.getElementById('mobile-header-search')]
+                    .filter(visible)[0];
+                if (target) { target.focus({ preventScroll: true }); }
+            }, 0);
+        }
+
+        function isContainer(node) {
+            return node.nodeType === 1 && node.classList.contains('DocSearch-Container');
+        }
+
+        ['header-search', 'mobile-header-search'].forEach(function (id) {
+            var trigger = document.getElementById(id);
+            if (!trigger) { return; }
+            trigger.addEventListener('click', function () {
+                var button = slot.querySelector('.DocSearch-Button');
+                if (!button) { return; }
+                opener = trigger;
+                button.click();
+            });
+        });
+
+        new MutationObserver(function (records) {
+            records.forEach(function (record) {
+                Array.prototype.forEach.call(record.addedNodes, function (n) { if (isContainer(n)) { onOpen(n); } });
+                Array.prototype.forEach.call(record.removedNodes, function (n) { if (isContainer(n)) { onClose(); } });
+            });
+        }).observe(document.body, { childList: true });
+    }
+
+    // Render DocSearch's own button into the #docsearch slot. No searchParameters
+    // or transformItems: the index only facets on type/lang, and filtering on
+    // anything else returns zero hits with no error.
+    function mountDocSearch() {
+        var slot = document.getElementById('docsearch');
+        if (!slot || slot.hasChildNodes() || typeof window.docsearch !== 'function') { return; }
+        window.docsearch({
+            container: slot,
+            appId: DOCSEARCH_APP_ID,
+            apiKey: DOCSEARCH_API_KEY,
+            indexName: DOCSEARCH_INDEX_NAME,
+            placeholder: 'Search the developer documentation',
+            translations: {
+                button: {
+                    buttonText: 'Search the documentation',
+                    buttonAriaLabel: 'Search the documentation'
+                }
+            }
+        });
+        if (slot.querySelector('.DocSearch-Button')) {
+            ['header-search', 'mobile-header-search'].forEach(function (id) {
+                var trigger = document.getElementById(id);
+                if (trigger) { trigger.style.display = ''; }
+            });
+        }
+    }
+
+    function mountDocSearchSafely() {
+        try {
+            mountDocSearch();
+        } catch (e) {
+            // Search is optional; the header works without it.
+        }
+    }
+
+    // Append the DocSearch stylesheet, our tokens, then the library to <head>,
+    // and mount once the library has loaded. If the CDN is unreachable the tags
+    // fail to load, nothing is mounted and the slot stays empty.
+    function loadDocSearch() {
+        if (typeof window.docsearch === 'function') {
+            mountDocSearchSafely();
+            return;
+        }
+        var head = document.head || document.getElementsByTagName('head')[0];
+        if (!head || head.querySelector('script[src="' + DOCSEARCH_JS_URL + '"]')) { return; }
+
+        var css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = DOCSEARCH_CSS_URL;
+        head.appendChild(css);
+
+        var tokens = document.createElement('link');
+        tokens.rel = 'stylesheet';
+        tokens.href = DOCSEARCH_TOKENS_URL;
+        head.appendChild(tokens);
+
+        var js = document.createElement('script');
+        js.src = DOCSEARCH_JS_URL;
+        js.async = true;
+        js.addEventListener('load', mountDocSearchSafely);
+        head.appendChild(js);
+    }
+
+    function start() {
         init();
+        try {
+            setupSearchFocus();
+        } catch (e) {
+            // Search is optional; never let it affect the header.
+        }
+        try {
+            loadDocSearch();
+        } catch (e) {
+            // Search is optional; never let it affect the header.
+        }
+    }
+
+    if (document.body) {
+        start();
     } else {
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', start);
     }
 })();
