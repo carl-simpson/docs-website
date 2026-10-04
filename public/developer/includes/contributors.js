@@ -388,7 +388,10 @@
             'transition:background-color .15s ease,border-color .15s ease;}' +
         '.toc-sidebar a[data-cbox-sticky-link]:hover,a[data-cbox-sticky-link]:hover{' +
             'background:#962a16;border-color:#962a16;color:#fff;}' +
-        'a[data-cbox-sticky-link]:focus-visible{outline:3px solid #2c2c2c;outline-offset:2px;}';
+        'a[data-cbox-sticky-link]:focus-visible{outline:3px solid #2c2c2c;outline-offset:2px;}' +
+        // Floating twin for narrower screens and pages without the panel (bottom-right corner).
+        'a[data-cbox-float]{position:fixed;right:16px;bottom:16px;z-index:30;' +
+            'box-shadow:0 4px 14px rgba(0,0,0,.18);}';
 
     function stickyStyle() {
         if (document.getElementById('dev-cbox-sticky-css')) { return; }
@@ -457,6 +460,53 @@
         });
     }
 
+    /*
+     * Floating "Suggest an idea" (Vijay's feedback, Carl 2026-10-04): wherever the panel button
+     * above is not showing (below 1280px, or a page with no "On this page" panel), the same
+     * action sits in the bottom-right corner. It steps aside while the contributor box at the
+     * bottom of the page is on screen, so the two never double up. Not on the contributors page.
+     */
+    function floatingIdea() {
+        if (document.querySelector('[data-cbox-float]')) { return; }
+        stickyStyle();
+        var link = document.createElement('a');
+        link.setAttribute('data-cbox-sticky-link', '');
+        link.setAttribute('data-cbox-float', '');
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+        link.setAttribute('href', ideaGithubUrl('content'));
+        link.innerHTML = GITHUB_MARK + '<span>Suggest an idea</span><span class="sr-only"> (opens in a new tab)</span>';
+        link.style.display = 'none';
+        document.body.appendChild(link);
+
+        function sync() { link.setAttribute('href', ideaGithubUrl('content')); }
+        link.addEventListener('click', sync);
+        link.addEventListener('auxclick', sync);
+
+        function onScreen(el) {
+            if (!el || !el.getClientRects().length) { return false; }
+            var r = el.getBoundingClientRect();
+            return r.bottom > 0 && r.top < window.innerHeight;
+        }
+        function update() {
+            var panelLink = document.querySelector('[data-cbox-sticky] a[data-cbox-sticky-link]');
+            var panelShown = !!panelLink && panelLink.getClientRects().length > 0;
+            var boxShown = onScreen(document.querySelector('[data-dev-cbox]'));
+            link.style.display = panelShown || boxShown ? 'none' : '';
+        }
+        var queued = false;
+        function schedule() {
+            if (queued) { return; }
+            queued = true;
+            window.requestAnimationFrame(function () { queued = false; update(); });
+        }
+        window.addEventListener('scroll', schedule, { passive: true });
+        window.addEventListener('resize', schedule);
+        window.addEventListener('load', schedule);
+        update();
+        return schedule;
+    }
+
     /* ---------- Injection ---------- */
 
     function inject(html, fullTarget) {
@@ -488,11 +538,13 @@
 
         // Independent of the contributor data, and the page's TOC is already built by now.
         stickyIdea();
+        var refloat = full ? null : floatingIdea();
 
         fetch('contributors.json', { cache: 'no-cache' })
             .then(function (r) { return r.ok ? r.json() : []; })
             .then(function (data) { inject(boxHtml(normalise(data), editUrl, full), fullTarget); })
-            .catch(function () { inject(boxHtml([], editUrl, full), fullTarget); }); // the ways to contribute still render
+            .catch(function () { inject(boxHtml([], editUrl, full), fullTarget); }) // the ways to contribute still render
+            .then(function () { if (refloat) { refloat(); } });
     }
 
     if (document.readyState !== 'loading') { init(); }
