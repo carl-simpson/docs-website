@@ -84,6 +84,8 @@
         { label: 'The Core', href: '/the-core/' }
     ];
 
+    // Last ecosystem link ends in "+", as on the merchant docs and the landing page (partials/ecosystem-menu.blade.php).
+    var plusSvg = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.8125 5.75C11.8125 6.24219 11.4023 6.65234 10.9375 6.65234H7V10.5898C7 11.0547 6.58984 11.4375 6.125 11.4375C5.63281 11.4375 5.25 11.0547 5.25 10.5898V6.65234H1.3125C0.820312 6.65234 0.4375 6.24219 0.4375 5.75C0.4375 5.28516 0.820312 4.90234 1.3125 4.90234H5.25V0.964844C5.25 0.472656 5.63281 0.0625 6.125 0.0625C6.58984 0.0625 7 0.472656 7 0.964844V4.90234H10.9375C11.4023 4.875 11.8125 5.28516 11.8125 5.75Z" fill="#F26423"/></svg>';
     var arrowSvg = '<svg width="8" height="11" viewBox="0 0 8 11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.75 11C1.50391 11 1.28516 10.918 1.12109 10.7539C0.765625 10.4258 0.765625 9.85156 1.12109 9.52344L4.86719 5.75L1.12109 2.00391C0.765625 1.67578 0.765625 1.10156 1.12109 0.773438C1.44922 0.417969 2.02344 0.417969 2.35156 0.773438L6.72656 5.14844C7.08203 5.47656 7.08203 6.05078 6.72656 6.37891L2.35156 10.7539C2.1875 10.918 1.96875 11 1.75 11Z" fill="#F26423"/></svg>';
 
     function ecosystemItems() {
@@ -92,7 +94,7 @@
             return sep +
                 '<div class="bg-charcoal flex gap-2.5 items-center justify-start px-5 py-2.5 text-sm">' +
                 '<a href="' + l.href + '" target="_blank" rel="noopener" class="text-white font-bold no-underline whitespace-nowrap hover:text-orange transition-colors duration-200">' + l.label + '</a>' +
-                arrowSvg + '</div>';
+                (i === ECOSYSTEM_LINKS.length - 1 ? plusSvg : arrowSvg) + '</div>';
         }).join('');
     }
 
