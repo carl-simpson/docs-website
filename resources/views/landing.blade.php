@@ -45,6 +45,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.docsearch-tokens')
 
     <style>
         [x-cloak] { display: none !important; }
@@ -89,11 +90,34 @@
                     <a href="https://www.magentoassociation.org/home" target="_blank" rel="noopener" class="text-sm font-medium text-charcoal-300 hover:text-orange transition-colors no-underline">Magento Association</a>
                     <a href="https://github.com/magento/magento2" target="_blank" rel="noopener" class="text-sm font-medium text-charcoal-300 hover:text-orange transition-colors no-underline">GitHub</a>
                     <a href="https://community.magento.com/" target="_blank" rel="noopener" class="text-sm font-medium text-charcoal-300 hover:text-orange transition-colors no-underline">Community</a>
+                    {{-- Search Icon (triggers Algolia) — same control as the docs headers --}}
+                    <button
+                        type="button"
+                        class="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-off-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-opacity-50"
+                        aria-label="Search the documentation"
+                        id="header-search"
+                    >
+                        <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 16C9.77498 15.9996 11.4988 15.4054 12.897 14.312L17.293 18.708L18.707 17.294L14.311 12.898C15.405 11.4997 15.9996 9.77544 16 8C16 3.589 12.411 0 8 0C3.589 0 0 3.589 0 8C0 12.411 3.589 16 8 16ZM8 2C11.309 2 14 4.691 14 8C14 11.309 11.309 14 8 14C4.691 14 2 11.309 2 8C2 4.691 4.691 2 8 2Z" fill="#F26423"/>
+                        </svg>
+                    </button>
                 </nav>
-                {{-- Mobile burger --}}
+                {{-- Mobile search + burger --}}
+                <div class="md:hidden flex items-center gap-2">
+                    <button
+                        type="button"
+                        class="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-off-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-opacity-50"
+                        aria-label="Search the documentation"
+                        id="mobile-header-search"
+                    >
+                        <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 16C9.77498 15.9996 11.4988 15.4054 12.897 14.312L17.293 18.708L18.707 17.294L14.311 12.898C15.405 11.4997 15.9996 9.77544 16 8C16 3.589 12.411 0 8 0C3.589 0 0 3.589 0 8C0 12.411 3.589 16 8 16ZM8 2C11.309 2 14 4.691 14 8C14 11.309 11.309 14 8 14C4.691 14 2 11.309 2 8C2 4.691 4.691 2 8 2Z" fill="#F26423"/>
+                        </svg>
+                    </button>
                 <button data-landing-menu-toggle type="button" class="md:hidden inline-flex items-center justify-center w-10 h-10 -mr-2 text-charcoal hover:text-orange focus:outline-none focus:ring-2 focus:ring-orange" aria-label="Open menu" aria-expanded="false">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
+                </div>
             </div>
         </div>
 
@@ -470,5 +494,14 @@
         </div>
     </footer>
 
+{{-- Hidden DocSearch container for Algolia integration (same as partials/layout.blade.php) --}}
+<div
+    id="docsearch"
+    style="display: none;"
+    data-algolia-app-id="{{ config('algolia.connections.main.id', '') }}"
+    data-algolia-search-key="{{ config('algolia.connections.main.search_key', '') }}"
+    data-algolia-index-name="{{ config('algolia.connections.main.index_name', 'devmage-os') }}"
+    data-version="main"
+></div>
 </body>
 </html>
