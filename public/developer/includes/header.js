@@ -107,11 +107,16 @@
         '<div class="sticky top-0 z-50 bg-white flex items-center h-16 w-full border-b border-gray-200 shadow-sm">' +
             '<div class="flex items-center justify-between w-full max-w-7xl xl:max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">' +
                 '<a href="/" class="inline-flex items-center" aria-label="Magento home">' + MAGENTO_LOGO + '</a>' +
-                '<button data-mobile-menu-toggle class="lg:hidden flex items-center justify-center w-10 h-10 text-charcoal hover:text-orange transition-all focus:outline-none focus:ring-2 focus:ring-orange" aria-label="Toggle navigation menu" aria-expanded="false">' +
-                    '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>' +
-                '</button>' +
-                '<div class="hidden lg:flex items-center gap-8">' +
-                    '<nav class="flex flex-row gap-x-6 lg:gap-x-7 xl:gap-x-8 items-center">' + desktopNav() + '</nav>' +
+                '<div class="flex items-center gap-2 lg:gap-8">' +
+                    // Single search slot for every breakpoint: DocSearch renders its
+                    // own button here (icon only below 768px). Empty if the CDN fails.
+                    '<div id="docsearch" class="flex items-center"></div>' +
+                    '<button data-mobile-menu-toggle class="lg:hidden flex items-center justify-center w-10 h-10 text-charcoal hover:text-orange transition-all focus:outline-none focus:ring-2 focus:ring-orange" aria-label="Toggle navigation menu" aria-expanded="false">' +
+                        '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>' +
+                    '</button>' +
+                    '<div class="hidden lg:flex items-center gap-8">' +
+                        '<nav class="flex flex-row gap-x-6 lg:gap-x-7 xl:gap-x-8 items-center">' + desktopNav() + '</nav>' +
+                    '</div>' +
                 '</div>' +
             '</div>' +
         '</div>' +
@@ -160,15 +165,49 @@
         if (close) { close.addEventListener('click', closeMenu); }
         if (overlay) { overlay.addEventListener('click', closeMenu); }
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && panel && !panel.classList.contains('hidden')) { closeMenu(); }
+            // While the search modal is open, Escape belongs to DocSearch only.
+            if (e.key === 'Escape' && !document.body.classList.contains('DocSearch--active') &&
+                panel && !panel.classList.contains('hidden')) { closeMenu(); }
         });
     }
 
-    // Append the DocSearch stylesheet, our tokens, then the library to <head>.
-    // Nothing is mounted here. If the CDN is unreachable the tags simply fail to
-    // load and window.docsearch stays undefined; the header does not depend on it.
+    // Render DocSearch's own button into the #docsearch slot. No searchParameters
+    // or transformItems: the index only facets on type/lang, and filtering on
+    // anything else returns zero hits with no error (search/spec-dev.md §4).
+    function mountDocSearch() {
+        var slot = document.getElementById('docsearch');
+        if (!slot || slot.hasChildNodes() || typeof window.docsearch !== 'function') { return; }
+        window.docsearch({
+            container: slot,
+            appId: DOCSEARCH_APP_ID,
+            apiKey: DOCSEARCH_API_KEY,
+            indexName: DOCSEARCH_INDEX_NAME,
+            placeholder: 'Search the developer documentation',
+            translations: {
+                button: {
+                    buttonText: 'Search the documentation',
+                    buttonAriaLabel: 'Search the documentation'
+                }
+            }
+        });
+    }
+
+    function mountDocSearchSafely() {
+        try {
+            mountDocSearch();
+        } catch (e) {
+            // Search is optional; the header works without it.
+        }
+    }
+
+    // Append the DocSearch stylesheet, our tokens, then the library to <head>,
+    // and mount once the library has loaded. If the CDN is unreachable the tags
+    // fail to load, nothing is mounted and the slot stays empty.
     function loadDocSearch() {
-        if (typeof window.docsearch === 'function') { return; }
+        if (typeof window.docsearch === 'function') {
+            mountDocSearchSafely();
+            return;
+        }
         var head = document.head || document.getElementsByTagName('head')[0];
         if (!head || head.querySelector('script[src="' + DOCSEARCH_JS_URL + '"]')) { return; }
 
@@ -185,6 +224,7 @@
         var js = document.createElement('script');
         js.src = DOCSEARCH_JS_URL;
         js.async = true;
+        js.addEventListener('load', mountDocSearchSafely);
         head.appendChild(js);
     }
 

@@ -272,10 +272,15 @@
     text-decoration-thickness: 3px;
 }
 
-/* Header trigger: 44x44 minimum tap target (button.css sets height: 36px) */
+/* Header trigger: 44x44 minimum tap target (button.css sets height: 36px),
+   square corners and a charcoal outline as in design B. The vendor left margin
+   is dropped; the header spaces its own items. */
 .DocSearch-Button {
     min-width: 44px;
     min-height: 44px;
+    margin: 0;
+    border: 2px solid var(--ma-search-border-color);
+    border-radius: var(--ma-search-radius);
 }
 
 /* Mobile (modal.css makes the modal full screen at 768px and below) */
