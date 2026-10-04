@@ -94,8 +94,7 @@
     class="qbcb {{ $expanded ? 'qbcb--expanded' : '' }} mt-16 border-2 border-charcoal bg-white"
     aria-labelledby="{{ $titleId }}"
 >
-    {{-- Head: kicker and heading; the contributors page adds the subtext and podium, every other
-         page links to it instead (Carl, 2026-10-04). --}}
+    {{-- Head: kicker and heading; the contributors page adds the subtext and podium (Carl, 2026-10-04). --}}
     <div class="qbcb-head px-6 pt-6 pb-5 border-b border-gray-200 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6">
         <div class="min-w-0">
             <div class="qbcb-kicker inline-flex items-center gap-2 mb-2 font-mono text-xs font-medium uppercase text-orange-700">
@@ -111,13 +110,6 @@
             @endif
         </div>
 
-        @unless($expanded)
-            <p class="m-0 shrink-0">
-                <a href="{{ route('contributors') }}" class="qbcb-all inline-flex items-center gap-1.5 whitespace-nowrap text-sm font-semibold text-charcoal no-underline hover:text-orange-700 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2">
-                    <span class="underline">See all contributors</span><span aria-hidden="true">&rarr;</span>
-                </a>
-            </p>
-        @endunless
 
         @if($expanded && count($contributors))
             <div class="qbcb-podium" role="group" aria-label="Top 3 contributors">
@@ -254,7 +246,7 @@
                     href="#"
                     class="qbcb-mail-link py-1 text-[13px] font-medium text-charcoal underline hover:text-orange-700 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2"
                 >
-                    <span class="text-gray-500">No GitHub account?</span> Email us
+                    Email us
                 </a>
             </div>
         </div>

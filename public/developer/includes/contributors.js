@@ -10,7 +10,7 @@
  * carries <div id="dev-contributors-full"> gets the FULL variant of the same box:
  * a larger podium, the top 10 open with no toggle, a "how this is counted" note, and
  * an edit card pointed at the repository root (that page has no upstream source file).
- * Every other page gets the compact box plus a "See all contributors" link.
+ * Every other page gets the compact box: heading and the two ways to contribute.
  *
  * Article pages also get a compact "Suggest an idea" button injected into the page's
  * own sticky "On this page" panel, so the call to action is reachable without scrolling
@@ -46,7 +46,6 @@
     var PLACES = 10;
     // A page carrying this placeholder is the contributors page: render the full variant there.
     var FULL_TARGET_ID = 'dev-contributors-full';
-    var CONTRIBUTORS_PAGE = 'contributors.html';
     // Breathing room left under a capped sticky panel so the last control is not flush to the edge.
     var STICKY_GAP = 24;
     var LINE = 'border-[#e4e2e0]';
@@ -58,7 +57,6 @@
     var EDIT_ICON = '<svg class="w-4 h-4 flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>';
     var INFO_ICON = '<svg class="inline-block w-[13px] h-[13px] mr-1 align-[-2px]" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm6.5-.25A.75.75 0 017.25 7h1a.75.75 0 01.75.75v2.75h.25a.75.75 0 010 1.5h-2a.75.75 0 010-1.5h.25v-2h-.25a.75.75 0 01-.75-.75zM8 6a1 1 0 100-2 1 1 0 000 2z"/></svg>';
     var CHEVRON = '<svg data-cbox-chevron class="w-3.5 h-3.5 group-aria-expanded:rotate-180 transition-transform duration-200 motion-reduce:transition-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
-    var ARROW = '<svg class="w-3.5 h-3.5 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
     var FOCUS = 'focus:outline-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-orange';
 
     function esc(s) {
@@ -168,9 +166,8 @@
                     '<h2 id="dev-cbox-title" class="m-0 mb-1.5 ' + (full ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl') + ' leading-tight font-extrabold tracking-[-0.015em] text-charcoal [text-wrap:balance]">Help build the Magento docs, and get your name on them</h2>' +
                     (full ? '<p class="m-0 max-w-[52ch] text-sm text-charcoal-300">Every merged edit counts toward the top 10 contributors. Ideas shape what we write next.</p>' : '') +
                 '</div>' +
-                // The podium, meter and top 10 live on the contributors page only (Carl, 2026-10-04);
-                // every other page links there instead.
-                (full ? podium(list, full) : seeAllLink()) +
+                // The podium, meter and top 10 live on the contributors page only (Carl, 2026-10-04).
+                (full ? podium(list, full) : '') +
             '</div>';
     }
 
@@ -240,17 +237,6 @@
             '</div>';
     }
 
-    // Box variant only: the full page must not link to itself.
-    function seeAllLink() {
-        return '' +
-            '<p class="m-0">' +
-                '<a data-cbox-all href="' + CONTRIBUTORS_PAGE + '" ' +
-                'class="inline-flex items-center gap-1.5 text-[13px] font-semibold text-charcoal no-underline hover:text-orange-700 ' + FOCUS + '">' +
-                    '<span class="underline decoration-orange decoration-2 underline-offset-4">See all contributors</span>' + ARROW +
-                '</a>' +
-            '</p>';
-    }
-
     function top10(list, full) {
         var rows = '';
         for (var p = 1; p <= PLACES; p++) { rows += topRow(list[p - 1], p, list.length); }
@@ -297,7 +283,7 @@
                     '</a>' +
                     '<a data-dev-idea-mail href="#" ' +
                     'class="py-1 text-[13px] font-medium text-charcoal underline decoration-orange decoration-2 underline-offset-4 hover:text-orange-700 ' + FOCUS + '">' +
-                        '<span class="text-charcoal-300">No GitHub account?</span> Email us' +
+                        'Email us' +
                     '</a>' +
                 '</div>' +
             '</div>';
