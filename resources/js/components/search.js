@@ -29,6 +29,70 @@ function initDocSearch() {
         searchParameters: {},
     });
 
+    // DocSearch 3.9 wraps Tab and handles Cmd/Ctrl+K, '/' and Escape itself. It does not
+    // return focus to the trigger on close, lets Shift+Tab leave the modal after a click
+    // on blank modal space, and gives the modal no dialog role. This complements it from
+    // outside, with no key handling of our own.
+    let opener = null;
+
+    // The merchant keeps its own DocSearch button in a hidden container, so the
+    // visible triggers are the header and mobile menu buttons.
+    const isVisible = (el) => !!el && el.isConnected && el.getClientRects().length > 0;
+
+    const guard = (e) => {
+        const modal = document.querySelector('.DocSearch-Modal');
+        const input = document.querySelector('.DocSearch-Input');
+        if (modal && input && !modal.contains(e.target)) {
+            input.focus();
+        }
+    };
+
+    const onOpen = (container) => {
+        const active = document.activeElement;
+        if (!opener && active && active !== document.body && !container.contains(active)) {
+            opener = active;
+        }
+        const modal = container.querySelector('.DocSearch-Modal');
+        if (modal) {
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-modal', 'true');
+            modal.setAttribute('aria-label', 'Search the documentation');
+        }
+        document.addEventListener('focusin', guard, true);
+    };
+
+    // Restore on the next tick: a click on the overlay closes DocSearch on mousedown, and
+    // the browser then moves focus to BODY as the default action of that mousedown.
+    const onClose = () => {
+        document.removeEventListener('focusin', guard, true);
+        const from = opener;
+        opener = null;
+        window.setTimeout(() => {
+            const active = document.activeElement;
+            if (active && active !== document.body) {
+                return;
+            }
+            // A trigger inside the mobile menu panel is no use once the panel is closing.
+            const usable = (el) => isVisible(el) && !el.closest('[aria-hidden="true"]');
+            const target = [from,
+                document.getElementById('header-search'),
+                document.getElementById('mobile-header-search'),
+                document.querySelector('[data-mobile-menu-toggle]')].find(usable);
+            if (target) {
+                target.focus({ preventScroll: true });
+            }
+        }, 0);
+    };
+
+    const isContainer = (node) => node.nodeType === 1 && node.classList.contains('DocSearch-Container');
+
+    new MutationObserver((records) => {
+        records.forEach((record) => {
+            record.addedNodes.forEach((n) => { if (isContainer(n)) { onOpen(n); } });
+            record.removedNodes.forEach((n) => { if (isContainer(n)) { onClose(); } });
+        });
+    }).observe(document.body, { childList: true });
+
     // Function to trigger search modal
     const triggerSearch = () => {
         // Try to find and click the DocSearch button
@@ -53,6 +117,7 @@ function initDocSearch() {
     if (homepageSearchBtn) {
         homepageSearchBtn.addEventListener('click', (e) => {
             e.preventDefault();
+            opener = e.currentTarget;
             triggerSearch();
         });
     }
@@ -62,6 +127,7 @@ function initDocSearch() {
     if (headerSearchBtn) {
         headerSearchBtn.addEventListener('click', (e) => {
             e.preventDefault();
+            opener = e.currentTarget;
             triggerSearch();
         });
     }
@@ -71,17 +137,10 @@ function initDocSearch() {
     if (mobileHeaderSearchBtn) {
         mobileHeaderSearchBtn.addEventListener('click', (e) => {
             e.preventDefault();
+            opener = e.currentTarget;
             triggerSearch();
         });
     }
-
-    // Add keyboard shortcut (CMD+K on Mac, CTRL+K on Windows/Linux)
-    document.addEventListener('keydown', (e) => {
-        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-            e.preventDefault();
-            triggerSearch();
-        }
-    });
 }
 
 // Check if DOM is already loaded (module scripts defer by default)

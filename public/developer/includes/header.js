@@ -171,6 +171,68 @@
         });
     }
 
+    // DocSearch 3.9 already wraps Tab and handles Cmd/Ctrl+K, '/' and Escape. It does
+    // not return focus to the trigger when it closes, lets Shift+Tab leave the modal
+    // after a click on blank modal space, and gives the modal no dialog role. This
+    // complements it from outside, with no key handling of our own.
+    function setupSearchFocus() {
+        var slot = document.getElementById('docsearch');
+        if (!slot || typeof MutationObserver !== 'function') { return; }
+        var opener = null;
+
+        function visible(el) {
+            return !!el && el.isConnected && el.getClientRects().length > 0;
+        }
+
+        function guard(e) {
+            var modal = document.querySelector('.DocSearch-Modal');
+            var input = document.querySelector('.DocSearch-Input');
+            if (modal && input && !modal.contains(e.target)) { input.focus(); }
+        }
+
+        function onOpen(container) {
+            var active = document.activeElement;
+            if (!opener && active && active !== document.body && !container.contains(active)) { opener = active; }
+            var modal = container.querySelector('.DocSearch-Modal');
+            if (modal) {
+                modal.setAttribute('role', 'dialog');
+                modal.setAttribute('aria-modal', 'true');
+                modal.setAttribute('aria-label', 'Search the documentation');
+            }
+            document.addEventListener('focusin', guard, true);
+        }
+
+        // Restore on the next tick: a click on the overlay closes DocSearch on mousedown,
+        // and the browser then moves focus to BODY as the default action of that mousedown.
+        function onClose() {
+            document.removeEventListener('focusin', guard, true);
+            var from = opener;
+            opener = null;
+            window.setTimeout(function () {
+                var active = document.activeElement;
+                if (active && active !== document.body) { return; }
+                var target = visible(from) ? from : slot.querySelector('.DocSearch-Button');
+                if (visible(target)) { target.focus({ preventScroll: true }); }
+            }, 0);
+        }
+
+        function isContainer(node) {
+            return node.nodeType === 1 && node.classList.contains('DocSearch-Container');
+        }
+
+        slot.addEventListener('click', function (e) {
+            var button = e.target.closest ? e.target.closest('.DocSearch-Button') : null;
+            if (button) { opener = button; }
+        });
+
+        new MutationObserver(function (records) {
+            records.forEach(function (record) {
+                Array.prototype.forEach.call(record.addedNodes, function (n) { if (isContainer(n)) { onOpen(n); } });
+                Array.prototype.forEach.call(record.removedNodes, function (n) { if (isContainer(n)) { onClose(); } });
+            });
+        }).observe(document.body, { childList: true });
+    }
+
     // Render DocSearch's own button into the #docsearch slot. No searchParameters
     // or transformItems: the index only facets on type/lang, and filtering on
     // anything else returns zero hits with no error (search/spec-dev.md §4).
@@ -230,6 +292,11 @@
 
     function start() {
         init();
+        try {
+            setupSearchFocus();
+        } catch (e) {
+            // Search is optional; never let it affect the header.
+        }
         try {
             loadDocSearch();
         } catch (e) {
