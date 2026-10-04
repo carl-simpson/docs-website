@@ -26,8 +26,10 @@
     // already injected GitHubContributorsService (e.g. ContributorsController) passes the
     // list in; docs.blade.php's existing include (out of scope for this task) doesn't, so we
     // fall back to resolving the service from the container here — never a bare `new`.
+    // The per-page box no longer shows contributors (only the contributors page does), so the
+    // service is only called for the expanded variant.
     if ($contributors === null) {
-        $contributors = app(\App\Services\GitHubContributorsService::class)->getTopContributors(10);
+        $contributors = $expanded ? app(\App\Services\GitHubContributorsService::class)->getTopContributors(10) : [];
     }
 
     $boxId = 'gh-cbox-' . \Illuminate\Support\Str::random(6);
@@ -92,7 +94,8 @@
     class="qbcb {{ $expanded ? 'qbcb--expanded' : '' }} mt-16 border-2 border-charcoal bg-white"
     aria-labelledby="{{ $titleId }}"
 >
-    {{-- Head: kicker, heading, subtext, podium --}}
+    {{-- Head: kicker and heading; the contributors page adds the subtext and podium, every other
+         page links to it instead (Carl, 2026-10-04). --}}
     <div class="qbcb-head px-6 pt-6 pb-5 border-b border-gray-200 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6">
         <div class="min-w-0">
             <div class="qbcb-kicker inline-flex items-center gap-2 mb-2 font-mono text-xs font-medium uppercase text-orange-700">
@@ -101,12 +104,22 @@
             <h2 id="{{ $titleId }}" class="m-0 mb-1.5 text-xl sm:text-2xl font-extrabold leading-tight text-charcoal">
                 Help build the Magento docs, and get your name on them
             </h2>
-            <p class="qbcb-subtext m-0 text-sm text-gray-600">
-                Every merged edit counts toward the top 10 contributors shown on every page. Ideas shape what we write next.
-            </p>
+            @if($expanded)
+                <p class="qbcb-subtext m-0 text-sm text-gray-600">
+                    Every merged edit counts toward the top 10 contributors. Ideas shape what we write next.
+                </p>
+            @endif
         </div>
 
-        @if(count($contributors))
+        @unless($expanded)
+            <p class="m-0 shrink-0">
+                <a href="{{ route('contributors') }}" class="qbcb-all inline-flex items-center gap-1.5 whitespace-nowrap text-sm font-semibold text-charcoal no-underline hover:text-orange-700 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2">
+                    <span class="underline">See all contributors</span><span aria-hidden="true">&rarr;</span>
+                </a>
+            </p>
+        @endunless
+
+        @if($expanded && count($contributors))
             <div class="qbcb-podium" role="group" aria-label="Top 3 contributors">
                 @foreach([2, 1, 3] as $rank)
                     @php $c = $contributors[$rank - 1] ?? null; @endphp
@@ -134,7 +147,8 @@
         @endif
     </div>
 
-    {{-- Places meter + top 10 toggle --}}
+    @if($expanded)
+    {{-- Places meter + top 10 (contributors page only) --}}
     <div class="qbcb-meter px-6 py-3.5 bg-gray-50 border-b border-gray-200 flex flex-wrap items-center justify-between gap-3">
         <div class="flex flex-wrap items-center gap-3">
             <div class="qbcb-cells" aria-hidden="true">
@@ -187,14 +201,8 @@
         </ol>
         <p class="mt-3 mb-0 text-xs text-gray-500">Counts combine the <code class="font-mono">docs</code> and <code class="font-mono">docs-website</code> repositories. Updated periodically.</p>
 
-        @unless($expanded)
-            <p class="mt-2 mb-0 text-sm">
-                <a href="{{ route('contributors') }}" class="font-semibold text-charcoal underline hover:text-orange-700 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2">
-                    See all contributors
-                </a>
-            </p>
-        @endunless
     </div>
+    @endif
 
     {{-- Ways to contribute --}}
     <div class="grid grid-cols-1 {{ $editUrl ? 'md:grid-cols-2' : '' }}">

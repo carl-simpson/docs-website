@@ -166,9 +166,11 @@
                         '<i class="inline-block w-2.5 h-2.5 bg-orange" aria-hidden="true"></i>Written by the community' +
                     '</div>' +
                     '<h2 id="dev-cbox-title" class="m-0 mb-1.5 ' + (full ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl') + ' leading-tight font-extrabold tracking-[-0.015em] text-charcoal [text-wrap:balance]">Help build the Magento docs, and get your name on them</h2>' +
-                    '<p class="m-0 max-w-[52ch] text-sm text-charcoal-300">Every merged edit counts toward the top 10 contributors shown on every page. Ideas shape what we write next.</p>' +
+                    (full ? '<p class="m-0 max-w-[52ch] text-sm text-charcoal-300">Every merged edit counts toward the top 10 contributors. Ideas shape what we write next.</p>' : '') +
                 '</div>' +
-                podium(list, full) +
+                // The podium, meter and top 10 live on the contributors page only (Carl, 2026-10-04);
+                // every other page links there instead.
+                (full ? podium(list, full) : seeAllLink()) +
             '</div>';
     }
 
@@ -241,7 +243,7 @@
     // Box variant only: the full page must not link to itself.
     function seeAllLink() {
         return '' +
-            '<p class="mt-3 mb-0">' +
+            '<p class="m-0">' +
                 '<a data-cbox-all href="' + CONTRIBUTORS_PAGE + '" ' +
                 'class="inline-flex items-center gap-1.5 text-[13px] font-semibold text-charcoal no-underline hover:text-orange-700 ' + FOCUS + '">' +
                     '<span class="underline decoration-orange decoration-2 underline-offset-4">See all contributors</span>' + ARROW +
@@ -255,9 +257,7 @@
         return '' +
             '<div id="dev-cbox-top10" class="px-6 pt-2 pb-4 border-b ' + LINE + '"' + (full ? '' : ' hidden') + '>' +
                 '<ol class="list-none m-0 p-0 columns-1 sm:columns-2 gap-x-7">' + rows + '</ol>' +
-                (full
-                    ? counting()
-                    : '<p class="mt-3 mb-0 text-xs text-charcoal-300">Counts combine the <code class="font-mono">docs</code> and <code class="font-mono">docs-website</code> repositories. Updated when the site is rebuilt.</p>' + seeAllLink()) +
+                counting() +
             '</div>';
     }
 
@@ -338,8 +338,7 @@
         return '' +
             '<section data-dev-cbox' + (full ? ' data-dev-cbox-full' : '') + ' class="' + (full ? 'mt-0 mb-10' : 'mt-9 mb-10') + ' border-2 border-charcoal bg-white font-sans text-charcoal [overflow-wrap:anywhere]" aria-labelledby="dev-cbox-title">' +
                 head(list, full) +
-                places(list, full) +
-                top10(list, full) +
+                (full ? places(list, full) + top10(list, full) : '') +
                 ways(editUrl, full) +
                 '<div class="flex flex-wrap justify-between gap-x-4 gap-y-1.5 px-6 py-[11px] border-t ' + LINE + ' text-xs text-charcoal-300">' +
                     '<span>' + INFO_ICON + 'Ideas and edits on GitHub are public.</span>' +
