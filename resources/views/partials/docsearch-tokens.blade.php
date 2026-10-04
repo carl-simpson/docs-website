@@ -11,6 +11,16 @@
         if (! is_array($decoded['light'] ?? null) || ! is_array($decoded['dark'] ?? null)) {
             throw new \UnexpectedValueException('expected "light" and "dark" token maps');
         }
+        // Values are echoed inside <style>, a raw-text element: Blade's escaping would corrupt
+        // quotes or ampersands, so anything that needs escaping is rejected instead.
+        foreach (['light', 'dark'] as $mode) {
+            foreach ($decoded[$mode] as $name => $value) {
+                if (! is_string($name) || ! preg_match('/^--[a-z0-9-]+$/', $name)
+                    || ! is_string($value) || preg_match('/["\'&<>{};]/', $value)) {
+                    throw new \UnexpectedValueException('invalid token ' . $mode . '.' . (is_string($name) ? $name : '?'));
+                }
+            }
+        }
         $docsearchTokens = $decoded;
     } catch (\Throwable $e) {
         \Illuminate\Support\Facades\Log::warning('DocSearch design-tokens not rendered: ' . $e->getMessage(), ['file' => $docsearchTokenFile]);

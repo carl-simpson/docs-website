@@ -21,7 +21,7 @@
     /* --- Algolia DocSearch (public, search-only credentials) --------------------
      * Mirrors the merchant config in config/algolia.php. The index is shared:
      * the Algolia app contains exactly one index. Keep these in step with the
-     * merchant side — see search/spec-dev.md §3.2 before rotating.
+     * merchant side (config/algolia.php) when rotating the key.
      *
      * DOCSEARCH_VERSION is pinned exactly (never a range) and is the only place
      * the version lives; it resolves to:
@@ -235,7 +235,7 @@
 
     // Render DocSearch's own button into the #docsearch slot. No searchParameters
     // or transformItems: the index only facets on type/lang, and filtering on
-    // anything else returns zero hits with no error (search/spec-dev.md §4).
+    // anything else returns zero hits with no error.
     function mountDocSearch() {
         var slot = document.getElementById('docsearch');
         if (!slot || slot.hasChildNodes() || typeof window.docsearch !== 'function') { return; }
