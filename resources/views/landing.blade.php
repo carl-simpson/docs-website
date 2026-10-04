@@ -84,16 +84,16 @@
                         <path d="M14.7883 7.46973L4.90405 13.0923V24.349L7.54104 25.8487V14.5978L14.7883 10.4692L22.0415 14.5978V25.8487L24.6785 24.349V13.0923L14.7883 7.46973Z" fill="#F1BC1B"/>
                         <path d="M16.0862 26.2367L14.7883 26.9779L13.4492 26.2135V14.233L10.178 16.0975V27.3485L13.4492 29.213L14.7883 29.9773L16.0862 29.2362L19.4045 27.3485V16.0975L16.0862 14.2098V26.2367Z" fill="#F1BC1B"/>
                     </svg>
-                    <span class="ml-3 text-xl font-bold text-charcoal">Magento Documentation</span>
+                    <span class="ml-3 text-xl font-bold text-charcoal">Magento<span class="hidden sm:inline"> Documentation</span></span>
                 </a>
                 <nav class="hidden md:flex items-center gap-6">
-                    <a href="https://www.magentoassociation.org/home" target="_blank" rel="noopener" class="text-sm font-medium text-charcoal-300 hover:text-orange transition-colors no-underline">Magento Association</a>
-                    <a href="https://github.com/magento/magento2" target="_blank" rel="noopener" class="text-sm font-medium text-charcoal-300 hover:text-orange transition-colors no-underline">GitHub</a>
-                    <a href="https://community.magento.com/" target="_blank" rel="noopener" class="text-sm font-medium text-charcoal-300 hover:text-orange transition-colors no-underline">Community</a>
+                    <a href="https://www.magentoassociation.org/home" target="_blank" rel="noopener" class="text-sm font-medium text-charcoal hover:text-orange transition-colors no-underline">Magento Association</a>
+                    <a href="https://github.com/magento/magento2" target="_blank" rel="noopener" class="text-sm font-medium text-charcoal hover:text-orange transition-colors no-underline">GitHub</a>
+                    <a href="https://community.magento.com/" target="_blank" rel="noopener" class="text-sm font-medium text-charcoal hover:text-orange transition-colors no-underline">Community</a>
                     {{-- Search Icon (triggers Algolia) — same control as the docs headers --}}
                     <button
                         type="button"
-                        class="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-off-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-opacity-50"
+                        class="flex items-center justify-center w-[2.5rem] h-[2.5rem] rounded-lg hover:bg-off-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-opacity-50"
                         aria-label="Search the documentation"
                         id="header-search"
                     >
@@ -106,7 +106,7 @@
                 <div class="md:hidden flex items-center gap-2">
                     <button
                         type="button"
-                        class="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-off-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-opacity-50"
+                        class="flex items-center justify-center w-[2.5rem] h-[2.5rem] rounded-lg hover:bg-off-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-opacity-50"
                         aria-label="Search the documentation"
                         id="mobile-header-search"
                     >
@@ -114,7 +114,7 @@
                             <path d="M8 16C9.77498 15.9996 11.4988 15.4054 12.897 14.312L17.293 18.708L18.707 17.294L14.311 12.898C15.405 11.4997 15.9996 9.77544 16 8C16 3.589 12.411 0 8 0C3.589 0 0 3.589 0 8C0 12.411 3.589 16 8 16ZM8 2C11.309 2 14 4.691 14 8C14 11.309 11.309 14 8 14C4.691 14 2 11.309 2 8C2 4.691 4.691 2 8 2Z" fill="#F26423"/>
                         </svg>
                     </button>
-                <button data-landing-menu-toggle type="button" class="md:hidden inline-flex items-center justify-center w-10 h-10 -mr-2 text-charcoal hover:text-orange focus:outline-none focus:ring-2 focus:ring-orange" aria-label="Open menu" aria-expanded="false">
+                <button data-landing-menu-toggle type="button" class="md:hidden inline-flex items-center justify-center w-[2.5rem] h-[2.5rem] text-charcoal hover:text-orange focus:outline-none focus:ring-2 focus:ring-orange" aria-label="Open menu" aria-expanded="false">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
                 </div>

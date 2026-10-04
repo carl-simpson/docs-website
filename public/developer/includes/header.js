@@ -57,10 +57,12 @@
     // the recognisable Magento hexagon-in-box; the text identifies it as the
     // Magento Open Source Developer Documentation.
     var MAGENTO_LOGO = '' +
-        '<span class="inline-flex items-center gap-2.5">' +
-        '<svg class="h-8 w-auto flex-shrink-0" viewBox="0 0 30 35" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Magento" role="img">' +
+        '<span class="inline-flex items-center gap-3">' +
+        '<svg width="30" height="33" viewBox="0 0 30 33" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0" aria-hidden="true">' +
         '<path d="M0 4.06492H29.6763V31.8882C29.6763 32.502 29.1713 33 28.5487 33H1.12762C0.505079 33 0 32.502 0 31.8882V4.06492Z" fill="#34323A"/>' +
         '<path d="M1.26857 0H28.4078C29.1066 0 29.6763 0.561678 29.6763 1.25075V4.06492H0V1.25075C0 0.561678 0.569682 0 1.26857 0Z" fill="#C9C9C9"/>' +
+        '<path d="M2.37269 3.0458C2.94031 3.0458 3.40046 2.59211 3.40046 2.03246C3.40046 1.47281 2.94031 1.01913 2.37269 1.01913C1.80506 1.01913 1.34491 1.47281 1.34491 2.03246C1.34491 2.59211 1.80506 3.0458 2.37269 3.0458Z" fill="#848484"/>' +
+        '<path d="M5.28571 3.0458C5.85334 3.0458 6.31349 2.59211 6.31349 2.03246C6.31349 1.47281 5.85334 1.01913 5.28571 1.01913C4.71809 1.01913 4.25793 1.47281 4.25793 2.03246C4.25793 2.59211 4.71809 3.0458 5.28571 3.0458Z" fill="#848484"/>' +
         '<path d="M14.7883 7.46973L4.90405 13.0923V24.349L7.54104 25.8487V14.5978L14.7883 10.4692L22.0415 14.5978V25.8487L24.6785 24.349V13.0923L14.7883 7.46973Z" fill="#F1BC1B"/>' +
         '<path d="M16.0862 26.2367L14.7883 26.9779L13.4492 26.2135V14.233L10.178 16.0975V27.3485L13.4492 29.213L14.7883 29.9773L16.0862 29.2362L19.4045 27.3485V16.0975L16.0862 14.2098V26.2367Z" fill="#F1BC1B"/>' +
         '</svg>' +
@@ -110,14 +112,14 @@
 
     var html = '' +
         // Ecosystem bar (desktop only) — scrolls away with the page.
-        '<div class="hidden lg:flex bg-charcoal items-center justify-center h-10 w-full">' +
+        '<div style="letter-spacing:0.6px" class="hidden lg:flex bg-charcoal items-center justify-center h-10 w-full">' +
             '<div class="max-w-7xl xl:max-w-[90rem] w-full flex items-center justify-between px-4 sm:px-6 lg:px-8">' +
                 '<div class="text-sm leading-[1.42] text-white font-bold">Explore the Magento<span class="text-[9px] align-super">&reg;</span> Open Source Ecosystem</div>' +
                 '<div class="flex items-center">' + ecosystemItems() + '</div>' +
             '</div>' +
         '</div>' +
         // Main header — sticky, fixed h-16 to align with `sticky top-16` quick-jump nav.
-        '<div class="sticky top-0 z-50 bg-white flex items-center h-16 w-full border-b border-gray-200 shadow-sm">' +
+        '<div style="letter-spacing:0.6px" class="sticky top-0 z-50 bg-white flex items-center h-16 w-full border-b border-gray-200 shadow-sm">' +
             '<div class="flex items-center justify-between w-full max-w-7xl xl:max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">' +
                 '<a href="/" class="inline-flex items-center" aria-label="Magento home">' + MAGENTO_LOGO + '</a>' +
                 '<div class="flex items-center gap-2 lg:gap-8">' +
@@ -137,7 +139,7 @@
         '</div>' +
         // Mobile overlay + panel.
         '<div data-mobile-menu-overlay class="hidden fixed inset-0 bg-charcoal/80 z-40 lg:hidden transition-opacity duration-200" aria-hidden="true"></div>' +
-        '<div data-mobile-menu-panel aria-hidden="true" class="hidden fixed top-0 right-0 h-full w-[26rem] max-w-[90%] bg-white shadow-2xl z-50 lg:hidden overflow-y-auto transform translate-x-full transition-transform duration-300 ease-out border-t-4 border-yellow">' +
+        '<div data-mobile-menu-panel style="letter-spacing:0.6px" aria-hidden="true" class="hidden fixed top-0 right-0 h-full w-[26rem] max-w-[90%] bg-white shadow-2xl z-50 lg:hidden overflow-y-auto transform translate-x-full transition-transform duration-300 ease-out border-t-4 border-yellow">' +
             '<div class="flex flex-col h-full">' +
                 '<div class="flex items-center justify-between px-6 py-5 border-b border-gray-200 bg-off-white">' +
                     '<h2 class="text-xl font-bold text-charcoal m-0">Menu</h2>' +
