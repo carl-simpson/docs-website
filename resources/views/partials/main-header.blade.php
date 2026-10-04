@@ -1,5 +1,5 @@
 {{-- Main Header - White header with logo and navigation from Figma --}}
-<div class="sticky top-0 z-50 bg-white flex items-center justify-center py-4 sm:py-6 lg:py-6 h-auto w-full border-b border-gray-200 shadow-sm">
+<div class="sticky top-0 z-50 bg-white flex items-center justify-center h-16 w-full border-b border-gray-200 shadow-sm">
     <div class="flex items-center justify-between w-full max-w-7xl xl:max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         {{-- Magento Logo --}}
         <div class="flex items-center">
