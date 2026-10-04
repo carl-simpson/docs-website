@@ -91,7 +91,7 @@
             var sep = i > 0 ? '<div class="h-10 w-px bg-gray-600"></div>' : '';
             return sep +
                 '<div class="bg-charcoal flex gap-2.5 items-center justify-start px-5 py-2.5 text-sm">' +
-                '<a href="' + l.href + '" target="_blank" rel="noopener" class="text-white font-bold no-underline hover:text-orange transition-colors duration-200">' + l.label + '</a>' +
+                '<a href="' + l.href + '" target="_blank" rel="noopener" class="text-white font-bold no-underline whitespace-nowrap hover:text-orange transition-colors duration-200">' + l.label + '</a>' +
                 arrowSvg + '</div>';
         }).join('');
     }
@@ -114,8 +114,8 @@
         // Ecosystem bar (desktop only) — scrolls away with the page.
         '<div style="letter-spacing:0.6px" class="hidden lg:flex bg-charcoal items-center justify-center h-10 w-full">' +
             '<div class="max-w-7xl xl:max-w-[90rem] w-full flex items-center justify-between px-4 sm:px-6 lg:px-8">' +
-                '<div class="text-sm leading-[1.42] text-white font-bold">Explore the Magento<span class="text-[9px] align-super">&reg;</span> Open Source Ecosystem</div>' +
-                '<div class="flex items-center">' + ecosystemItems() + '</div>' +
+                '<div class="hidden xl:block text-sm leading-[1.42] text-white font-bold">Explore the Magento<span class="text-[9px] align-super">&reg;</span> Open Source Ecosystem</div>' +
+                '<div class="flex items-center ml-auto">' + ecosystemItems() + '</div>' +
             '</div>' +
         '</div>' +
         // Main header — sticky, fixed h-16 to align with `sticky top-16` quick-jump nav.
