@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between w-full max-w-7xl xl:max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         {{-- Magento Logo --}}
         <div class="flex items-center">
-            <a href="/" class="inline-flex items-center no-underline" aria-label="Magento Open Source merchant documentation home">
+            <a href="/" class="inline-flex items-center no-underline" aria-label="Magento Merchant Docs home">
                 {{-- Same logo build as the landing page and developer docs: mark, name, section label --}}
                 <span class="inline-flex items-center gap-3">
                     <svg width="30" height="33" viewBox="0 0 30 33" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0" aria-hidden="true">

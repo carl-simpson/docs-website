@@ -121,7 +121,7 @@
         // Main header — sticky, fixed h-16 to align with `sticky top-16` quick-jump nav.
         '<div style="letter-spacing:0.6px" class="sticky top-0 z-50 bg-white flex items-center h-16 w-full border-b border-gray-200 shadow-sm">' +
             '<div class="flex items-center justify-between w-full max-w-7xl xl:max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">' +
-                '<a href="/" class="inline-flex items-center" aria-label="Magento home">' + MAGENTO_LOGO + '</a>' +
+                '<a href="/" class="inline-flex items-center" aria-label="Magento Developer Docs home">' + MAGENTO_LOGO + '</a>' +
                 '<div class="flex items-center gap-2 lg:gap-8">' +
                     // DocSearch renders its own button into this hidden slot; the visible
                     // triggers below open it, as on the merchant docs.

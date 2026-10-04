@@ -141,6 +141,17 @@ function initDocSearch() {
             triggerSearch();
         });
     }
+
+    // Search bar inside the merchant mobile menu: bound directly so it is recorded as the opener
+    // and focus returns to it (inside the open menu) when search closes.
+    const mobileMenuSearchBtn = document.getElementById('mobile-menu-search');
+    if (mobileMenuSearchBtn) {
+        mobileMenuSearchBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            opener = e.currentTarget;
+            triggerSearch();
+        });
+    }
 }
 
 // Check if DOM is already loaded (module scripts defer by default)

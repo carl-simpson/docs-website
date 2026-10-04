@@ -47,16 +47,6 @@ function initApp() {
         });
     }
 
-    // Connect mobile menu search to desktop search functionality
-    const desktopSearchBtn = document.getElementById('header-search');
-    const mobileMenuSearch = document.getElementById('mobile-menu-search');
-
-    if (mobileMenuSearch && desktopSearchBtn) {
-        mobileMenuSearch.addEventListener('click', () => {
-            desktopSearchBtn.click();
-        });
-    }
-
     import('./components/accessibility');
 }
 
