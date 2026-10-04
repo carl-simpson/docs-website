@@ -75,8 +75,10 @@
     <header class="bg-white border-b border-gray-200">
         <div class="max-w-7xl xl:max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <a href="/" class="inline-flex items-center no-underline flex-shrink-0">
-                    <svg width="30" height="33" viewBox="0 0 30 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <a href="/" class="inline-flex items-center no-underline flex-shrink-0" aria-label="Magento Documentation home">
+                    {{-- Same logo build as the developer and merchant docs: mark, name, section label --}}
+                    <span class="inline-flex items-center gap-3">
+                    <svg width="30" height="33" viewBox="0 0 30 33" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0" aria-hidden="true">
                         <path d="M0 4.06492H29.6763V31.8882C29.6763 32.502 29.1713 33 28.5487 33H1.12762C0.505079 33 0 32.502 0 31.8882V4.06492Z" fill="#34323A"/>
                         <path d="M1.26857 0H28.4078C29.1066 0 29.6763 0.561678 29.6763 1.25075V4.06492H0V1.25075C0 0.561678 0.569682 0 1.26857 0Z" fill="#C9C9C9"/>
                         <path d="M2.37269 3.0458C2.94031 3.0458 3.40046 2.59211 3.40046 2.03246C3.40046 1.47281 2.94031 1.01913 2.37269 1.01913C1.80506 1.01913 1.34491 1.47281 1.34491 2.03246C1.34491 2.59211 1.80506 3.0458 2.37269 3.0458Z" fill="#848484"/>
@@ -84,9 +86,11 @@
                         <path d="M14.7883 7.46973L4.90405 13.0923V24.349L7.54104 25.8487V14.5978L14.7883 10.4692L22.0415 14.5978V25.8487L24.6785 24.349V13.0923L14.7883 7.46973Z" fill="#F1BC1B"/>
                         <path d="M16.0862 26.2367L14.7883 26.9779L13.4492 26.2135V14.233L10.178 16.0975V27.3485L13.4492 29.213L14.7883 29.9773L16.0862 29.2362L19.4045 27.3485V16.0975L16.0862 14.2098V26.2367Z" fill="#F1BC1B"/>
                     </svg>
-                    <span class="ml-3 text-xl font-bold text-charcoal">Magento<span class="hidden sm:inline"> Documentation</span></span>
+                        <span class="text-xl font-bold text-charcoal leading-none">Magento</span>
+                        <span class="hidden sm:inline-block text-[11px] font-semibold uppercase tracking-wider text-charcoal-300 border-l border-gray-300 pl-2.5 pt-1">Documentation</span>
+                    </span>
                 </a>
-                <nav class="hidden md:flex items-center gap-6">
+                <nav class="hidden lg:flex items-center gap-6">
                     <a href="https://www.magentoassociation.org/home" target="_blank" rel="noopener" class="text-sm font-medium text-charcoal hover:text-orange transition-colors no-underline">Magento Association</a>
                     <a href="https://github.com/magento/magento2" target="_blank" rel="noopener" class="text-sm font-medium text-charcoal hover:text-orange transition-colors no-underline">GitHub</a>
                     <a href="https://community.magento.com/" target="_blank" rel="noopener" class="text-sm font-medium text-charcoal hover:text-orange transition-colors no-underline">Community</a>
@@ -103,7 +107,7 @@
                     </button>
                 </nav>
                 {{-- Mobile search + burger --}}
-                <div class="md:hidden flex items-center gap-2">
+                <div class="lg:hidden flex items-center gap-2">
                     <button
                         type="button"
                         class="flex items-center justify-center w-[2.5rem] h-[2.5rem] rounded-lg hover:bg-off-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-opacity-50"
@@ -114,7 +118,7 @@
                             <path d="M8 16C9.77498 15.9996 11.4988 15.4054 12.897 14.312L17.293 18.708L18.707 17.294L14.311 12.898C15.405 11.4997 15.9996 9.77544 16 8C16 3.589 12.411 0 8 0C3.589 0 0 3.589 0 8C0 12.411 3.589 16 8 16ZM8 2C11.309 2 14 4.691 14 8C14 11.309 11.309 14 8 14C4.691 14 2 11.309 2 8C2 4.691 4.691 2 8 2Z" fill="#F26423"/>
                         </svg>
                     </button>
-                <button data-landing-menu-toggle type="button" class="md:hidden inline-flex items-center justify-center w-[2.5rem] h-[2.5rem] text-charcoal hover:text-orange focus:outline-none focus:ring-2 focus:ring-orange" aria-label="Open menu" aria-expanded="false">
+                <button data-landing-menu-toggle type="button" class="inline-flex items-center justify-center w-[2.5rem] h-[2.5rem] text-charcoal hover:text-orange focus:outline-none focus:ring-2 focus:ring-orange" aria-label="Open menu" aria-expanded="false">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
                 </div>
@@ -122,7 +126,7 @@
         </div>
 
         {{-- Mobile slide-out menu (vanilla JS — self-contained, no framework dependency) --}}
-        <div class="md:hidden">
+        <div class="lg:hidden">
             {{-- Overlay --}}
             <div data-landing-menu-overlay class="hidden fixed inset-0 bg-charcoal/80 z-40 transition-opacity duration-200 opacity-0" aria-hidden="true"></div>
             {{-- Panel --}}
