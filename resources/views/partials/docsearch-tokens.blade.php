@@ -15,7 +15,7 @@
         // quotes or ampersands, so anything that needs escaping is rejected instead.
         foreach (['light', 'dark'] as $mode) {
             foreach ($decoded[$mode] as $name => $value) {
-                if (! is_string($name) || ! preg_match('/^--[a-z0-9-]+$/', $name)
+                if (! is_string($name) || ! preg_match('/^--[a-z0-9-]+$/D', $name)
                     || ! is_string($value) || preg_match('/["\'&<>{};]/', $value)) {
                     throw new \UnexpectedValueException('invalid token ' . $mode . '.' . (is_string($name) ? $name : '?'));
                 }

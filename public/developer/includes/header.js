@@ -40,6 +40,19 @@
         SCRIPT_SRC.replace(/[^\/?#]*([?#].*)?$/, '') + 'docsearch-tokens.css' :
         'includes/docsearch-tokens.css';
 
+    // Header search trigger: the same control as the merchant docs header
+    // (resources/views/partials/main-header.blade.php, #header-search). Hidden until
+    // DocSearch has mounted, so a failed CDN load never leaves a dead icon.
+    var SEARCH_ICON =
+        '<svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+            '<path d="M8 16C9.77498 15.9996 11.4988 15.4054 12.897 14.312L17.293 18.708L18.707 17.294L14.311 12.898C15.405 11.4997 15.9996 9.77544 16 8C16 3.589 12.411 0 8 0C3.589 0 0 3.589 0 8C0 12.411 3.589 16 8 16ZM8 2C11.309 2 14 4.691 14 8C14 11.309 11.309 14 8 14C4.691 14 2 11.309 2 8C2 4.691 4.691 2 8 2Z" fill="#F26423"/>' +
+        '</svg>';
+    var SEARCH_TRIGGER_CLASS = 'flex items-center justify-center w-10 h-10 rounded-lg hover:bg-off-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-opacity-50';
+
+    function searchTrigger(id, extraClass) {
+        return '<button type="button" id="' + id + '" class="' + (extraClass ? extraClass + ' ' : '') + SEARCH_TRIGGER_CLASS + '" aria-label="Search the documentation" style="display:none">' + SEARCH_ICON + '</button>';
+    }
+
     // Magento box mark (icon only) + text wordmark + section label. The icon is
     // the recognisable Magento hexagon-in-box; the text identifies it as the
     // Magento Open Source Developer Documentation.
@@ -108,14 +121,16 @@
             '<div class="flex items-center justify-between w-full max-w-7xl xl:max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">' +
                 '<a href="/" class="inline-flex items-center" aria-label="Magento home">' + MAGENTO_LOGO + '</a>' +
                 '<div class="flex items-center gap-2 lg:gap-8">' +
-                    // Single search slot for every breakpoint: DocSearch renders its
-                    // own button here (icon only below 768px). Empty if the CDN fails.
-                    '<div id="docsearch" class="flex items-center"></div>' +
+                    // DocSearch renders its own button into this hidden slot; the visible
+                    // triggers below open it, as on the merchant docs.
+                    '<div id="docsearch" style="display:none"></div>' +
+                    searchTrigger('mobile-header-search', 'lg:hidden') +
                     '<button data-mobile-menu-toggle class="lg:hidden flex items-center justify-center w-10 h-10 text-charcoal hover:text-orange transition-all focus:outline-none focus:ring-2 focus:ring-orange" aria-label="Toggle navigation menu" aria-expanded="false">' +
                         '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>' +
                     '</button>' +
                     '<div class="hidden lg:flex items-center gap-8">' +
                         '<nav class="flex flex-row gap-x-6 lg:gap-x-7 xl:gap-x-8 items-center">' + desktopNav() + '</nav>' +
+                        searchTrigger('header-search') +
                     '</div>' +
                 '</div>' +
             '</div>' +
@@ -211,8 +226,9 @@
             window.setTimeout(function () {
                 var active = document.activeElement;
                 if (active && active !== document.body) { return; }
-                var target = visible(from) ? from : slot.querySelector('.DocSearch-Button');
-                if (visible(target)) { target.focus({ preventScroll: true }); }
+                var target = [from, document.getElementById('header-search'), document.getElementById('mobile-header-search')]
+                    .filter(visible)[0];
+                if (target) { target.focus({ preventScroll: true }); }
             }, 0);
         }
 
@@ -220,9 +236,15 @@
             return node.nodeType === 1 && node.classList.contains('DocSearch-Container');
         }
 
-        slot.addEventListener('click', function (e) {
-            var button = e.target.closest ? e.target.closest('.DocSearch-Button') : null;
-            if (button) { opener = button; }
+        ['header-search', 'mobile-header-search'].forEach(function (id) {
+            var trigger = document.getElementById(id);
+            if (!trigger) { return; }
+            trigger.addEventListener('click', function () {
+                var button = slot.querySelector('.DocSearch-Button');
+                if (!button) { return; }
+                opener = trigger;
+                button.click();
+            });
         });
 
         new MutationObserver(function (records) {
@@ -252,6 +274,12 @@
                 }
             }
         });
+        if (slot.querySelector('.DocSearch-Button')) {
+            ['header-search', 'mobile-header-search'].forEach(function (id) {
+                var trigger = document.getElementById(id);
+                if (trigger) { trigger.style.display = ''; }
+            });
+        }
     }
 
     function mountDocSearchSafely() {
