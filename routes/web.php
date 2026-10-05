@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ContributorsController;
 use App\Http\Controllers\DocsController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\WebhookController;
 
@@ -25,6 +26,9 @@ Route::middleware('throttle:120,1')->group(function () {
     Route::get("team", [TeamController::class, "index"])->name("team");
 
     Route::get("contributors", [ContributorsController::class, "index"])->name("contributors");
+
+    // Built from the merchant navigation and the developer files; robots.txt points here.
+    Route::get("sitemap.xml", [SitemapController::class, "index"])->name("sitemap");
 });
 
 // GitHub webhook for docs sync (excluded from throttling)
