@@ -46,6 +46,8 @@
     var PLACES = 10;
     // A page carrying this placeholder is the contributors page: render the full variant there.
     var FULL_TARGET_ID = 'dev-contributors-full';
+    // A hub page (developer home, section indexes) carries this placeholder: render the compact block there.
+    var HUB_TARGET_ID = 'dev-contributor-box';
     // Breathing room left under a capped sticky panel so the last control is not flush to the edge.
     var STICKY_GAP = 24;
     var LINE = 'border-[#e4e2e0]';
@@ -315,17 +317,19 @@
             '</div>';
     }
 
-    function ways(editUrl, full) {
+    // repoCard: hub pages and the contributors page have no source file of their own, so the
+    // improve card opens the repository and says so.
+    function ways(editUrl, repoCard) {
         var cols = editUrl ? 'md:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]' : '';
-        return '<div class="grid grid-cols-1 ' + cols + '">' + ideaCard() + (editUrl ? editCard(editUrl, full) : '') + '</div>';
+        return '<div class="grid grid-cols-1 ' + cols + '">' + ideaCard() + (editUrl ? editCard(editUrl, repoCard) : '') + '</div>';
     }
 
-    function boxHtml(list, editUrl, full) {
+    function boxHtml(list, editUrl, full, hub) {
         return '' +
             '<section data-dev-cbox' + (full ? ' data-dev-cbox-full' : '') + ' class="' + (full ? 'mt-0 mb-10' : 'mt-9 mb-10') + ' border-2 border-charcoal bg-white font-sans text-charcoal [overflow-wrap:anywhere]" aria-labelledby="dev-cbox-title">' +
                 head(list, full) +
                 (full ? places(list, full) + top10(list, full) : '') +
-                ways(editUrl, full) +
+                ways(editUrl, full || hub) +
                 '<div class="flex flex-wrap justify-between gap-x-4 gap-y-1.5 px-6 py-[11px] border-t ' + LINE + ' text-xs text-charcoal-300">' +
                     '<span>' + INFO_ICON + 'Ideas and edits on GitHub are public.</span>' +
                     '<span>Emailed ideas go straight to the docs team.</span>' +
@@ -491,7 +495,7 @@
         function update() {
             var panelLink = document.querySelector('[data-cbox-sticky] a[data-cbox-sticky-link]');
             var panelShown = !!panelLink && panelLink.getClientRects().length > 0;
-            var boxShown = onScreen(document.querySelector('[data-dev-cbox]'));
+            var boxShown = onScreen(document.querySelector('[aria-label="Top Contributors"]'));
             link.style.display = panelShown || boxShown ? 'none' : '';
         }
         var queued = false;
@@ -506,6 +510,77 @@
         update();
         return schedule;
     }
+
+    /* ---------- Article pages: the original top-contributors row (as on the live site) ---------- */
+
+    // Ported unchanged from the pre-widget contributors.js (Carl, 2026-10-05: article pages keep
+    // the avatars; the new block lives on hub pages and the contributors page).
+    // Dev-docs scoped: the commit history of the developer/ folder.
+    var ROW_REPO_URL = 'https://github.com/magentoopensource/docs/commits/main/developer';
+    var RANK = [
+        'bg-yellow-400 text-yellow-900 ring-2 ring-yellow-500',
+        'bg-gray-300 text-gray-700 ring-2 ring-gray-400',
+        'bg-orange-300 text-orange-800 ring-2 ring-orange-400'
+    ];
+
+    function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    function contributorsSection(contribs) {
+        if (!Array.isArray(contribs) || contribs.length === 0) { return ''; }
+        var cards = contribs.slice(0, 3).map(function (c, i) {
+            var count = Number(c.contributions || 0).toLocaleString();
+            return '' +
+                '<a href="' + esc(c.html_url) + '" target="_blank" rel="noopener noreferrer" ' +
+                'title="' + esc(c.login) + ' — ' + count + ' contributions" ' +
+                'class="group relative flex items-center gap-3 px-4 py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-gray-300 transition-all duration-150 no-underline">' +
+                    '<img src="' + esc(c.avatar_url) + '" alt="' + esc(c.login) + '" class="w-8 h-8 ring-2 ring-white" loading="lazy" width="32" height="32" />' +
+                    '<span class="text-sm font-medium text-gray-700 group-hover:text-gray-900">' + esc(c.login) + '</span>' +
+                    '<span class="text-xs px-2 py-1 bg-orange-100 text-orange-700 font-medium">' + count + '</span>' +
+                    '<span class="absolute -top-2 -right-2 flex items-center justify-center w-5 h-5 text-[10px] font-bold shadow-sm ' + (RANK[i] || RANK[2]) + '">' + (i + 1) + '</span>' +
+                '</a>';
+        }).join('');
+        return '' +
+            '<div class="flex-1" role="region" aria-label="Top Contributors">' +
+                '<h2 class="text-sm font-semibold uppercase tracking-wider text-charcoal-300 mb-4">Top Contributors</h2>' +
+                '<div class="flex flex-wrap items-center gap-3">' + cards + '</div>' +
+                '<div class="mt-4">' +
+                    '<a href="' + ROW_REPO_URL + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors no-underline">' +
+                        'View all contributors' +
+                        '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>' +
+                    '</a>' +
+                '</div>' +
+            '</div>';
+    }
+
+    function rowEditSection(editUrl) {
+        if (!editUrl) { return ''; }
+        return '' +
+            '<div class="flex-shrink-0 sm:text-right">' +
+                '<a href="' + esc(editUrl) + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-150 no-underline">' +
+                    '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>' +
+                    'Edit this page on GitHub' +
+                '</a>' +
+            '</div>';
+    }
+
+    function rowHtml(contribs, editUrl) {
+        var left = contributorsSection(contribs);
+        var right = rowEditSection(editUrl);
+        if (!left && !right) { return ''; }
+        // No page-width wrapper: the widget fills its host container (the #dev-contributors
+        // placeholder inside the article column on content pages), matching the merchant docs.
+        return '' +
+            '<div class="mt-16 pt-8 border-t border-gray-200">' +
+                '<div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-8">' +
+                    left + right +
+                '</div>' +
+            '</div>';
+    }
+
 
     /* ---------- Injection ---------- */
 
@@ -529,21 +604,40 @@
         bind(node);
     }
 
-    function init() {
-        var fullTarget = document.getElementById(FULL_TARGET_ID);
-        var full = !!fullTarget;
-        var meta = document.querySelector('meta[name="edit-url"]');
-        // The contributors page has no upstream source file, so its edit card goes to the repo root.
-        var editUrl = full ? REPO_ROOT_URL : safeUrl(meta ? meta.getAttribute('content') : '');
+    function injectRow(html) {
+        if (!html) { return; }
+        var container = document.createElement('div');
+        container.innerHTML = html;
+        var node = container.firstChild;
+        var target = document.getElementById('dev-contributors');
+        if (target) { target.appendChild(node); return; }
+        var footer = document.querySelector('footer');
+        if (footer && footer.parentNode) { footer.parentNode.insertBefore(node, footer); } else { document.body.appendChild(node); }
+    }
 
+    function init() {
+        // Three placements (Carl, 2026-10-05):
+        //   contributors page  <div id="dev-contributors-full">  the full block (podium, top 10, cards)
+        //   hub pages          <div id="dev-contributor-box">    the compact block (heading + cards)
+        //   article pages      everything else                    the original top-contributors row
+        var fullTarget = document.getElementById(FULL_TARGET_ID);
+        var hubTarget = document.getElementById(HUB_TARGET_ID);
+        var data = fetch('contributors.json', { cache: 'no-cache' })
+            .then(function (r) { return r.ok ? r.json() : []; })
+            .catch(function () { return []; });
+
+        if (fullTarget || hubTarget) {
+            // Neither has a source file of its own, so the improve card goes to the repo root.
+            data.then(function (d) { inject(boxHtml(normalise(d), REPO_ROOT_URL, !!fullTarget, !!hubTarget), fullTarget || hubTarget); });
+            return;
+        }
+
+        var meta = document.querySelector('meta[name="edit-url"]');
+        var editUrl = safeUrl(meta ? meta.getAttribute('content') : '');
         // Independent of the contributor data, and the page's TOC is already built by now.
         stickyIdea();
-        var refloat = full ? null : floatingIdea();
-
-        fetch('contributors.json', { cache: 'no-cache' })
-            .then(function (r) { return r.ok ? r.json() : []; })
-            .then(function (data) { inject(boxHtml(normalise(data), editUrl, full), fullTarget); })
-            .catch(function () { inject(boxHtml([], editUrl, full), fullTarget); }) // the ways to contribute still render
+        var refloat = floatingIdea();
+        data.then(function (d) { injectRow(rowHtml(d, editUrl)); })
             .then(function () { if (refloat) { refloat(); } });
     }
 

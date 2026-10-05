@@ -476,6 +476,11 @@
     </section>
 
     {{-- Footer --}}
+    {{-- Contributor block (compact): hub pages get it; article pages keep the top-contributors row --}}
+    <div class="w-full max-w-7xl xl:max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <x-contributor-box :hub="true" :page-title="'Magento Documentation'" />
+    </div>
+
     <footer class="bg-charcoal text-white">
         <div class="max-w-7xl xl:max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div class="grid md:grid-cols-3 gap-8 items-center">

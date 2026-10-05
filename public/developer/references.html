@@ -86,6 +86,8 @@
     <!-- Header -->
     <!-- Shared header — single source of truth -->
     <script src="includes/header.js"></script>
+    <!-- Contributor block (reads locally-baked contributors.json) -->
+    <script src="includes/contributors.js"></script>
     <!-- Page Header -->
     <section class="bg-white border-b border-gray-200">
         <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
@@ -208,6 +210,9 @@
             </a>
         </div>
     </section>
+
+    <!-- Contributor block (compact): hub pages get it; article pages keep the top-contributors row -->
+    <div id="dev-contributor-box" class="max-w-7xl xl:max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 pb-16"></div>
 
     <!-- Footer -->
     <footer class="relative pt-12 bg-white border-t border-charcoal">

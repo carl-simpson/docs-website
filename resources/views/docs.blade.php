@@ -141,7 +141,7 @@
 
             {{-- Floating "Suggest an idea" (Vijay's feedback, Carl 2026-10-04): shown wherever the
                  panel button above is not (below xl, or no "On this page" panel), and hidden while
-                 the contributor box at the bottom is on screen. Same docs-topic form. --}}
+                 the contributors row at the bottom is on screen. Same docs-topic form. --}}
             <a
                 data-gh-cbox-float
                 href="{{ $stickyIdeaUrl }}"
@@ -165,7 +165,7 @@
                     function update() {
                         var panel = document.querySelector('[data-gh-sticky-link]');
                         var panelShown = !!panel && panel.getClientRects().length > 0;
-                        link.style.display = panelShown || onScreen(document.querySelector('[data-gh-cbox]')) ? 'none' : '';
+                        link.style.display = panelShown || onScreen(document.querySelector('[aria-label="Top Contributors"]')) ? 'none' : '';
                     }
                     var queued = false;
                     function schedule() {

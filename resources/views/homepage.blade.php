@@ -166,4 +166,9 @@
             </div>
         </div>
     </section>
+
+    {{-- Contributor block (compact): hub pages get it; article pages keep the top-contributors row --}}
+    <div class="w-full max-w-7xl xl:max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <x-contributor-box :hub="true" :page-title="'Merchant Documentation'" />
+    </div>
 @endsection

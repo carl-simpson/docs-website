@@ -17,7 +17,7 @@
             </p>
         </div>
 
-        <x-github-contributors
+        <x-contributor-box
             :contributors="$contributors"
             :edit-url="'https://github.com/magentoopensource/docs'"
             :page-title="'Contributors'"
