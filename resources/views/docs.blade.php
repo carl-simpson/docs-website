@@ -109,8 +109,24 @@
                         @endforeach
                     </nav>
 
-                    {{-- Back to Top --}}
-                    <div class="mt-8 pt-6 border-t border-gray-200 flex-none">
+                    {{-- Sticky "Suggest an idea" (D9). At the foot of the page this divider lines up with the
+                         contributor row's top border and the button with "Edit this page on GitHub":
+                         51px = the row's 32px top padding + its 19px "Written by the community" label. --}}
+                    <div class="mt-8 pt-[51px] border-t border-gray-200 flex-none">
+                        <a
+                            data-gh-sticky-link
+                            href="{{ $stickyIdeaUrl }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="flex items-center justify-center gap-2 h-11 px-3 bg-red-600 border-2 border-red-600 text-white text-sm font-semibold no-underline focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2"
+                        >
+                            <svg class="w-4 h-4 flex-none" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                            Suggest an idea<span class="sr-only"> (opens GitHub in a new tab)</span>
+                        </a>
+                    </div>
+
+                    {{-- Back to Top: underneath the idea button (Carl, 2026-10-05) --}}
+                    <div class="mt-3 flex-none">
                         <a
                             href="#"
                             class="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-orange-600 transition-colors no-underline focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2"
@@ -119,20 +135,6 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
                             </svg>
                             Back to top
-                        </a>
-                    </div>
-
-                    {{-- Sticky "Suggest an idea" (D9) --}}
-                    <div class="mt-4 flex-none">
-                        <a
-                            data-gh-sticky-link
-                            href="{{ $stickyIdeaUrl }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="flex items-center justify-center gap-2 px-3 py-2.5 bg-red-600 border-2 border-red-600 text-white text-sm font-semibold no-underline focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2"
-                        >
-                            <svg class="w-4 h-4 flex-none" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-                            Suggest an idea<span class="sr-only"> (opens GitHub in a new tab)</span>
                         </a>
                     </div>
                 </div>

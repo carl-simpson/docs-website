@@ -259,9 +259,9 @@
         return '' +
             '<label class="relative block ' + extraClass + '">' +
                 '<input type="radio" name="dev-idea-type" value="' + esc(value) + '"' + (checked ? ' checked' : '') + ' class="peer absolute inset-0 z-10 m-0 w-full h-full opacity-0 cursor-pointer" />' +
-                '<span class="grid gap-px h-full px-3 py-[9px] cursor-pointer text-charcoal peer-[:not(:checked):hover]:bg-[#f5f3f1] peer-checked:bg-charcoal peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-[3px] peer-focus-visible:-outline-offset-[3px] peer-focus-visible:outline-orange">' +
+                '<span class="grid gap-px h-full px-3 ' + (hint ? 'py-[9px]' : 'py-[7px]') + ' cursor-pointer text-charcoal peer-[:not(:checked):hover]:bg-[#f5f3f1] peer-checked:bg-charcoal peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-[3px] peer-focus-visible:-outline-offset-[3px] peer-focus-visible:outline-orange">' +
                     '<strong class="text-[13px] font-semibold">' + esc(label) + '</strong>' +
-                    '<small class="text-[11.5px] leading-[1.35] opacity-80">' + esc(hint) + '</small>' +
+                    (hint ? '<small class="text-[11.5px] leading-[1.35] opacity-80">' + esc(hint) + '</small>' : '') +
                 '</span>' +
             '</label>';
     }
@@ -337,6 +337,48 @@
             '</section>';
     }
 
+    // Compact block for hub pages (Carl, 2026-10-05): heading, then one row with the idea choice,
+    // Suggest on GitHub, Email us and the repository link. Same hooks as the full box, so bind() works.
+    function compactHtml(repoUrl) {
+        var label = 'm-0 text-sm font-bold text-charcoal';
+        return '' +
+            '<section data-dev-cbox data-dev-cbox-compact class="mt-9 mb-10 border-2 border-charcoal bg-white font-sans text-charcoal [overflow-wrap:anywhere]" aria-labelledby="dev-cbox-title">' +
+                '<div class="px-5 sm:px-6 py-5">' +
+                    '<div class="inline-flex items-center gap-2 mb-2 font-mono text-[11px] font-medium leading-none tracking-[0.12em] uppercase text-orange-700">' +
+                        '<i class="inline-block w-2.5 h-2.5 bg-orange" aria-hidden="true"></i>Written by the community' +
+                    '</div>' +
+                    '<h2 id="dev-cbox-title" class="m-0 text-lg sm:text-xl leading-tight font-extrabold tracking-[-0.015em] text-charcoal [text-wrap:balance]">Help build the Magento docs, and get your name on them</h2>' +
+                    '<div class="grid gap-4 mt-4 pt-4 border-t ' + LINE + ' lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-x-8">' +
+                        '<div data-cbox-idea class="flex flex-wrap items-center gap-x-4 gap-y-2.5">' +
+                            '<h3 class="' + label + '">Suggest an idea</h3>' +
+                            '<fieldset class="m-0 p-0 border-0 min-w-0">' +
+                                '<legend class="sr-only">What kind of idea is it?</legend>' +
+                                '<div class="grid grid-cols-2 border border-charcoal">' +
+                                    ideaChoice('content', 'A docs topic', '', true, '') +
+                                    ideaChoice('website', 'This website', '', false, 'border-l border-charcoal') +
+                                '</div>' +
+                            '</fieldset>' +
+                            '<div class="flex flex-wrap items-center gap-x-4 gap-y-2.5">' +
+                                '<a data-dev-idea-github href="' + esc(ideaGithubUrl('content')) + '" target="_blank" rel="noopener noreferrer" ' +
+                                'class="inline-flex items-center justify-center gap-2 px-[15px] py-2 bg-orange-700 hover:bg-orange-800 border-2 border-orange-700 hover:border-orange-800 text-white hover:text-white text-sm font-semibold no-underline ' + FOCUS.replace('outline-orange', 'outline-charcoal') + '">' +
+                                    GITHUB_MARK + 'Suggest on GitHub<span class="sr-only"> (opens in a new tab)</span>' +
+                                '</a>' +
+                                '<a data-dev-idea-mail href="#" ' +
+                                'class="py-1 text-[13px] font-medium text-charcoal underline decoration-orange decoration-2 underline-offset-4 hover:text-orange-700 ' + FOCUS + '">Email us</a>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div data-cbox-edit class="flex flex-wrap items-center gap-x-4 gap-y-2.5 lg:pl-8 lg:border-l ' + LINE + '">' +
+                            '<h3 class="' + label + '">Improve a page</h3>' +
+                            '<a data-cbox-edit-link href="' + esc(repoUrl) + '" target="_blank" rel="noopener noreferrer" ' +
+                            'class="inline-flex items-center justify-center gap-2 px-[15px] py-2 bg-white hover:bg-charcoal border-2 border-charcoal text-charcoal hover:text-white text-sm font-semibold no-underline ' + FOCUS + '">' +
+                                EDIT_ICON + 'Open the docs repository<span class="sr-only"> (opens in a new tab)</span>' +
+                            '</a>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</section>';
+    }
+
     /* ---------- Behaviour (bound after injection; no inline handlers) ---------- */
 
     function bind(box) {
@@ -387,12 +429,15 @@
     var STICKY_CSS = '' +
         '.toc-sidebar a[data-cbox-sticky-link],a[data-cbox-sticky-link]{' +
             'display:flex;align-items:center;justify-content:center;gap:.5rem;' +
-            'margin:0;padding:.625rem .75rem;border:2px solid #bc3312;background:#bc3312;' +
+            'box-sizing:border-box;height:2.75rem;margin:0;padding:0 .75rem;border:2px solid #bc3312;background:#bc3312;' +
             'color:#fff;font-size:.8125rem;font-weight:600;line-height:1.25;text-decoration:none;' +
             'transition:background-color .15s ease,border-color .15s ease;}' +
         '.toc-sidebar a[data-cbox-sticky-link]:hover,a[data-cbox-sticky-link]:hover{' +
             'background:#962a16;border-color:#962a16;color:#fff;}' +
         'a[data-cbox-sticky-link]:focus-visible{outline:3px solid #2c2c2c;outline-offset:2px;}' +
+        // "Back to top" sits underneath the idea button, so it drops its own divider (Carl, 2026-10-05).
+        '.toc-sidebar [data-cbox-sticky] + .toc-back-to-top{margin-top:.75rem;padding-top:0;border-top:0;}' +
+        '.toc-sidebar [data-cbox-sticky] + .toc-back-to-top a{padding-top:0;padding-bottom:0;line-height:1.25rem;}' +
         // Floating twin for narrower screens and pages without the panel (bottom-right corner).
         'a[data-cbox-float]{position:fixed;right:16px;bottom:16px;z-index:30;' +
             'box-shadow:0 4px 14px rgba(0,0,0,.18);}';
@@ -440,13 +485,17 @@
         stickyStyle();
         var wrap = document.createElement('div');
         wrap.setAttribute('data-cbox-sticky', '');
-        wrap.className = 'mt-5 pt-4 border-t ' + LINE;
+        // At the foot of the page this divider lines up with the contributor row's top border and
+        // the button with "Edit this page on GitHub": 51px = the row's 32px top padding + its 19px label.
+        wrap.className = 'mt-6 pt-[51px] border-t ' + LINE;
         // One action only: the docs-topic issue form from the shared contract (§6).
         wrap.innerHTML = '' +
             '<a data-cbox-sticky-link href="' + esc(ideaGithubUrl('content')) + '" target="_blank" rel="noopener noreferrer">' +
                 GITHUB_MARK + '<span>Suggest an idea</span><span class="sr-only"> (opens in a new tab)</span>' +
             '</a>';
-        panel.appendChild(wrap);
+        // Above "Back to top", which moves underneath the button (Carl, 2026-10-05).
+        var back = panel.querySelector('.toc-back-to-top');
+        if (back) { panel.insertBefore(wrap, back); } else { panel.appendChild(wrap); }
 
         var link = wrap.querySelector('[data-cbox-sticky-link]');
         function sync() { link.setAttribute('href', ideaGithubUrl('content')); }
@@ -511,73 +560,52 @@
         return schedule;
     }
 
-    /* ---------- Article pages: the original top-contributors row (as on the live site) ---------- */
+    /* ---------- Article pages: the contributor row ---------- */
 
-    // Ported unchanged from the pre-widget contributors.js (Carl, 2026-10-05: article pages keep
-    // the avatars; the new block lives on hub pages and the contributors page).
-    // Dev-docs scoped: the commit history of the developer/ folder.
-    var ROW_REPO_URL = 'https://github.com/magentoopensource/docs/commits/main/developer';
-    var RANK = [
-        'bg-yellow-400 text-yellow-900 ring-2 ring-yellow-500',
-        'bg-gray-300 text-gray-700 ring-2 ring-gray-400',
-        'bg-orange-300 text-orange-800 ring-2 ring-orange-400'
-    ];
-
-    function esc(s) {
-        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
-            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-        });
-    }
+    // Restyled in line with the contributor block (Carl, 2026-10-05): avatars only (names stay
+    // available to screen readers), linking to our contributors page, and "Edit this page on
+    // GitHub" as a black button. Same layout and sizes as the merchant row (github-contributors.blade.php).
+    var CONTRIBUTORS_PAGE = 'contributors.html';
 
     function contributorsSection(contribs) {
         if (!Array.isArray(contribs) || contribs.length === 0) { return ''; }
-        var cards = contribs.slice(0, 3).map(function (c, i) {
-            var count = Number(c.contributions || 0).toLocaleString();
-            return '' +
-                '<a href="' + esc(c.html_url) + '" target="_blank" rel="noopener noreferrer" ' +
-                'title="' + esc(c.login) + ' — ' + count + ' contributions" ' +
-                'class="group relative flex items-center gap-3 px-4 py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-gray-300 transition-all duration-150 no-underline">' +
-                    '<img src="' + esc(c.avatar_url) + '" alt="' + esc(c.login) + '" class="w-8 h-8 ring-2 ring-white" loading="lazy" width="32" height="32" />' +
-                    '<span class="text-sm font-medium text-gray-700 group-hover:text-gray-900">' + esc(c.login) + '</span>' +
-                    '<span class="text-xs px-2 py-1 bg-orange-100 text-orange-700 font-medium">' + count + '</span>' +
-                    '<span class="absolute -top-2 -right-2 flex items-center justify-center w-5 h-5 text-[10px] font-bold shadow-sm ' + (RANK[i] || RANK[2]) + '">' + (i + 1) + '</span>' +
-                '</a>';
+        var top = contribs.slice(0, 5);
+        var avatars = top.map(function (c, i) {
+            return '<img src="' + esc(safeUrl(c.avatar_url)) + '" alt="" width="44" height="44" loading="lazy" ' +
+                'class="block w-11 h-11 max-w-none m-0 object-cover bg-[#f1f1f1] border-2 border-white outline outline-1 outline-[#e5e7eb]' + (i ? ' -ml-2' : '') + '" />';
         }).join('');
         return '' +
-            '<div class="flex-1" role="region" aria-label="Top Contributors">' +
-                '<h2 class="text-sm font-semibold uppercase tracking-wider text-charcoal-300 mb-4">Top Contributors</h2>' +
-                '<div class="flex flex-wrap items-center gap-3">' + cards + '</div>' +
-                '<div class="mt-4">' +
-                    '<a href="' + ROW_REPO_URL + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors no-underline">' +
-                        'View all contributors' +
-                        '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>' +
-                    '</a>' +
+            '<div role="region" aria-label="Top Contributors" class="flex flex-col items-start">' +
+                '<div class="flex items-center gap-2 mb-2 font-mono text-[11px] font-medium leading-none tracking-[0.12em] uppercase text-orange-700">' +
+                    '<i class="inline-block w-2 h-2 bg-orange" aria-hidden="true"></i>Written by the community' +
                 '</div>' +
+                '<a href="' + CONTRIBUTORS_PAGE + '" class="group inline-flex items-center gap-2.5 text-sm font-medium text-charcoal no-underline ' + FOCUS + '">' +
+                    '<span class="inline-flex" aria-hidden="true">' + avatars + '</span>' +
+                    '<span class="group-hover:underline decoration-orange decoration-2 underline-offset-4">Meet the contributors</span>' +
+                    '<span class="sr-only">: ' + top.map(function (c) { return esc(c.login); }).join(', ') + '</span>' +
+                    '<svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>' +
+                '</a>' +
             '</div>';
     }
 
     function rowEditSection(editUrl) {
         if (!editUrl) { return ''; }
         return '' +
-            '<div class="flex-shrink-0 sm:text-right">' +
-                '<a href="' + esc(editUrl) + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-150 no-underline">' +
-                    '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>' +
-                    'Edit this page on GitHub' +
-                '</a>' +
-            '</div>';
+            '<a href="' + esc(editUrl) + '" target="_blank" rel="noopener noreferrer" ' +
+            'class="inline-flex items-center gap-2 h-11 px-4 bg-charcoal hover:bg-charcoal-400 border-2 border-charcoal hover:border-charcoal-400 text-white hover:text-white text-sm font-semibold no-underline ' + FOCUS + '">' +
+                EDIT_ICON + 'Edit this page on GitHub<span class="sr-only"> (opens in a new tab)</span>' +
+            '</a>';
     }
 
     function rowHtml(contribs, editUrl) {
         var left = contributorsSection(contribs);
         var right = rowEditSection(editUrl);
         if (!left && !right) { return ''; }
-        // No page-width wrapper: the widget fills its host container (the #dev-contributors
+        // No page-width wrapper: the row fills its host container (the #dev-contributors
         // placeholder inside the article column on content pages), matching the merchant docs.
         return '' +
-            '<div class="mt-16 pt-8 border-t border-gray-200">' +
-                '<div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-8">' +
-                    left + right +
-                '</div>' +
+            '<div data-contributor-row class="mt-16 pt-8 pb-8 border-t border-gray-200 flex flex-wrap items-end justify-between gap-x-6 gap-y-5">' +
+                left + right +
             '</div>';
     }
 
@@ -618,17 +646,22 @@
     function init() {
         // Three placements (Carl, 2026-10-05):
         //   contributors page  <div id="dev-contributors-full">  the full block (podium, top 10, cards)
-        //   hub pages          <div id="dev-contributor-box">    the compact block (heading + cards)
+        //   hub pages          <div id="dev-contributor-box">    the compact block (heading + one row of actions)
         //   article pages      everything else                    the original top-contributors row
         var fullTarget = document.getElementById(FULL_TARGET_ID);
         var hubTarget = document.getElementById(HUB_TARGET_ID);
+        if (hubTarget && !fullTarget) {
+            // The compact block shows no contributors, so it needs no data.
+            inject(compactHtml(REPO_ROOT_URL), hubTarget);
+            return;
+        }
         var data = fetch('contributors.json', { cache: 'no-cache' })
             .then(function (r) { return r.ok ? r.json() : []; })
             .catch(function () { return []; });
 
-        if (fullTarget || hubTarget) {
-            // Neither has a source file of its own, so the improve card goes to the repo root.
-            data.then(function (d) { inject(boxHtml(normalise(d), REPO_ROOT_URL, !!fullTarget, !!hubTarget), fullTarget || hubTarget); });
+        if (fullTarget) {
+            // No source file of its own, so the improve card goes to the repo root.
+            data.then(function (d) { inject(boxHtml(normalise(d), REPO_ROOT_URL, true, false), fullTarget); });
             return;
         }
 
