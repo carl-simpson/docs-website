@@ -488,8 +488,8 @@
         var wrap = document.createElement('div');
         wrap.setAttribute('data-cbox-sticky', '');
         // At the foot of the page this divider lines up with the contributor row's top border and
-        // the button with "Edit this page on GitHub": 51px = the row's 32px top padding + its 19px label.
-        wrap.className = 'mt-6 pt-[51px] border-t ' + LINE;
+        // the button with "Edit this page on GitHub": 79px = the row's 32px top padding + its 91px card - the 44px button.
+        wrap.className = 'mt-6 pt-[79px] border-t ' + LINE;
         // One action only: the docs-topic issue form from the shared contract (§6).
         wrap.innerHTML = '' +
             '<a data-cbox-sticky-link href="' + esc(ideaGithubUrl('content')) + '" target="_blank" rel="noopener noreferrer">' +
@@ -577,15 +577,18 @@
                 'class="block w-11 h-11 max-w-none m-0 object-cover bg-[#f1f1f1] border-2 border-white outline outline-1 outline-[#e5e7eb]' + (i ? ' -ml-2' : '') + '" />';
         }).join('');
         return '' +
-            '<div role="region" aria-label="Top Contributors" class="flex flex-col items-start">' +
-                '<div class="flex items-center gap-2 mb-2 font-mono text-[11px] font-medium leading-none tracking-[0.12em] uppercase text-orange-700">' +
-                    '<i class="inline-block w-2 h-2 bg-orange" aria-hidden="true"></i>Written by the community' +
-                '</div>' +
-                '<a href="' + CONTRIBUTORS_PAGE + '" class="group inline-flex items-center gap-2.5 text-sm font-medium text-charcoal no-underline ' + FOCUS + '">' +
-                    '<span class="inline-flex" aria-hidden="true">' + avatars + '</span>' +
-                    '<span class="group-hover:underline decoration-orange decoration-2 underline-offset-4">Meet the contributors</span>' +
-                    '<span class="sr-only">: ' + top.map(function (c) { return esc(c.login); }).join(', ') + '</span>' +
-                    '<svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>' +
+            // One bordered card, wholly a link, like the hub block (Carl, 2026-10-05)
+            '<div role="region" aria-label="Top Contributors" class="flex">' +
+                '<a href="' + CONTRIBUTORS_PAGE + '" class="group inline-flex flex-col gap-2 px-4 py-3 bg-white border-2 border-charcoal hover:border-orange-500 text-charcoal hover:text-charcoal no-underline transition-colors duration-150 motion-reduce:transition-none ' + FOCUS + '">' +
+                    '<span class="flex items-center gap-2 font-mono text-[11px] font-medium leading-none tracking-[0.12em] uppercase text-orange-700">' +
+                        '<i class="inline-block w-2 h-2 bg-orange" aria-hidden="true"></i>Written by the community' +
+                    '</span>' +
+                    '<span class="flex items-center gap-3 text-sm font-semibold">' +
+                        '<span class="inline-flex" aria-hidden="true">' + avatars + '</span>' +
+                        '<span>Meet the contributors</span>' +
+                        '<span class="sr-only">: ' + top.map(function (c) { return esc(c.login); }).join(', ') + '</span>' +
+                        '<svg class="w-4 h-4 ml-3 text-orange-700 transition-transform duration-150 group-hover:translate-x-[3px] motion-reduce:transition-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-6-6l6 6-6 6"/></svg>' +
+                    '</span>' +
                 '</a>' +
             '</div>';
     }
