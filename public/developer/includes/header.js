@@ -115,14 +115,14 @@
     var html = '' +
         // Ecosystem bar (desktop only) — scrolls away with the page.
         '<div style="letter-spacing:0.6px" class="hidden lg:flex bg-charcoal items-center justify-center h-10 w-full">' +
-            '<div class="max-w-7xl xl:max-w-[90rem] w-full flex items-center justify-between px-4 sm:px-6 lg:px-8">' +
+            '<div class="max-w-7xl xl:max-w-[96rem] w-full flex items-center justify-between px-4 sm:px-6 lg:px-8">' +
                 '<div class="hidden xl:block text-sm leading-[1.42] text-white font-bold">Explore the Magento<span class="text-[9px] align-super">&reg;</span> Open Source Ecosystem</div>' +
                 '<div class="flex items-center ml-auto">' + ecosystemItems() + '</div>' +
             '</div>' +
         '</div>' +
         // Main header — sticky, fixed h-16 to align with `sticky top-16` quick-jump nav.
         '<div style="letter-spacing:0.6px" class="sticky top-0 z-50 bg-white flex items-center h-16 w-full border-b border-gray-200 shadow-sm">' +
-            '<div class="flex items-center justify-between w-full max-w-7xl xl:max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">' +
+            '<div class="flex items-center justify-between w-full max-w-7xl xl:max-w-[96rem] mx-auto px-4 sm:px-6 lg:px-8">' +
                 '<a href="/" class="inline-flex items-center" aria-label="Magento Developer Docs home">' + MAGENTO_LOGO + '</a>' +
                 '<div class="flex items-center gap-2 lg:gap-8">' +
                     // DocSearch renders its own button into this hidden slot; the visible

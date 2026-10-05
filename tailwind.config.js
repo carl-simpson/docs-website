@@ -33,7 +33,7 @@ export default {
             },
             maxWidth: {
                 xxs: "16rem",
-                "8xl": "90rem", // 1440px - Standard large desktop viewport
+                "8xl": "96rem", // 1536px - one site width for every header and page (Carl, 2026-10-05)
                 "9xl": "96rem",
                 "75ch": "75ch",  // For readable documentation line length
             },
