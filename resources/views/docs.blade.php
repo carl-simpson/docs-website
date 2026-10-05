@@ -111,8 +111,8 @@
 
                     {{-- Sticky "Suggest an idea" (D9). At the foot of the page this divider lines up with the
                          contributor row's top border and the button with "Edit this page on GitHub":
-                         79px = the row's 32px top padding + its 91px contributor card - the 44px button. --}}
-                    <div class="mt-8 pt-[79px] border-t border-gray-200 flex-none">
+                         77px = the row's 32px top padding + its 89px contributor card - the 44px button. --}}
+                    <div class="mt-8 pt-[77px] border-t border-gray-200 flex-none">
                         <a
                             data-gh-sticky-link
                             href="{{ $stickyIdeaUrl }}"

@@ -488,8 +488,8 @@
         var wrap = document.createElement('div');
         wrap.setAttribute('data-cbox-sticky', '');
         // At the foot of the page this divider lines up with the contributor row's top border and
-        // the button with "Edit this page on GitHub": 79px = the row's 32px top padding + its 91px card - the 44px button.
-        wrap.className = 'mt-6 pt-[79px] border-t ' + LINE;
+        // the button with "Edit this page on GitHub": 77px = the row's 32px top padding + its 89px card - the 44px button.
+        wrap.className = 'mt-6 pt-[77px] border-t ' + LINE;
         // One action only: the docs-topic issue form from the shared contract (§6).
         wrap.innerHTML = '' +
             '<a data-cbox-sticky-link href="' + esc(ideaGithubUrl('content')) + '" target="_blank" rel="noopener noreferrer">' +
@@ -579,7 +579,7 @@
         return '' +
             // One bordered card, wholly a link, like the hub block (Carl, 2026-10-05)
             '<div role="region" aria-label="Top Contributors" class="flex">' +
-                '<a href="' + CONTRIBUTORS_PAGE + '" class="group inline-flex flex-col gap-2 px-4 py-3 bg-white border-2 border-charcoal hover:border-orange-500 text-charcoal hover:text-charcoal no-underline transition-colors duration-150 motion-reduce:transition-none ' + FOCUS + '">' +
+                '<a href="' + CONTRIBUTORS_PAGE + '" class="group inline-flex flex-col gap-2 px-4 py-3 bg-white border border-gray-200 hover:border-orange-500 text-charcoal hover:text-charcoal no-underline transition-colors duration-150 motion-reduce:transition-none ' + FOCUS + '">' +
                     '<span class="flex items-center gap-2 font-mono text-[11px] font-medium leading-none tracking-[0.12em] uppercase text-orange-700">' +
                         '<i class="inline-block w-2 h-2 bg-orange" aria-hidden="true"></i>Written by the community' +
                     '</span>' +
