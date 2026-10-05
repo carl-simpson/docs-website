@@ -153,9 +153,10 @@
     <!-- ============================================================ -->
     <section class="relative bg-white border-b border-gray-200 overflow-hidden">
         <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 relative">
-            <!-- Decorative hexagons — anchored to content container right edge -->
-            <div class="absolute right-0 bottom-0 w-[340px] h-[340px] sm:w-[480px] sm:h-[480px] lg:w-[640px] lg:h-[640px] pointer-events-none translate-x-1/4 translate-y-1/4 -z-10 opacity-[0.40] xl:z-auto xl:opacity-100" aria-hidden="true">
-                <svg viewBox="0 0 960 960" xmlns="http://www.w3.org/2000/svg">
+            <!-- Decorative hexagons: inside the content box, right edge level with the header's search icon,
+                 as tall as the hero (Carl, 2026-10-05). The viewBox is cropped to the outer hexagon. -->
+            <div data-hero-art class="absolute inset-y-0 right-4 sm:right-6 lg:right-8 flex items-center pointer-events-none -z-10 opacity-[0.40] xl:z-auto xl:opacity-100" aria-hidden="true">
+                <svg class="h-full w-auto" viewBox="67 10 826 940" xmlns="http://www.w3.org/2000/svg">
                     <polygon points="480,10 893,245 893,715 480,950 67,715 67,245" fill="#2C2C2C"/>
                     <polygon points="480,110 806,300 806,660 480,850 154,660 154,300" fill="#F26423"/>
                     <polygon points="480,210 719,355 719,605 480,750 241,605 241,355" fill="#F1BC1B"/>
@@ -640,7 +641,7 @@
     </section>
 
     <!-- Contributor widget target (landing has no article column, so page-width) -->
-    <div id="dev-contributors" class="max-w-7xl xl:max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8"></div>
+    <div id="dev-contributor-box" class="max-w-7xl xl:max-w-[96rem] mx-auto px-4 sm:px-6 lg:px-8 pb-16"></div>
 
     <!-- ============================================================ -->
     <!-- FOOTER                                                        -->

@@ -197,20 +197,24 @@
     <section class="relative bg-white overflow-hidden">
         <div class="relative min-h-[420px] sm:min-h-[500px] lg:min-h-[560px] flex flex-col items-center justify-center">
 
-            <div class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden" aria-hidden="true">
+            {{-- Artwork fills the header's content box: same container classes as the header, each viewBox cropped
+                 to the drawn hexagons so the outer ring meets the logo and search-icon edges at every width. --}}
+            <div data-hero-art class="absolute inset-0 mx-auto max-w-7xl xl:max-w-8xl px-4 sm:px-6 lg:px-8 pointer-events-none" aria-hidden="true">
+            <div class="relative h-full flex items-center justify-center overflow-hidden">
                 <!-- Desktop (sm+): original layered translucent hexagons — unchanged -->
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" class="hidden sm:block w-auto min-h-[140%] opacity-[0.40]" preserveAspectRatio="xMidYMid meet">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="105.6 0 588.8 800" class="hidden sm:block w-full h-auto flex-none opacity-[0.40]" preserveAspectRatio="xMidYMid meet">
                     <path fill-rule="evenodd" fill="#F1BC1B" d="M400,-30 L694.4,140 L694.4,480 L400,650 L105.6,480 L105.6,140 Z M400,120 L564.5,215 L564.5,405 L400,500 L235.5,405 L235.5,215 Z"/>
                     <path fill-rule="evenodd" fill="#F26423" d="M400,99 L656.3,247 L656.3,543 L400,691 L143.7,543 L143.7,247 Z M400,249 L526.4,322 L526.4,468 L400,541 L273.6,468 L273.6,322 Z"/>
                     <path fill-rule="evenodd" fill="#2C2C2C" d="M400,228 L618.2,354 L618.2,606 L400,732 L181.8,606 L181.8,354 Z M400,338 L522.9,409 L522.9,551 L400,622 L277.1,551 L277.1,409 Z"/>
                 </svg>
                 <!-- Mobile (<sm): solid nested hexagons — cleaner, more solid even rings -->
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" class="block sm:hidden w-auto min-h-[140%] opacity-[0.40]" preserveAspectRatio="xMidYMid meet">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="60 0 680 800" class="block sm:hidden w-full h-auto flex-none opacity-[0.40]" preserveAspectRatio="xMidYMid meet">
                     <polygon points="400,8 740,204 740,596 400,792 60,596 60,204" fill="#F1BC1B"/>
                     <polygon points="400,110 651,255 651,545 400,690 149,545 149,255" fill="#F26423"/>
                     <polygon points="400,212 563,306 563,494 400,588 237,494 237,306" fill="#2C2C2C"/>
                     <polygon points="400,314 475,357 475,443 400,486 325,443 325,357" fill="#FFFFFF"/>
                 </svg>
+            </div>
             </div>
 
             <div class="absolute bottom-0 left-0 right-0 h-1.5" style="background: linear-gradient(to right, #F1BC1B, #F26423, #2C2C2C);"></div>
@@ -459,7 +463,7 @@
                 </div>
                 <h2 class="text-3xl sm:text-4xl font-extrabold text-charcoal mb-4">Built by the Community</h2>
                 <p class="text-lg text-charcoal-300 leading-relaxed mb-8">
-                    This documentation is a Magento Association initiative. Every page is generated from real Magento source code, reviewed by domain experts, and continuously improved. Want to contribute? We need reviewers and module specialists.
+                    This documentation is maintained by the Magento Association. Every page is generated from real Magento source code, reviewed by domain experts, and continuously improved. Want to contribute? We need reviewers and module specialists.
                 </p>
                 <div class="flex flex-wrap justify-center gap-4">
                     <a href="https://www.magentoassociation.org/home" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-6 py-3 bg-charcoal text-white font-semibold hover:bg-charcoal-600 transition-colors no-underline text-sm">
@@ -471,6 +475,10 @@
                         Contribute on GitHub
                     </a>
                 </div>
+            </div>
+            {{-- The contributor block lives inside the community callout (Carl, 2026-10-05) --}}
+            <div class="max-w-5xl mx-auto">
+                <x-contributor-box layout="landing" :page-title="'Magento Documentation'" />
             </div>
         </div>
     </section>
