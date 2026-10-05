@@ -125,16 +125,16 @@
                         </a>
                     </div>
 
-                    {{-- Back to Top: underneath the idea button (Carl, 2026-10-05) --}}
+                    {{-- Back to Top: underneath the idea button, right-aligned, arrow after the words (Carl, 2026-10-05) --}}
                     <div class="mt-3 flex-none">
                         <a
                             href="#"
-                            class="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-orange-600 transition-colors no-underline focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2"
+                            class="flex items-center justify-end gap-2 text-sm font-medium text-gray-600 hover:text-orange-600 transition-colors no-underline focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2"
                         >
+                            Back to top
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
                             </svg>
-                            Back to top
                         </a>
                     </div>
                 </div>
