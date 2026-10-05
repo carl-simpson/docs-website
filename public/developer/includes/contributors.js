@@ -24,8 +24,8 @@
  * Included on every dev-docs page as:  <script src="includes/contributors.js"></script>
  */
 (function () {
-    // TEST fork — switch to magentoopensource/docs before upstream PR
-    var IDEA_REPO = 'carl-simpson/docs';
+    // Issue forms (idea-content.yml, idea-website.yml) live in the docs content repo.
+    var IDEA_REPO = 'magentoopensource/docs';
 
     /*
      * Shared contract (MA-DOCS-IDEAS-WIDGET.md §6): template names, field id `page_url`,

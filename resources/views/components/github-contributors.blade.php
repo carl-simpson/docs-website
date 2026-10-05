@@ -19,8 +19,8 @@
 @props(['editUrl' => '', 'pageTitle' => null, 'expanded' => false, 'contributors' => null])
 
 @php
-    // TEST fork — switch to magentoopensource/docs before the upstream PR (MA-DOCS-IDEAS-WIDGET.md §5).
-    $ideaRepo = 'carl-simpson/docs';
+    // Issue forms (idea-content.yml, idea-website.yml) live in the docs content repo.
+    $ideaRepo = 'magentoopensource/docs';
 
     // Anonymous Blade components don't inherit the including view's data, so a caller that
     // already injected GitHubContributorsService (e.g. ContributorsController) passes the
@@ -320,6 +320,9 @@
     .qbcb-rows { columns: 1; column-gap: 28px; }
     @media (min-width: 640px) { .qbcb-rows { columns: 2; } }
     .qbcb-row { grid-template-columns: 26px 30px minmax(0, 1fr) auto; column-gap: 10px; break-inside: avoid; }
+    /* The docs typography numbers every `ol > li` with a ::before counter (resources/css/_typography.css).
+       Inside this grid that pseudo-element becomes an extra cell and shifts every column, so switch it off here. */
+    .qbcb-rows > .qbcb-row::before { content: none; display: none; }
     .qbcb-row-avatar { display: block; width: 30px; height: 30px; border: 1px solid #fff; outline: 1px solid #e5e7eb; background: #f1f1f1; overflow: hidden; }
     .qbcb-row-avatar.is-next { border: 2px solid #F26423; background: #FFF7F0; }
     .qbcb-row-avatar.is-open { border: 1px dashed #d1d5db; background: transparent; }
@@ -327,7 +330,11 @@
 
     .qbcb-choices { display: grid; grid-template-columns: 1fr; }
     @media (min-width: 421px) { .qbcb-choices { grid-template-columns: 1fr 1fr; } }
-    .qbcb-choice { position: relative; display: block; }
+    /* The docs styles give every `label` opacity .4, uppercase, 10px and wide tracking
+       (resources/css/_components.css) and force `strong` to charcoal (_typography.css); undo
+       both inside the idea choice so it matches the developer docs. */
+    .qbcb-choice { position: relative; display: block; opacity: 1; text-transform: none; letter-spacing: normal; font-size: inherit; line-height: inherit; margin: 0; }
+    .qbcb-choice-label strong { color: inherit; }
     .qbcb-choice + .qbcb-choice { border-top: 1px solid #2c2c2c; }
     @media (min-width: 421px) { .qbcb-choice + .qbcb-choice { border-top: 0; border-left: 1px solid #2c2c2c; } }
     .qbcb-choice-input { position: absolute; inset: 0; z-index: 1; margin: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }

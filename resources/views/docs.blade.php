@@ -81,8 +81,7 @@
             @php
                 // Sticky "Suggest an idea" button (D9): single action, the idea-content.yml
                 // contract URL (MA-DOCS-IDEAS-WIDGET.md §6), server-rendered.
-                // TEST fork — switch to magentoopensource/docs before the upstream PR.
-                $stickyIdeaRepo = 'carl-simpson/docs';
+                $stickyIdeaRepo = 'magentoopensource/docs';
                 $stickyIdeaUrl = 'https://github.com/' . $stickyIdeaRepo . '/issues/new?' . http_build_query([
                     'template' => 'idea-content.yml',
                     'title' => '[Docs topic] ',
