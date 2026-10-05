@@ -1091,12 +1091,13 @@ def _gh_get(url):
         return json.load(resp)
 
 
-def write_contributors_json(out_dir, limit=3):
+def write_contributors_json(out_dir, limit=10):
     """Bake the documentation-platform contributors into contributors.json (consumed
-    client-side by includes/contributors.js). Combines the developer/ CONTENT
-    (magentoopensource/docs) with the docs-website repo (the site + generator that build
-    and present the docs), aggregated per author. Best-effort: on any failure writes an
-    empty list so the widget simply hides."""
+    client-side by includes/contributors.js). Same sources and counting as the merchant
+    docs (config/services.php github.contributor_sources, GitHubContributorsService): the
+    GitHub contributors of magentoopensource/docs and magentoopensource/docs-website,
+    summed per login, so one person shows one number on both doc systems. Best-effort: on
+    any failure writes an empty list so the widget simply hides."""
     agg = {}
 
     def add(login, avatar, html, n):
@@ -1113,16 +1114,12 @@ def write_contributors_json(out_dir, limit=3):
 
     data = []
     try:
-        # (1) developer/ CONTENT authorship in magentoopensource/docs
-        for c in _gh_get('https://api.github.com/repos/magentoopensource/docs/commits?path=developer&per_page=100'):
-            a = c.get('author') or {}
-            add(a.get('login'), a.get('avatar_url'), a.get('html_url'), 1)
-        # (2) docs-website repo (the generator + site that build/present the docs)
-        for c in _gh_get('https://api.github.com/repos/magentoopensource/docs-website/contributors?per_page=100'):
-            if c.get('type') == 'User':
-                add(c.get('login'), c.get('avatar_url'), c.get('html_url'), c.get('contributions', 0))
+        for repo in ('magentoopensource/docs', 'magentoopensource/docs-website'):
+            for c in _gh_get('https://api.github.com/repos/' + repo + '/contributors?per_page=100'):
+                if c.get('type') == 'User':
+                    add(c.get('login'), c.get('avatar_url'), c.get('html_url'), c.get('contributions', 0))
         data = sorted(agg.values(), key=lambda x: x['contributions'], reverse=True)[:limit]
-        print(f"  Contributors: {len(data)} (dev-docs content + docs-website, combined)")
+        print(f"  Contributors: {len(data)} (docs + docs-website, combined, same as the merchant docs)")
     except Exception as e:
         print(f"  Contributors: fetch failed ({e}) — writing empty list (widget hides)")
     with open(os.path.join(out_dir, 'contributors.json'), 'w') as f:

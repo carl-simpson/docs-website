@@ -463,7 +463,7 @@
                 </div>
                 <h2 class="text-3xl sm:text-4xl font-extrabold text-charcoal mb-4">Built by the Community</h2>
                 <p class="text-lg text-charcoal-300 leading-relaxed mb-8">
-                    This documentation is a Magento Association initiative. Every page is generated from real Magento source code, reviewed by domain experts, and continuously improved. Want to contribute? We need reviewers and module specialists.
+                    This documentation is maintained by the Magento Association. Every page is generated from real Magento source code, reviewed by domain experts, and continuously improved. Want to contribute? We need reviewers and module specialists.
                 </p>
                 <div class="flex flex-wrap justify-center gap-4">
                     <a href="https://www.magentoassociation.org/home" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-6 py-3 bg-charcoal text-white font-semibold hover:bg-charcoal-600 transition-colors no-underline text-sm">
@@ -475,6 +475,10 @@
                         Contribute on GitHub
                     </a>
                 </div>
+            </div>
+            {{-- The contributor block lives inside the community callout (Carl, 2026-10-05) --}}
+            <div class="max-w-5xl mx-auto">
+                <x-contributor-box layout="landing" :page-title="'Magento Documentation'" />
             </div>
         </div>
     </section>

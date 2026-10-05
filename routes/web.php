@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ContributorsController;
 use App\Http\Controllers\DocsController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\WebhookController;
@@ -22,6 +23,8 @@ Route::middleware('throttle:120,1')->group(function () {
         ->name("merchant.category");
 
     Route::get("team", [TeamController::class, "index"])->name("team");
+
+    Route::get("contributors", [ContributorsController::class, "index"])->name("contributors");
 });
 
 // GitHub webhook for docs sync (excluded from throttling)
