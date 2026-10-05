@@ -42,7 +42,7 @@
     /* Scoped (.qbcr): the docs typography styles every `a` and `img`, so this row sets its own. */
     .qbcr { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px 24px; }
     .qbcr-people { display: flex; }
-    .qbcr a.qbcr-card { display: inline-flex; flex-direction: column; gap: 8px; padding: 12px 16px; background: #fff; border: 2px solid #2c2c2c; color: #2c2c2c; text-decoration: none; transition: border-color .15s ease; }
+    .qbcr a.qbcr-card { display: inline-flex; flex-direction: column; gap: 8px; padding: 12px 16px; background: #fff; border: 1px solid #e5e7eb; /* the row's own top line */ color: #2c2c2c; text-decoration: none; transition: border-color .15s ease; }
     .qbcr a.qbcr-card:hover { border-color: #F26423; color: #2c2c2c; }
     .qbcr a.qbcr-card:focus-visible { outline: 3px solid #F26423; outline-offset: 2px; }
     .qbcr-kicker { display: flex; align-items: center; gap: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; font-weight: 500; letter-spacing: .12em; line-height: 1; text-transform: uppercase; color: #bc3312; }
