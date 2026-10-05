@@ -437,7 +437,9 @@
         'a[data-cbox-sticky-link]:focus-visible{outline:3px solid #2c2c2c;outline-offset:2px;}' +
         // "Back to top" sits underneath the idea button, so it drops its own divider (Carl, 2026-10-05).
         '.toc-sidebar [data-cbox-sticky] + .toc-back-to-top{margin-top:.75rem;padding-top:0;border-top:0;}' +
-        '.toc-sidebar [data-cbox-sticky] + .toc-back-to-top a{padding-top:0;padding-bottom:0;line-height:1.25rem;}' +
+        // Right-aligned with the arrow after the words (Carl, 2026-10-05): the generated markup has the
+        // arrow first, so reverse the row rather than regenerating every page.
+        '.toc-sidebar [data-cbox-sticky] + .toc-back-to-top a{padding-top:0;padding-bottom:0;line-height:1.25rem;flex-direction:row-reverse;justify-content:flex-start;}' +
         // Floating twin for narrower screens and pages without the panel (bottom-right corner).
         'a[data-cbox-float]{position:fixed;right:16px;bottom:16px;z-index:30;' +
             'box-shadow:0 4px 14px rgba(0,0,0,.18);}';
